@@ -27,6 +27,13 @@ enum Commands {
         #[arg(long)]
         path: Option<String>,
     },
+
+    /// Validate chain invariants (genesis + linkage)
+    Validate {
+        /// Input path for chain JSON
+        #[arg(long)]
+        path: Option<String>,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -49,6 +56,14 @@ fn main() -> anyhow::Result<()> {
             let chain = Chain::load(&p)?;
             println!("chain: {}", p.display());
             println!("height={} tip={}", chain.height(), chain.tip_hash());
+        }
+        Commands::Validate { path } => {
+            let p = path
+                .map(std::path::PathBuf::from)
+                .unwrap_or_else(Chain::default_path);
+            let chain = Chain::load(&p)?;
+            chain.validate()?;
+            println!("OK: chain is valid (height={})", chain.height());
         }
     }
 
