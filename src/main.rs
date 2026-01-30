@@ -34,6 +34,17 @@ enum Commands {
         #[arg(long)]
         path: Option<String>,
     },
+
+    /// Mine and append an empty block (demo PoW)
+    Mine {
+        /// Path for chain JSON (will be created if missing)
+        #[arg(long)]
+        path: Option<String>,
+
+        /// PoW difficulty (leading '0' hex chars)
+        #[arg(long, default_value_t = 3)]
+        difficulty: usize,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -64,6 +75,23 @@ fn main() -> anyhow::Result<()> {
             let chain = Chain::load(&p)?;
             chain.validate()?;
             println!("OK: chain is valid (height={})", chain.height());
+        }
+        Commands::Mine { path, difficulty } => {
+            let p = path
+                .map(std::path::PathBuf::from)
+                .unwrap_or_else(Chain::default_path);
+
+            let mut chain = if p.exists() {
+                Chain::load(&p)?
+            } else {
+                Chain::new_genesis()
+            };
+
+            let mined = chain.mine_empty_block(difficulty)?;
+            chain.save(&p)?;
+
+            println!("Mined block at height={}", chain.height());
+            println!("nonce={} tip={}", mined.header.nonce, chain.tip_hash());
         }
     }
 

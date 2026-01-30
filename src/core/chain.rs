@@ -55,6 +55,34 @@ impl Chain {
         Ok(())
     }
 
+    /// Mine and append an empty block (demo PoW).
+    pub fn mine_empty_block(&mut self, difficulty: usize) -> anyhow::Result<Block> {
+        let prev = self.blocks.last().expect("genesis exists");
+        let prev_hash = hash_block(prev);
+
+        let txs: Vec<Transaction> = vec![];
+        let mut nonce = 0_u64;
+
+        loop {
+            let header = BlockHeader {
+                prev_hash: prev_hash.clone(),
+                timestamp_ms: now_ms(),
+                nonce,
+                merkle_root: merkle_root(&txs),
+            };
+            let candidate = Block {
+                header,
+                txs: txs.clone(),
+            };
+            let h = hash_block(&candidate);
+            if pow_ok(&h, difficulty) {
+                self.blocks.push(candidate.clone());
+                return Ok(candidate);
+            }
+            nonce = nonce.wrapping_add(1);
+        }
+    }
+
     /// Basic chain validation (linkage + merkle placeholder).
     pub fn validate(&self) -> anyhow::Result<()> {
         anyhow::ensure!(!self.blocks.is_empty(), "chain has no blocks");
@@ -97,4 +125,9 @@ pub fn merkle_root(txs: &[Transaction]) -> String {
     // Day 2 placeholder: simple hash of concatenated tx JSON.
     let bytes = serde_json::to_vec(txs).expect("serialize txs");
     sha256_hex(&bytes)
+}
+
+/// Very small PoW: block hash must start with N '0' hex chars.
+pub fn pow_ok(block_hash: &str, difficulty: usize) -> bool {
+    block_hash.chars().take(difficulty).all(|c| c == '0')
 }
