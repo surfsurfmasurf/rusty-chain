@@ -33,6 +33,12 @@ cargo run -- init
 
 # show status
 cargo run -- status
+
+# validate chain invariants
+cargo run -- validate
+
+# mine 1 empty block (demo PoW)
+cargo run -- mine --difficulty 3
 ```
 
 
@@ -44,7 +50,15 @@ cargo run -- init
 # read status
 cargo run -- status
 
+# validate
+cargo run -- validate
+
+# mine + check status
+cargo run -- mine --difficulty 2
+cargo run -- status
+
 # or explicit path
 cargo run -- init --path /tmp/chain.json
+cargo run -- mine --difficulty 2 --path /tmp/chain.json
 cargo run -- status --path /tmp/chain.json
 ```
