@@ -1,4 +1,5 @@
 use crate::core::hash::sha256_hex;
+use crate::core::time::now_ms;
 use crate::core::types::{Block, BlockHeader, Transaction};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -13,7 +14,7 @@ impl Chain {
     pub fn new_genesis() -> Self {
         let header = BlockHeader {
             prev_hash: "0".repeat(64),
-            timestamp_ms: 0,
+            timestamp_ms: now_ms(),
             nonce: 0,
             merkle_root: merkle_root(&[]),
         };
