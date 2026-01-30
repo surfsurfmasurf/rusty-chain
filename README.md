@@ -34,3 +34,17 @@ cargo run -- init
 # show status
 cargo run -- status
 ```
+
+
+### Demo
+```bash
+# write genesis (default: data/chain.json)
+cargo run -- init
+
+# read status
+cargo run -- status
+
+# or explicit path
+cargo run -- init --path /tmp/chain.json
+cargo run -- status --path /tmp/chain.json
+```
