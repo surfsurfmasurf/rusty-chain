@@ -9,6 +9,14 @@ Next:
 - Define core data structures: `BlockHeader`, `Block`, `Chain`
 - Add hashing + serialization
 
-## Day 2 (in progress)
-- Core structs + chain storage
-- CLI init/status writes/reads chain.json
+## Day 2
+- Added core types: BlockHeader/Block/Transaction
+- Added hashing helper (sha256 hex)
+- Added Chain storage: genesis + JSON load/save
+- CLI: init/status now write/read chain.json
+- Tests: genesis + save/load roundtrip
+
+Next:
+- Add timestamp + real genesis timestamp
+- Add basic validation rules (prev_hash linkage)
+- Start PoW skeleton
