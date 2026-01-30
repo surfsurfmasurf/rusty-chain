@@ -54,6 +54,37 @@ impl Chain {
         fs::write(path, s)?;
         Ok(())
     }
+
+    /// Basic chain validation (linkage + merkle placeholder).
+    pub fn validate(&self) -> anyhow::Result<()> {
+        anyhow::ensure!(!self.blocks.is_empty(), "chain has no blocks");
+
+        let genesis = &self.blocks[0];
+        anyhow::ensure!(
+            genesis.header.prev_hash == "0".repeat(64),
+            "genesis prev_hash must be 64 zeros"
+        );
+        anyhow::ensure!(
+            genesis.header.merkle_root == merkle_root(&genesis.txs),
+            "genesis merkle_root mismatch"
+        );
+
+        for i in 1..self.blocks.len() {
+            let prev = &self.blocks[i - 1];
+            let cur = &self.blocks[i];
+
+            anyhow::ensure!(
+                cur.header.prev_hash == hash_block(prev),
+                "block {i} prev_hash does not match previous block hash"
+            );
+            anyhow::ensure!(
+                cur.header.merkle_root == merkle_root(&cur.txs),
+                "block {i} merkle_root mismatch"
+            );
+        }
+
+        Ok(())
+    }
 }
 
 pub fn hash_block(block: &Block) -> String {
