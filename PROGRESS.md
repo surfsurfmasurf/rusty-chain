@@ -16,7 +16,13 @@ Next:
 - CLI: init/status now write/read chain.json
 - Tests: genesis + save/load roundtrip
 
+## Day 3
+- Genesis now uses real timestamp (ms)
+- Added `validate` command (genesis invariants + prev_hash linkage)
+- Added minimal PoW + `mine` command (leading '0' hex chars)
+- Tests: validation + mining PoW checks
+
 Next:
-- Add timestamp + real genesis timestamp
-- Add basic validation rules (prev_hash linkage)
-- Start PoW skeleton
+- Add block/chain validation for PoW difficulty parameter (store per-chain config?)
+- Add basic tx inclusion + mempool skeleton
+- Better merkle placeholder (tx hash list instead of json blob)
