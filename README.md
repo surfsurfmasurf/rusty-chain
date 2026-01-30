@@ -23,3 +23,14 @@ cargo run -- --help
 - Week 2: 트랜잭션 + 서명 + 지갑(계정 모델)
 - Week 3: P2P 전파/동기화 + 포크 처리
 - Week 4: 안정화 + docker 데모 + 문서/릴리즈
+
+
+## CLI
+
+```bash
+# create genesis
+cargo run -- init
+
+# show status
+cargo run -- status
+```
