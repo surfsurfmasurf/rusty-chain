@@ -8,3 +8,7 @@
 Next:
 - Define core data structures: `BlockHeader`, `Block`, `Chain`
 - Add hashing + serialization
+
+## Day 2 (in progress)
+- Core structs + chain storage
+- CLI init/status writes/reads chain.json
