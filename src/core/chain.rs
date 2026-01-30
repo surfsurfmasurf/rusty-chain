@@ -61,14 +61,16 @@ impl Chain {
         let prev_hash = hash_block(prev);
 
         let txs: Vec<Transaction> = vec![];
+        let merkle_root = merkle_root(&txs);
+        let timestamp_ms = now_ms();
         let mut nonce = 0_u64;
 
         loop {
             let header = BlockHeader {
                 prev_hash: prev_hash.clone(),
-                timestamp_ms: now_ms(),
+                timestamp_ms,
                 nonce,
-                merkle_root: merkle_root(&txs),
+                merkle_root: merkle_root.clone(),
             };
             let candidate = Block {
                 header,
