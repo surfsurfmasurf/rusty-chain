@@ -1,5 +1,7 @@
 use clap::{Parser, Subcommand};
 
+mod core;
+
 #[derive(Parser, Debug)]
 #[command(name = "rusty-chain")]
 #[command(about = "A mini blockchain built in Rust (30-day build).", long_about = None)]
