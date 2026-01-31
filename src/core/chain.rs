@@ -125,6 +125,14 @@ impl Chain {
                 cur.header.merkle_root == merkle_root(&cur.txs),
                 "block {i} merkle_root mismatch"
             );
+
+            let h = hash_block(cur);
+            anyhow::ensure!(
+                pow_ok(&h, self.pow_difficulty),
+                "block {i} fails PoW (difficulty={} hash={})",
+                self.pow_difficulty,
+                h
+            );
         }
 
         Ok(())
