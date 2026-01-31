@@ -22,7 +22,12 @@ Next:
 - Added minimal PoW + `mine` command (leading '0' hex chars)
 - Tests: validation + mining PoW checks
 
+## Day 4
+- Store PoW difficulty in `chain.json` (`Chain.pow_difficulty`) with serde defaults for backward compatibility
+- `mine` persists the chosen difficulty, `status` prints it
+- `validate` now enforces PoW for all non-genesis blocks
+- Tests: PoW failure detection + JSON defaulting when the field is missing
+
 Next:
-- Add block/chain validation for PoW difficulty parameter (store per-chain config?)
 - Add basic tx inclusion + mempool skeleton
 - Better merkle placeholder (tx hash list instead of json blob)

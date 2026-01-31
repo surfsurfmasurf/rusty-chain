@@ -34,10 +34,11 @@ cargo run -- init
 # show status
 cargo run -- status
 
-# validate chain invariants
+# validate chain invariants (includes PoW check using difficulty stored in chain.json)
 cargo run -- validate
 
 # mine 1 empty block (demo PoW)
+# note: the chosen --difficulty is persisted into chain.json
 cargo run -- mine --difficulty 3
 ```
 
