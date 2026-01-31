@@ -105,7 +105,12 @@ fn main() -> anyhow::Result<()> {
             chain.save(&p)?;
 
             println!("Mined block at height={}", chain.height());
-            println!("nonce={} tip={}", mined.header.nonce, chain.tip_hash());
+            println!(
+                "nonce={} tip={} difficulty={}",
+                mined.header.nonce,
+                chain.tip_hash(),
+                chain.pow_difficulty
+            );
         }
     }
 
