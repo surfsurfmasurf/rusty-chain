@@ -68,6 +68,9 @@ impl Chain {
 
     /// Mine and append an empty block (demo PoW).
     pub fn mine_empty_block(&mut self, difficulty: usize) -> anyhow::Result<Block> {
+        // Persist difficulty so later `validate` has the right context.
+        self.pow_difficulty = difficulty;
+
         let prev = self.blocks.last().expect("genesis exists");
         let prev_hash = hash_block(prev);
 

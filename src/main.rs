@@ -84,7 +84,12 @@ fn main() -> anyhow::Result<()> {
             let p = chain_path(path);
             let chain = load_chain(&p)?;
             println!("chain: {}", p.display());
-            println!("height={} tip={}", chain.height(), chain.tip_hash());
+            println!(
+                "height={} tip={} difficulty={}",
+                chain.height(),
+                chain.tip_hash(),
+                chain.pow_difficulty
+            );
         }
         Commands::Validate { path } => {
             let p = chain_path(path);
