@@ -117,13 +117,18 @@ impl Chain {
             let prev = &self.blocks[i - 1];
             let cur = &self.blocks[i];
 
+            let prev_hash = hash_block(prev);
             anyhow::ensure!(
-                cur.header.prev_hash == hash_block(prev),
-                "block {i} prev_hash does not match previous block hash"
+                cur.header.prev_hash == prev_hash,
+                "block {i} prev_hash mismatch (expected={prev_hash} got={})",
+                cur.header.prev_hash
             );
+
+            let expected_merkle = merkle_root(&cur.txs);
             anyhow::ensure!(
-                cur.header.merkle_root == merkle_root(&cur.txs),
-                "block {i} merkle_root mismatch"
+                cur.header.merkle_root == expected_merkle,
+                "block {i} merkle_root mismatch (expected={expected_merkle} got={})",
+                cur.header.merkle_root
             );
 
             let h = hash_block(cur);
