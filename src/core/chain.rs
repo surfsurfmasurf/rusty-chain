@@ -7,7 +7,17 @@ use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Chain {
+    /// Chain-wide PoW difficulty (leading '0' hex chars).
+    ///
+    /// Stored in the chain file so `validate` can check PoW without CLI flags.
+    #[serde(default = "default_pow_difficulty")]
+    pub pow_difficulty: usize,
+
     pub blocks: Vec<Block>,
+}
+
+fn default_pow_difficulty() -> usize {
+    3
 }
 
 impl Chain {
@@ -23,6 +33,7 @@ impl Chain {
             txs: vec![],
         };
         Self {
+            pow_difficulty: default_pow_difficulty(),
             blocks: vec![genesis],
         }
     }
