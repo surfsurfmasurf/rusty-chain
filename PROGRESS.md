@@ -28,6 +28,13 @@ Next:
 - `validate` now enforces PoW for all non-genesis blocks
 - Tests: PoW failure detection + JSON defaulting when the field is missing
 
+Day 5
+- Added mempool (file-backed) with tx add/list CLI
+- Mining now includes mempool txs when present
+- Merkle root now hashes tx hashes (order-sensitive)
+- Added tests for merkle root + tx hash stability
+
 Next:
-- Add basic tx inclusion + mempool skeleton
-- Better merkle placeholder (tx hash list instead of json blob)
+- Add basic tx validation (nonce/amount sanity)
+- Persist mempool alongside chain in demo workflow
+- Improve tx display in status
