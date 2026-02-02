@@ -122,10 +122,11 @@ fn main() -> anyhow::Result<()> {
             let chain = load_chain(&p)?;
             println!("chain: {}", p.display());
             println!(
-                "height={} tip={} difficulty={}",
+                "height={} tip={} difficulty={} txs={}",
                 chain.height(),
                 chain.tip_hash(),
-                chain.pow_difficulty
+                chain.pow_difficulty,
+                chain.tx_count()
             );
         }
         Commands::Validate { path } => {

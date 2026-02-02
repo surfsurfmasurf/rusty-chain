@@ -47,6 +47,10 @@ impl Chain {
         hash_block(tip)
     }
 
+    pub fn tx_count(&self) -> usize {
+        self.blocks.iter().map(|b| b.txs.len()).sum()
+    }
+
     pub fn default_path() -> PathBuf {
         PathBuf::from("data/chain.json")
     }
