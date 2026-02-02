@@ -28,8 +28,10 @@ impl Mempool {
         Ok(())
     }
 
-    pub fn add_tx(&mut self, tx: Transaction) {
+    pub fn add_tx(&mut self, tx: Transaction) -> anyhow::Result<()> {
+        tx.validate_basic()?;
         self.txs.push(tx);
+        Ok(())
     }
 
     pub fn drain(&mut self) -> Vec<Transaction> {
