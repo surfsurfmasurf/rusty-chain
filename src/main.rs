@@ -3,6 +3,8 @@ use clap::{Parser, Subcommand};
 mod core;
 
 use core::chain::Chain;
+use core::mempool::Mempool;
+use core::types::Transaction;
 
 #[derive(Parser, Debug)]
 #[command(name = "rusty-chain")]
@@ -35,15 +37,45 @@ enum Commands {
         path: Option<String>,
     },
 
-    /// Mine and append an empty block (demo PoW)
+    /// Mine and append a block (uses mempool txs if available)
     Mine {
         /// Path for chain JSON (will be created if missing)
         #[arg(long)]
         path: Option<String>,
 
+        /// Optional path for mempool JSON
+        #[arg(long)]
+        mempool: Option<String>,
+
         /// PoW difficulty (leading '0' hex chars)
         #[arg(long, default_value_t = 3)]
         difficulty: usize,
+    },
+
+    /// Add a transaction to the mempool
+    TxAdd {
+        #[arg(long)]
+        from: String,
+
+        #[arg(long)]
+        to: String,
+
+        #[arg(long)]
+        amount: u64,
+
+        #[arg(long, default_value_t = 0)]
+        nonce: u64,
+
+        /// Optional path for mempool JSON
+        #[arg(long)]
+        mempool: Option<String>,
+    },
+
+    /// List mempool transactions
+    TxList {
+        /// Optional path for mempool JSON
+        #[arg(long)]
+        mempool: Option<String>,
     },
 }
 
@@ -59,6 +91,11 @@ fn load_chain(path: &std::path::Path) -> anyhow::Result<Chain> {
         path.display()
     );
     Chain::load(path)
+}
+
+fn mempool_path(path: Option<String>) -> std::path::PathBuf {
+    path.map(std::path::PathBuf::from)
+        .unwrap_or_else(Mempool::default_path)
 }
 
 fn load_or_genesis(path: &std::path::Path) -> anyhow::Result<Chain> {
@@ -97,20 +134,72 @@ fn main() -> anyhow::Result<()> {
             chain.validate()?;
             println!("OK: chain is valid (height={})", chain.height());
         }
-        Commands::Mine { path, difficulty } => {
+        Commands::Mine {
+            path,
+            mempool,
+            difficulty,
+        } => {
             let p = chain_path(path);
             let mut chain = load_or_genesis(&p)?;
 
-            let mined = chain.mine_empty_block(difficulty)?;
+            let mp_path = mempool_path(mempool);
+            let mut mp = if mp_path.exists() {
+                Mempool::load(&mp_path)?
+            } else {
+                Mempool::default()
+            };
+
+            let txs = mp.drain();
+            let mined = chain.mine_block(txs, difficulty)?;
             chain.save(&p)?;
+            mp.save(&mp_path)?;
 
             println!("Mined block at height={}", chain.height());
             println!(
-                "nonce={} tip={} difficulty={}",
+                "nonce={} tip={} difficulty={} txs={}",
                 mined.header.nonce,
                 chain.tip_hash(),
-                chain.pow_difficulty
+                chain.pow_difficulty,
+                mined.txs.len()
             );
+        }
+        Commands::TxAdd {
+            from,
+            to,
+            amount,
+            nonce,
+            mempool,
+        } => {
+            let mp_path = mempool_path(mempool);
+            let mut mp = if mp_path.exists() {
+                Mempool::load(&mp_path)?
+            } else {
+                Mempool::default()
+            };
+
+            let tx = Transaction {
+                from,
+                to,
+                amount,
+                nonce,
+            };
+            mp.add_tx(tx);
+            mp.save(&mp_path)?;
+            println!("Added tx to mempool: {}", mp_path.display());
+            println!("mempool size={}", mp.txs.len());
+        }
+        Commands::TxList { mempool } => {
+            let mp_path = mempool_path(mempool);
+            if !mp_path.exists() {
+                println!("mempool: {} (empty)", mp_path.display());
+                return Ok(());
+            }
+            let mp = Mempool::load(&mp_path)?;
+            println!("mempool: {}", mp_path.display());
+            println!("count={}", mp.txs.len());
+            for (i, tx) in mp.txs.iter().enumerate() {
+                println!("{i}: {} -> {} amount={} nonce={}", tx.from, tx.to, tx.amount, tx.nonce);
+            }
         }
     }
 
