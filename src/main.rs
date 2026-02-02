@@ -189,8 +189,7 @@ fn main() -> anyhow::Result<()> {
                 amount,
                 nonce,
             };
-            tx.validate_basic()?;
-            mp.add_tx(tx);
+            mp.add_tx(tx)?;
             mp.save(&mp_path)?;
             println!("Added tx to mempool: {}", mp_path.display());
             println!("mempool size={}", mp.txs.len());
