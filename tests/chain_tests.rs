@@ -1,4 +1,5 @@
-use rusty_chain::core::chain::{Chain, hash_block, pow_ok};
+use rusty_chain::core::chain::{Chain, hash_block, pow_ok, merkle_root, tx_hash};
+use rusty_chain::core::types::Transaction;
 
 #[test]
 fn genesis_has_height_zero() {
@@ -74,4 +75,40 @@ fn load_defaults_pow_difficulty_when_missing_in_json() {
 
     let loaded: Chain = serde_json::from_value(v).unwrap();
     assert_eq!(loaded.pow_difficulty, 3);
+}
+
+#[test]
+fn merkle_root_changes_with_tx_order() {
+    let tx1 = Transaction {
+        from: "a".into(),
+        to: "b".into(),
+        amount: 1,
+        nonce: 0,
+    };
+    let tx2 = Transaction {
+        from: "c".into(),
+        to: "d".into(),
+        amount: 2,
+        nonce: 1,
+    };
+
+    let r1 = merkle_root(&[tx1.clone(), tx2.clone()]);
+    let r2 = merkle_root(&[tx2, tx1]);
+
+    assert_ne!(r1, r2, "merkle root should depend on tx order");
+    assert!(!r1.is_empty());
+}
+
+#[test]
+fn tx_hash_is_stable() {
+    let tx = Transaction {
+        from: "alice".into(),
+        to: "bob".into(),
+        amount: 42,
+        nonce: 7,
+    };
+
+    let h1 = tx_hash(&tx);
+    let h2 = tx_hash(&tx);
+    assert_eq!(h1, h2);
 }
