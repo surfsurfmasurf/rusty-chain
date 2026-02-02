@@ -1,11 +1,9 @@
 use anyhow::Context;
 use clap::{Parser, Subcommand};
 
-mod core;
-
-use core::chain::Chain;
-use core::mempool::Mempool;
-use core::types::Transaction;
+use rusty_chain::core::chain::Chain;
+use rusty_chain::core::mempool::Mempool;
+use rusty_chain::core::types::Transaction;
 
 #[derive(Parser, Debug)]
 #[command(name = "rusty-chain")]
@@ -217,7 +215,10 @@ fn main() -> anyhow::Result<()> {
             println!("mempool: {}", mp_path.display());
             println!("count={}", mp.txs.len());
             for (i, tx) in mp.txs.iter().enumerate() {
-                println!("{i}: {} -> {} amount={} nonce={}", tx.from, tx.to, tx.amount, tx.nonce);
+                println!(
+                    "{i}: {} -> {} amount={} nonce={}",
+                    tx.from, tx.to, tx.amount, tx.nonce
+                );
             }
         }
     }
