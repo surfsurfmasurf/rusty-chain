@@ -37,9 +37,15 @@ cargo run -- status
 # validate chain invariants (includes PoW check using difficulty stored in chain.json)
 cargo run -- validate
 
-# mine 1 empty block (demo PoW)
+# mine a block (uses mempool txs if available)
 # note: the chosen --difficulty is persisted into chain.json
 cargo run -- mine --difficulty 3
+
+# add a tx to mempool
+cargo run -- tx-add --from alice --to bob --amount 10 --nonce 0
+
+# list mempool
+cargo run -- tx-list
 ```
 
 
