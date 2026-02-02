@@ -34,7 +34,13 @@ Day 5
 - Merkle root now hashes tx hashes (order-sensitive)
 - Added tests for merkle root + tx hash stability
 
+## Day 6
+- Status now prints total tx count in-chain (and optional mempool tx count)
+- Added basic tx validation (non-empty from/to, from!=to, amount>0)
+- `mine` refuses to mine invalid mempool txs (sanity check)
+- Tests: tx validation + mempool insert rejection
+
 Next:
-- Add basic tx validation (nonce/amount sanity)
-- Persist mempool alongside chain in demo workflow
-- Improve tx display in status
+- Improve tx display formatting (tx hash preview?)
+- Add duplicate-tx detection (by tx hash) in mempool
+- Start Week 2: signatures / account model / nonce enforcement
