@@ -66,8 +66,8 @@ impl Chain {
         Ok(())
     }
 
-    /// Mine and append an empty block (demo PoW).
-    pub fn mine_empty_block(&mut self, new_difficulty: usize) -> anyhow::Result<Block> {
+    /// Mine and append a block with provided transactions.
+    pub fn mine_block(&mut self, txs: Vec<Transaction>, new_difficulty: usize) -> anyhow::Result<Block> {
         // Persist difficulty so later `validate` has the right context.
         self.pow_difficulty = new_difficulty;
         let difficulty = self.pow_difficulty;
@@ -75,7 +75,6 @@ impl Chain {
         let prev = self.blocks.last().expect("genesis exists");
         let prev_hash = hash_block(prev);
 
-        let txs: Vec<Transaction> = vec![];
         let merkle_root = merkle_root(&txs);
         let timestamp_ms = now_ms();
         let mut nonce = 0_u64;
@@ -98,6 +97,11 @@ impl Chain {
             }
             nonce = nonce.wrapping_add(1);
         }
+    }
+
+    /// Mine and append an empty block (demo PoW).
+    pub fn mine_empty_block(&mut self, new_difficulty: usize) -> anyhow::Result<Block> {
+        self.mine_block(vec![], new_difficulty)
     }
 
     /// Basic chain validation (linkage + merkle placeholder).
@@ -151,10 +155,24 @@ pub fn hash_block(block: &Block) -> String {
     sha256_hex(&bytes)
 }
 
-pub fn merkle_root(txs: &[Transaction]) -> String {
-    // Day 2 placeholder: simple hash of concatenated tx JSON.
-    let bytes = serde_json::to_vec(txs).expect("serialize txs");
+pub fn tx_hash(tx: &Transaction) -> String {
+    let bytes = serde_json::to_vec(tx).expect("serialize tx");
     sha256_hex(&bytes)
+}
+
+pub fn merkle_root(txs: &[Transaction]) -> String {
+    // Simple demo merkle: hash of concatenated tx hashes.
+    if txs.is_empty() {
+        return sha256_hex(&[]);
+    }
+
+    let joined = txs
+        .iter()
+        .map(tx_hash)
+        .collect::<Vec<_>>()
+        .join("");
+
+    sha256_hex(joined.as_bytes())
 }
 
 /// Very small PoW: block hash must start with N '0' hex chars.
