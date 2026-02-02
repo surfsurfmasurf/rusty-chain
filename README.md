@@ -48,6 +48,10 @@ cargo run -- tx-add --from alice --to bob --amount 10 --nonce 0
 cargo run -- tx-list
 ```
 
+Notes:
+- `tx-add` does basic validation: `from`/`to` non-empty, `from != to`, `amount > 0`.
+- `status` can also read the mempool to show pending tx count:
+  - `cargo run -- status --mempool data/mempool.json`
 
 ### Demo
 ```bash
