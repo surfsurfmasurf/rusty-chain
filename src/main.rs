@@ -1,3 +1,4 @@
+use anyhow::Context;
 use clap::{Parser, Subcommand};
 
 mod core;
@@ -151,6 +152,10 @@ fn main() -> anyhow::Result<()> {
             };
 
             let txs = mp.drain();
+            for (i, tx) in txs.iter().enumerate() {
+                tx.validate_basic()
+                    .with_context(|| format!("invalid mempool tx #{i}"))?;
+            }
             let mined = chain.mine_block(txs, difficulty)?;
             chain.save(&p)?;
             mp.save(&mp_path)?;
