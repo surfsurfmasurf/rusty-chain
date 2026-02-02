@@ -71,7 +71,11 @@ impl Chain {
     }
 
     /// Mine and append a block with provided transactions.
-    pub fn mine_block(&mut self, txs: Vec<Transaction>, new_difficulty: usize) -> anyhow::Result<Block> {
+    pub fn mine_block(
+        &mut self,
+        txs: Vec<Transaction>,
+        new_difficulty: usize,
+    ) -> anyhow::Result<Block> {
         // Persist difficulty so later `validate` has the right context.
         self.pow_difficulty = new_difficulty;
         let difficulty = self.pow_difficulty;
@@ -170,11 +174,7 @@ pub fn merkle_root(txs: &[Transaction]) -> String {
         return sha256_hex(&[]);
     }
 
-    let joined = txs
-        .iter()
-        .map(tx_hash)
-        .collect::<Vec<_>>()
-        .join("");
+    let joined = txs.iter().map(tx_hash).collect::<Vec<_>>().join("");
 
     sha256_hex(joined.as_bytes())
 }
