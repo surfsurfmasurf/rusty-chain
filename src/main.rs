@@ -29,6 +29,10 @@ enum Commands {
         /// Input path for chain JSON
         #[arg(long)]
         path: Option<String>,
+
+        /// Optional path for mempool JSON
+        #[arg(long)]
+        mempool: Option<String>,
     },
 
     /// Validate chain invariants (genesis + linkage)
@@ -118,16 +122,25 @@ fn main() -> anyhow::Result<()> {
             println!("Initialized chain at {}", p.display());
             println!("height={} tip={}", chain.height(), chain.tip_hash());
         }
-        Commands::Status { path } => {
+        Commands::Status { path, mempool } => {
             let p = chain_path(path);
             let chain = load_chain(&p)?;
+
+            let mp_path = mempool_path(mempool);
+            let mp_count = if mp_path.exists() {
+                Mempool::load(&mp_path)?.txs.len()
+            } else {
+                0
+            };
+
             println!("chain: {}", p.display());
             println!(
-                "height={} tip={} difficulty={} txs={}",
+                "height={} tip={} difficulty={} chain_txs={} mempool_txs={}",
                 chain.height(),
                 chain.tip_hash(),
                 chain.pow_difficulty,
-                chain.tx_count()
+                chain.tx_count(),
+                mp_count
             );
         }
         Commands::Validate { path } => {
