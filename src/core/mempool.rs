@@ -1,4 +1,4 @@
-use crate::core::chain::tx_hash;
+use crate::core::hash::tx_hash;
 use crate::core::types::Transaction;
 use serde::{Deserialize, Serialize};
 use std::fs;
