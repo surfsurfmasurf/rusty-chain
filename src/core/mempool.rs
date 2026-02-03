@@ -1,3 +1,4 @@
+use crate::core::chain::tx_hash;
 use crate::core::types::Transaction;
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -30,6 +31,11 @@ impl Mempool {
 
     pub fn add_tx(&mut self, tx: Transaction) -> anyhow::Result<()> {
         tx.validate_basic()?;
+
+        let h = tx_hash(&tx);
+        let already = self.txs.iter().any(|t| tx_hash(t) == h);
+        anyhow::ensure!(!already, "duplicate tx (hash={h})");
+
         self.txs.push(tx);
         Ok(())
     }
