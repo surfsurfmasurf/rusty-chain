@@ -41,10 +41,10 @@ cargo run -- validate
 # note: the chosen --difficulty is persisted into chain.json
 cargo run -- mine --difficulty 3
 
-# add a tx to mempool
+# add a tx to mempool (prints tx hash)
 cargo run -- tx-add --from alice --to bob --amount 10 --nonce 0
 
-# list mempool
+# list mempool (shows short tx hash prefix)
 cargo run -- tx-list
 ```
 

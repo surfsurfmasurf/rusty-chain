@@ -40,7 +40,13 @@ Day 5
 - `mine` refuses to mine invalid mempool txs (sanity check)
 - Tests: tx validation + mempool insert rejection
 
+## Day 7
+- CLI: `tx-list` now prints a short tx hash prefix for easier demo/debug
+- Mempool: reject duplicate txs by tx hash
+- CLI: `tx-add` prints the tx hash
+- Tests: added coverage for duplicate rejection
+
 Next:
-- Improve tx display formatting (tx hash preview?)
-- Add duplicate-tx detection (by tx hash) in mempool
 - Start Week 2: signatures / account model / nonce enforcement
+- Nonce enforcement rules (per-sender monotonic nonces)
+- Better tx display formatting (fees? signature preview?)
