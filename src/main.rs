@@ -200,9 +200,11 @@ fn main() -> anyhow::Result<()> {
                 amount,
                 nonce,
             };
+            let h = tx_hash(&tx);
             mp.add_tx(tx)?;
             mp.save(&mp_path)?;
             println!("Added tx to mempool: {}", mp_path.display());
+            println!("tx_hash={}", h);
             println!("mempool size={}", mp.txs.len());
         }
         Commands::TxList { mempool } => {
