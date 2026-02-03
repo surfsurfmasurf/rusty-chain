@@ -1,4 +1,5 @@
-use rusty_chain::core::chain::{Chain, hash_block, merkle_root, pow_ok, tx_hash};
+use rusty_chain::core::chain::{Chain, hash_block, merkle_root, pow_ok};
+use rusty_chain::core::hash::tx_hash;
 use rusty_chain::core::types::Transaction;
 
 #[test]

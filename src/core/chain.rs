@@ -1,4 +1,4 @@
-use crate::core::hash::sha256_hex;
+use crate::core::hash::{sha256_hex, tx_hash};
 use crate::core::time::now_ms;
 use crate::core::types::{Block, BlockHeader, Transaction};
 use serde::{Deserialize, Serialize};
@@ -160,11 +160,6 @@ impl Chain {
 pub fn hash_block(block: &Block) -> String {
     // Stable hashing: serialize header + txs as JSON (demo-friendly).
     let bytes = serde_json::to_vec(block).expect("serialize block");
-    sha256_hex(&bytes)
-}
-
-pub fn tx_hash(tx: &Transaction) -> String {
-    let bytes = serde_json::to_vec(tx).expect("serialize tx");
     sha256_hex(&bytes)
 }
 

@@ -1,7 +1,8 @@
 use anyhow::Context;
 use clap::{Parser, Subcommand};
 
-use rusty_chain::core::chain::{Chain, tx_hash};
+use rusty_chain::core::chain::Chain;
+use rusty_chain::core::hash::tx_hash;
 use rusty_chain::core::mempool::Mempool;
 use rusty_chain::core::types::Transaction;
 
