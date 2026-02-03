@@ -1,6 +1,7 @@
 use crate::core::hash::tx_hash;
 use crate::core::types::Transaction;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -33,8 +34,8 @@ impl Mempool {
         tx.validate_basic()?;
 
         let h = tx_hash(&tx);
-        let already = self.txs.iter().any(|t| tx_hash(t) == h);
-        anyhow::ensure!(!already, "duplicate tx (hash={h})");
+        let existing: HashSet<String> = self.txs.iter().map(tx_hash).collect();
+        anyhow::ensure!(!existing.contains(&h), "duplicate tx (hash={h})");
 
         self.txs.push(tx);
         Ok(())
