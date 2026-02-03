@@ -53,3 +53,20 @@ fn mempool_add_rejects_invalid_tx() {
     assert!(err.contains("must differ"), "unexpected error: {err}");
     assert_eq!(mp.txs.len(), 0);
 }
+
+#[test]
+fn mempool_add_rejects_duplicate_tx() {
+    let mut mp = Mempool::default();
+    let tx = Transaction {
+        from: "alice".into(),
+        to: "bob".into(),
+        amount: 1,
+        nonce: 0,
+    };
+
+    mp.add_tx(tx.clone()).unwrap();
+
+    let err = mp.add_tx(tx).unwrap_err().to_string();
+    assert!(err.contains("duplicate tx"), "unexpected error: {err}");
+    assert_eq!(mp.txs.len(), 1);
+}
