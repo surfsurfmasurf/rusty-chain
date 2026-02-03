@@ -206,6 +206,7 @@ fn main() -> anyhow::Result<()> {
             mp.save(&mp_path)?;
             println!("Added tx to mempool: {}", mp_path.display());
             println!("tx_hash={}", h);
+            println!("tx_hash_short={}", h.get(..8).unwrap_or(&h));
             println!("mempool size={}", mp.txs.len());
         }
         Commands::TxList { mempool } => {
@@ -219,7 +220,7 @@ fn main() -> anyhow::Result<()> {
             println!("count={}", mp.txs.len());
             for (i, tx) in mp.txs.iter().enumerate() {
                 let h = tx_hash(tx);
-                let short = &h[..8];
+                let short = h.get(..8).unwrap_or(&h);
                 println!(
                     "{i}: {short} {} -> {} amount={} nonce={}",
                     tx.from, tx.to, tx.amount, tx.nonce
