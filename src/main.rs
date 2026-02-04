@@ -245,6 +245,8 @@ fn main() -> anyhow::Result<()> {
             println!("Added tx to mempool: {}", mp_path.display());
             println!("tx_hash={}", h);
             println!("tx_hash_short={}", h.get(..8).unwrap_or(&h));
+            println!("nonce={}", filled_nonce);
+            println!("base_nonce(chain)={}", base_nonce);
             println!("mempool size={}", mp.txs.len());
         }
         Commands::TxList { mempool } => {
