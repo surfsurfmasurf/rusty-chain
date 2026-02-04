@@ -6,6 +6,8 @@ use rusty_chain::core::hash::tx_hash;
 use rusty_chain::core::mempool::Mempool;
 use rusty_chain::core::types::Transaction;
 
+use std::collections::HashMap;
+
 #[derive(Parser, Debug)]
 #[command(name = "rusty-chain")]
 #[command(about = "A mini blockchain built in Rust (30-day build).", long_about = None)]
@@ -58,6 +60,10 @@ enum Commands {
 
     /// Add a transaction to the mempool
     TxAdd {
+        /// Optional path for chain JSON (used for nonce enforcement)
+        #[arg(long)]
+        chain: Option<String>,
+
         #[arg(long)]
         from: String,
 
@@ -67,8 +73,9 @@ enum Commands {
         #[arg(long)]
         amount: u64,
 
-        #[arg(long, default_value_t = 0)]
-        nonce: u64,
+        /// Tx nonce (per-sender). If omitted, it will be auto-filled from chain+mempool.
+        #[arg(long)]
+        nonce: Option<u64>,
 
         /// Optional path for mempool JSON
         #[arg(long)]
@@ -163,11 +170,30 @@ fn main() -> anyhow::Result<()> {
                 Mempool::default()
             };
 
-            let txs = mp.drain();
-            for (i, tx) in txs.iter().enumerate() {
+            // Validate mempool txs before draining so we don't lose them on failure.
+            for (i, tx) in mp.txs.iter().enumerate() {
                 tx.validate_basic()
                     .with_context(|| format!("invalid mempool tx #{i}"))?;
             }
+
+            // Enforce simple per-sender nonces: expected = chain.next_nonce_for(sender) + index
+            // within this mined block.
+            let mut expected: HashMap<String, u64> = HashMap::new();
+            for (i, tx) in mp.txs.iter().enumerate() {
+                let entry = expected
+                    .entry(tx.from.clone())
+                    .or_insert_with(|| chain.next_nonce_for(&tx.from));
+                anyhow::ensure!(
+                    tx.nonce == *entry,
+                    "invalid nonce in mempool tx #{i} sender={} (expected={} got={})",
+                    tx.from,
+                    *entry,
+                    tx.nonce
+                );
+                *entry = entry.saturating_add(1);
+            }
+
+            let txs = mp.drain();
             let mined = chain.mine_block(txs, difficulty)?;
             chain.save(&p)?;
             mp.save(&mp_path)?;
@@ -182,12 +208,17 @@ fn main() -> anyhow::Result<()> {
             );
         }
         Commands::TxAdd {
+            chain,
             from,
             to,
             amount,
             nonce,
             mempool,
         } => {
+            let chain_path = chain_path(chain);
+            let chain = load_or_genesis(&chain_path)?;
+            let base_nonce = chain.next_nonce_for(&from);
+
             let mp_path = mempool_path(mempool);
             let mut mp = if mp_path.exists() {
                 Mempool::load(&mp_path)?
@@ -195,14 +226,16 @@ fn main() -> anyhow::Result<()> {
                 Mempool::default()
             };
 
+            let filled_nonce = nonce.unwrap_or_else(|| mp.next_nonce_for(&from, base_nonce));
+
             let tx = Transaction {
                 from,
                 to,
                 amount,
-                nonce,
+                nonce: filled_nonce,
             };
             let h = tx_hash(&tx);
-            mp.add_tx(tx)?;
+            mp.add_tx_checked(tx, base_nonce)?;
             mp.save(&mp_path)?;
             println!("Added tx to mempool: {}", mp_path.display());
             println!("tx_hash={}", h);
