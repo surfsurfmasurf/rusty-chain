@@ -30,6 +30,48 @@ impl Mempool {
         Ok(())
     }
 
+    /// Compute the next expected nonce for `sender` given a base nonce (usually from chain).
+    ///
+    /// Rule: expected = base + number of pending txs from sender.
+    pub fn next_nonce_for(&self, sender: &str, base_nonce: u64) -> u64 {
+        let pending = self.txs.iter().filter(|t| t.from == sender).count() as u64;
+        base_nonce.saturating_add(pending)
+    }
+
+    /// Add a tx enforcing a simple per-sender nonce rule.
+    ///
+    /// This is intentionally minimal (Week 2 demo): it prevents gaps and duplicates for a sender
+    /// within the mempool, using the caller-provided `base_nonce` (from chain).
+    pub fn add_tx_checked(&mut self, tx: Transaction, base_nonce: u64) -> anyhow::Result<()> {
+        tx.validate_basic()?;
+
+        let expected = self.next_nonce_for(&tx.from, base_nonce);
+        anyhow::ensure!(
+            tx.nonce == expected,
+            "invalid nonce for sender={} (expected={} got={})",
+            tx.from,
+            expected,
+            tx.nonce
+        );
+
+        anyhow::ensure!(
+            !self
+                .txs
+                .iter()
+                .any(|t| t.from == tx.from && t.nonce == tx.nonce),
+            "duplicate nonce for sender={} (nonce={})",
+            tx.from,
+            tx.nonce
+        );
+
+        let h = tx_hash(&tx);
+        let existing: HashSet<String> = self.txs.iter().map(tx_hash).collect();
+        anyhow::ensure!(!existing.contains(&h), "duplicate tx (hash={h})");
+
+        self.txs.push(tx);
+        Ok(())
+    }
+
     pub fn add_tx(&mut self, tx: Transaction) -> anyhow::Result<()> {
         tx.validate_basic()?;
 
