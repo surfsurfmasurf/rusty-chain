@@ -50,3 +50,15 @@ Next:
 - Start Week 2: signatures / account model / nonce enforcement
 - Nonce enforcement rules (per-sender monotonic nonces)
 - Better tx display formatting (fees? signature preview?)
+
+## Day 8
+- Added chain helper to compute per-sender next nonce (max+1)
+- Mempool: added nonce-aware tx insertion (`add_tx_checked`) and expected-nonce helper
+- CLI: `tx-add` now auto-fills nonce when omitted, and enforces per-sender nonces using chain+mempool
+- CLI: `mine` validates mempool nonce sequence before draining/mining (prevents accidental tx loss)
+- Tests: added nonce coverage (chain + mempool)
+
+Next:
+- Decide account model (UTXO vs account) and add signatures (ed25519?)
+- Add state transition checks (balances + nonce) during `mine`/`validate`
+- Improve tx display (fees/signature preview)
