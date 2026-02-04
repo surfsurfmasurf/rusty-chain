@@ -30,6 +30,13 @@ impl Mempool {
         Ok(())
     }
 
+    fn ensure_unique_hash(&self, tx: &Transaction) -> anyhow::Result<()> {
+        let h = tx_hash(tx);
+        let existing: HashSet<String> = self.txs.iter().map(tx_hash).collect();
+        anyhow::ensure!(!existing.contains(&h), "duplicate tx (hash={h})");
+        Ok(())
+    }
+
     /// Compute the next expected nonce for `sender` given a base nonce (usually from chain).
     ///
     /// Rule: expected = base + number of pending txs from sender.
@@ -64,9 +71,7 @@ impl Mempool {
             tx.nonce
         );
 
-        let h = tx_hash(&tx);
-        let existing: HashSet<String> = self.txs.iter().map(tx_hash).collect();
-        anyhow::ensure!(!existing.contains(&h), "duplicate tx (hash={h})");
+        self.ensure_unique_hash(&tx)?;
 
         self.txs.push(tx);
         Ok(())
@@ -75,9 +80,7 @@ impl Mempool {
     pub fn add_tx(&mut self, tx: Transaction) -> anyhow::Result<()> {
         tx.validate_basic()?;
 
-        let h = tx_hash(&tx);
-        let existing: HashSet<String> = self.txs.iter().map(tx_hash).collect();
-        anyhow::ensure!(!existing.contains(&h), "duplicate tx (hash={h})");
+        self.ensure_unique_hash(&tx)?;
 
         self.txs.push(tx);
         Ok(())
