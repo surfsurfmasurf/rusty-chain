@@ -42,7 +42,9 @@ cargo run -- validate
 cargo run -- mine --difficulty 3
 
 # add a tx to mempool (prints tx hash)
-cargo run -- tx-add --from alice --to bob --amount 10 --nonce 0
+cargo run -- tx-add --from alice --to bob --amount 10
+# optionally specify nonce explicitly
+# cargo run -- tx-add --from alice --to bob --amount 10 --nonce 0
 
 # list mempool (shows short tx hash prefix)
 cargo run -- tx-list
@@ -50,6 +52,8 @@ cargo run -- tx-list
 
 Notes:
 - `tx-add` does basic validation: `from`/`to` non-empty, `from != to`, `amount > 0`.
+- `tx-add` enforces simple per-sender nonces (monotonic, starting at 0). If `--nonce` is omitted, it is auto-filled from `chain.json` + current mempool.
+  - Use `--chain` to point nonce enforcement at a non-default chain file.
 - `status` can also read the mempool to show pending tx count:
   - `cargo run -- status --mempool data/mempool.json`
 
