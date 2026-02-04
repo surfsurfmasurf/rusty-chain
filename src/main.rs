@@ -117,6 +117,26 @@ fn load_or_genesis(path: &std::path::Path) -> anyhow::Result<Chain> {
     }
 }
 
+fn validate_nonce_sequence(chain: &Chain, txs: &[Transaction]) -> anyhow::Result<()> {
+    // Enforce simple per-sender nonces: expected = chain.next_nonce_for(sender) + index
+    // within this tx list.
+    let mut expected: HashMap<String, u64> = HashMap::new();
+    for (i, tx) in txs.iter().enumerate() {
+        let entry = expected
+            .entry(tx.from.clone())
+            .or_insert_with(|| chain.next_nonce_for(&tx.from));
+        anyhow::ensure!(
+            tx.nonce == *entry,
+            "invalid nonce in mempool tx #{i} sender={} (expected={} got={})",
+            tx.from,
+            *entry,
+            tx.nonce
+        );
+        *entry = entry.saturating_add(1);
+    }
+    Ok(())
+}
+
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
@@ -176,22 +196,7 @@ fn main() -> anyhow::Result<()> {
                     .with_context(|| format!("invalid mempool tx #{i}"))?;
             }
 
-            // Enforce simple per-sender nonces: expected = chain.next_nonce_for(sender) + index
-            // within this mined block.
-            let mut expected: HashMap<String, u64> = HashMap::new();
-            for (i, tx) in mp.txs.iter().enumerate() {
-                let entry = expected
-                    .entry(tx.from.clone())
-                    .or_insert_with(|| chain.next_nonce_for(&tx.from));
-                anyhow::ensure!(
-                    tx.nonce == *entry,
-                    "invalid nonce in mempool tx #{i} sender={} (expected={} got={})",
-                    tx.from,
-                    *entry,
-                    tx.nonce
-                );
-                *entry = entry.saturating_add(1);
-            }
+            validate_nonce_sequence(&chain, &mp.txs)?;
 
             let txs = mp.drain();
             let mined = chain.mine_block(txs, difficulty)?;
