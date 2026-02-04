@@ -51,6 +51,23 @@ impl Chain {
         self.blocks.iter().map(|b| b.txs.len()).sum()
     }
 
+    /// Compute the next expected nonce for a given sender based on transactions already in-chain.
+    ///
+    /// Nonce enforcement is kept intentionally simple for Week 2 demos:
+    /// - Per-sender monotonically increasing u64 starting at 0.
+    /// - This does NOT check balances or signatures (yet).
+    pub fn next_nonce_for(&self, sender: &str) -> u64 {
+        let mut max_nonce: Option<u64> = None;
+        for b in &self.blocks {
+            for tx in &b.txs {
+                if tx.from == sender {
+                    max_nonce = Some(max_nonce.map_or(tx.nonce, |m| m.max(tx.nonce)));
+                }
+            }
+        }
+        max_nonce.map_or(0, |m| m.saturating_add(1))
+    }
+
     pub fn default_path() -> PathBuf {
         PathBuf::from("data/chain.json")
     }
