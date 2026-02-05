@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 
 use rusty_chain::core::chain::Chain;
 use rusty_chain::core::hash::tx_hash;
+use rusty_chain::core::keys::KeyFile;
 use rusty_chain::core::mempool::Mempool;
 use rusty_chain::core::types::Transaction;
 
@@ -18,6 +19,24 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Generate a local keypair for signing transactions
+    Keygen {
+        /// Key name (stored as data/keys/<name>.json)
+        #[arg(long)]
+        name: String,
+
+        /// Overwrite if the key already exists
+        #[arg(long, default_value_t = false)]
+        force: bool,
+    },
+
+    /// Print the public key (address) for a local key
+    Addr {
+        /// Key name (stored as data/keys/<name>.json)
+        #[arg(long)]
+        name: String,
+    },
+
     /// Initialize a new chain (writes genesis to disk)
     Init {
         /// Output path for chain JSON
@@ -141,6 +160,28 @@ fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
+        Commands::Keygen { name, force } => {
+            let path = KeyFile::path_for(&name);
+            if path.exists() && !force {
+                anyhow::bail!(
+                    "key already exists: {} (use --force to overwrite)",
+                    path.display()
+                );
+            }
+
+            let (file, _sk, _vk) = KeyFile::generate();
+            file.save(&path)?;
+            println!("Wrote key: {}", path.display());
+            println!("pubkey_hex={}", file.verifying_key_hex);
+        }
+        Commands::Addr { name } => {
+            let path = KeyFile::path_for(&name);
+            anyhow::ensure!(path.exists(), "key not found: {}", path.display());
+            let file = KeyFile::load(&path)?;
+            println!("name={}", name);
+            println!("path={}", path.display());
+            println!("pubkey_hex={}", file.verifying_key_hex);
+        }
         Commands::Init { path } => {
             let p = chain_path(path);
             let chain = Chain::new_genesis();
