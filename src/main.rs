@@ -274,12 +274,7 @@ fn main() -> anyhow::Result<()> {
 
             let filled_nonce = nonce.unwrap_or_else(|| mp.next_nonce_for(&from, base_nonce));
 
-            let tx = Transaction {
-                from,
-                to,
-                amount,
-                nonce: filled_nonce,
-            };
+            let tx = Transaction::new(from, to, amount, filled_nonce);
             let h = tx_hash(&tx);
             mp.add_tx_checked(tx, base_nonce)?;
             mp.save(&mp_path)?;

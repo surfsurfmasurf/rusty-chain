@@ -80,18 +80,8 @@ fn load_defaults_pow_difficulty_when_missing_in_json() {
 
 #[test]
 fn merkle_root_changes_with_tx_order() {
-    let tx1 = Transaction {
-        from: "a".into(),
-        to: "b".into(),
-        amount: 1,
-        nonce: 0,
-    };
-    let tx2 = Transaction {
-        from: "c".into(),
-        to: "d".into(),
-        amount: 2,
-        nonce: 1,
-    };
+    let tx1 = Transaction::new("a", "b", 1, 0);
+    let tx2 = Transaction::new("c", "d", 2, 1);
 
     let r1 = merkle_root(&[tx1.clone(), tx2.clone()]);
     let r2 = merkle_root(&[tx2, tx1]);
@@ -102,12 +92,7 @@ fn merkle_root_changes_with_tx_order() {
 
 #[test]
 fn tx_hash_is_stable() {
-    let tx = Transaction {
-        from: "alice".into(),
-        to: "bob".into(),
-        amount: 42,
-        nonce: 7,
-    };
+    let tx = Transaction::new("alice", "bob", 42, 7);
 
     let h1 = tx_hash(&tx);
     let h2 = tx_hash(&tx);

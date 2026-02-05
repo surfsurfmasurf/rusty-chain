@@ -9,9 +9,25 @@ pub struct BlockHeader {
     pub merkle_root: String,
 }
 
-/// A minimal transaction (placeholder). Week 2 will add signatures.
+/// A minimal transaction (Week 2: add optional signatures).
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Transaction {
+    pub from: String,
+    pub to: String,
+    pub amount: u64,
+    pub nonce: u64,
+
+    /// Optional ed25519 public key (hex) used to verify `signature_b64`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pubkey_hex: Option<String>,
+
+    /// Optional ed25519 signature (base64) over the signing payload.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub signature_b64: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct TxSignPayload {
     pub from: String,
     pub to: String,
     pub amount: u64,
@@ -19,6 +35,31 @@ pub struct Transaction {
 }
 
 impl Transaction {
+    pub fn new(from: impl Into<String>, to: impl Into<String>, amount: u64, nonce: u64) -> Self {
+        Self {
+            from: from.into(),
+            to: to.into(),
+            amount,
+            nonce,
+            pubkey_hex: None,
+            signature_b64: None,
+        }
+    }
+
+    pub fn signing_payload(&self) -> TxSignPayload {
+        TxSignPayload {
+            from: self.from.clone(),
+            to: self.to.clone(),
+            amount: self.amount,
+            nonce: self.nonce,
+        }
+    }
+
+    pub fn signing_bytes(&self) -> Vec<u8> {
+        // JSON keeps this demo-friendly; if we need canonical encoding later, we can swap it.
+        serde_json::to_vec(&self.signing_payload()).expect("serialize signing payload")
+    }
+
     /// Basic sanity checks (Week 1/early Week 2 demo).
     ///
     /// Note: signatures/balances/nonces will be enforced later.
