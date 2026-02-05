@@ -92,6 +92,10 @@ enum Commands {
         #[arg(long)]
         amount: u64,
 
+        /// Optional local key name (data/keys/<name>.json) to sign this tx.
+        #[arg(long)]
+        signer: Option<String>,
+
         /// Tx nonce (per-sender). If omitted, it will be auto-filled from chain+mempool.
         #[arg(long)]
         nonce: Option<u64>,
@@ -235,6 +239,8 @@ fn main() -> anyhow::Result<()> {
             for (i, tx) in mp.txs.iter().enumerate() {
                 tx.validate_basic()
                     .with_context(|| format!("invalid mempool tx #{i}"))?;
+                tx.verify_signature_if_present()
+                    .with_context(|| format!("invalid signature for mempool tx #{i}"))?;
             }
 
             validate_nonce_sequence(&chain, &mp.txs)?;
@@ -258,6 +264,7 @@ fn main() -> anyhow::Result<()> {
             from,
             to,
             amount,
+            signer,
             nonce,
             mempool,
         } => {
@@ -274,7 +281,19 @@ fn main() -> anyhow::Result<()> {
 
             let filled_nonce = nonce.unwrap_or_else(|| mp.next_nonce_for(&from, base_nonce));
 
-            let tx = Transaction::new(from, to, amount, filled_nonce);
+            let mut tx = Transaction::new(from, to, amount, filled_nonce);
+
+            if let Some(name) = signer {
+                let kp_path = KeyFile::path_for(&name);
+                anyhow::ensure!(kp_path.exists(), "key not found: {}", kp_path.display());
+                let key_file = KeyFile::load(&kp_path)?;
+                let sk = key_file.signing_key()?;
+
+                let sig = rusty_chain::core::crypto::sign_bytes(&sk, &tx.signing_bytes());
+                tx.pubkey_hex = Some(key_file.verifying_key_hex.clone());
+                tx.signature_b64 = Some(sig);
+            }
+
             let h = tx_hash(&tx);
             mp.add_tx_checked(tx, base_nonce)?;
             mp.save(&mp_path)?;
@@ -297,8 +316,13 @@ fn main() -> anyhow::Result<()> {
             for (i, tx) in mp.txs.iter().enumerate() {
                 let h = tx_hash(tx);
                 let short = h.get(..8).unwrap_or(&h);
+                let signed = if tx.signature_b64.is_some() {
+                    "signed"
+                } else {
+                    "unsigned"
+                };
                 println!(
-                    "{i}: {short} {} -> {} amount={} nonce={}",
+                    "{i}: {short} {} -> {} amount={} nonce={} ({signed})",
                     tx.from, tx.to, tx.amount, tx.nonce
                 );
             }

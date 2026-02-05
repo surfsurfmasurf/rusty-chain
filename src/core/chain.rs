@@ -1,6 +1,7 @@
 use crate::core::hash::{sha256_hex, tx_hash};
 use crate::core::time::now_ms;
 use crate::core::types::{Block, BlockHeader, Transaction};
+use anyhow::Context;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -146,6 +147,13 @@ impl Chain {
         for i in 1..self.blocks.len() {
             let prev = &self.blocks[i - 1];
             let cur = &self.blocks[i];
+
+            for (j, tx) in cur.txs.iter().enumerate() {
+                tx.validate_basic()
+                    .with_context(|| format!("invalid tx in block={i} index={j}"))?;
+                tx.verify_signature_if_present()
+                    .with_context(|| format!("invalid tx signature in block={i} index={j}"))?;
+            }
 
             let prev_hash = hash_block(prev);
             anyhow::ensure!(
