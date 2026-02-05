@@ -58,7 +58,13 @@ Next:
 - CLI: `mine` validates mempool nonce sequence before draining/mining (prevents accidental tx loss)
 - Tests: added nonce coverage (chain + mempool)
 
+## Day 9
+- Added ed25519 crypto helpers + key storage (`data/keys/*.json`)
+- CLI: `keygen` + `addr` for local demo keypairs
+- Transactions now have an explicit signing payload, with optional signature fields
+- Tests: signature verification + tamper detection
+
 Next:
-- Decide account model (UTXO vs account) and add signatures (ed25519?)
-- Add state transition checks (balances + nonce) during `mine`/`validate`
+- Wire signed txs into CLI (`tx-add --signer <name>`)
+- Decide account model (UTXO vs account) and enforce balances during `mine`/`validate`
 - Improve tx display (fees/signature preview)
