@@ -9,8 +9,9 @@ pub fn sha256_hex(bytes: &[u8]) -> String {
     hex::encode(out)
 }
 
-/// Stable transaction id (demo-friendly): SHA-256 of JSON-serialized tx.
+/// Stable transaction id (demo-friendly): SHA-256 of the signing payload.
+///
+/// This intentionally ignores optional signature fields so a tx's id doesn't change when signed.
 pub fn tx_hash(tx: &Transaction) -> String {
-    let bytes = serde_json::to_vec(tx).expect("serialize tx");
-    sha256_hex(&bytes)
+    sha256_hex(&tx.signing_bytes())
 }
