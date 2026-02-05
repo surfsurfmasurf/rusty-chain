@@ -70,6 +70,26 @@ impl Transaction {
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
         Ok(())
     }
+
+    /// Verify signature if present.
+    ///
+    /// Rules (for now):
+    /// - If both `pubkey_hex` and `signature_b64` are present, verify strictly.
+    /// - If neither is present, treat as unsigned and accept.
+    /// - If only one is present, reject.
+    pub fn verify_signature_if_present(&self) -> anyhow::Result<()> {
+        match (&self.pubkey_hex, &self.signature_b64) {
+            (None, None) => Ok(()),
+            (Some(_), None) | (None, Some(_)) => {
+                anyhow::bail!("tx signature fields must be both present or both absent")
+            }
+            (Some(pk_hex), Some(sig_b64)) => {
+                let vk = crate::core::crypto::verifying_key_from_hex(pk_hex)?;
+                crate::core::crypto::verify_bytes(&vk, &self.signing_bytes(), sig_b64)?;
+                Ok(())
+            }
+        }
+    }
 }
 
 /// Block = header + transactions.
