@@ -28,6 +28,12 @@ cargo run -- --help
 ## CLI
 
 ```bash
+# generate a local keypair (data/keys/alice.json)
+cargo run -- keygen --name alice
+
+# print public key (hex)
+cargo run -- addr --name alice
+
 # create genesis
 cargo run -- init
 
