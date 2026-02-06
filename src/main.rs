@@ -237,10 +237,8 @@ fn main() -> anyhow::Result<()> {
 
             // Validate mempool txs before draining so we don't lose them on failure.
             for (i, tx) in mp.txs.iter().enumerate() {
-                tx.validate_basic()
+                tx.validate_accept()
                     .with_context(|| format!("invalid mempool tx #{i}"))?;
-                tx.verify_signature_if_present()
-                    .with_context(|| format!("invalid signature for mempool tx #{i}"))?;
             }
 
             validate_nonce_sequence(&chain, &mp.txs)?;

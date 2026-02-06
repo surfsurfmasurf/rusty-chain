@@ -71,6 +71,13 @@ impl Transaction {
         Ok(())
     }
 
+    /// Basic tx validation for accepting into the mempool or a block.
+    pub fn validate_accept(&self) -> anyhow::Result<()> {
+        self.validate_basic()?;
+        self.verify_signature_if_present()?;
+        Ok(())
+    }
+
     /// Verify signature if present.
     ///
     /// Rules (for now):
