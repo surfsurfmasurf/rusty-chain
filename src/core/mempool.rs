@@ -51,6 +51,7 @@ impl Mempool {
     /// within the mempool, using the caller-provided `base_nonce` (from chain).
     pub fn add_tx_checked(&mut self, tx: Transaction, base_nonce: u64) -> anyhow::Result<()> {
         tx.validate_basic()?;
+        tx.verify_signature_if_present()?;
 
         let expected = self.next_nonce_for(&tx.from, base_nonce);
         anyhow::ensure!(
@@ -79,6 +80,7 @@ impl Mempool {
 
     pub fn add_tx(&mut self, tx: Transaction) -> anyhow::Result<()> {
         tx.validate_basic()?;
+        tx.verify_signature_if_present()?;
 
         self.ensure_unique_hash(&tx)?;
 
