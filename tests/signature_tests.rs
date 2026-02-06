@@ -5,10 +5,11 @@ use rusty_chain::core::types::Transaction;
 fn signed_tx_verifies() {
     let (sk, vk) = generate_keypair();
 
-    let mut tx = Transaction::new("alice", "bob", 10, 0);
+    let from = verifying_key_to_hex(&vk);
+    let mut tx = Transaction::new(from.clone(), "bob", 10, 0);
     let sig = sign_bytes(&sk, &tx.signing_bytes());
 
-    tx.pubkey_hex = Some(verifying_key_to_hex(&vk));
+    tx.pubkey_hex = Some(from);
     tx.signature_b64 = Some(sig);
 
     tx.verify_signature_if_present().unwrap();
@@ -18,10 +19,11 @@ fn signed_tx_verifies() {
 fn signed_tx_rejects_tampering() {
     let (sk, vk) = generate_keypair();
 
-    let mut tx = Transaction::new("alice", "bob", 10, 0);
+    let from = verifying_key_to_hex(&vk);
+    let mut tx = Transaction::new(from.clone(), "bob", 10, 0);
     let sig = sign_bytes(&sk, &tx.signing_bytes());
 
-    tx.pubkey_hex = Some(verifying_key_to_hex(&vk));
+    tx.pubkey_hex = Some(from);
     tx.signature_b64 = Some(sig);
 
     // Tamper after signing.
