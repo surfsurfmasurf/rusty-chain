@@ -52,12 +52,18 @@ cargo run -- tx-add --from alice --to bob --amount 10
 # optionally specify nonce explicitly
 # cargo run -- tx-add --from alice --to bob --amount 10 --nonce 0
 
+# signed tx (uses data/keys/<signer>.json)
+# Note: for signed txs, `from` is bound to the signer address (pubkey hex).
+cargo run -- tx-add --from alice --to bob --amount 10 --signer alice
+
 # list mempool (shows short tx hash prefix)
 cargo run -- tx-list
 ```
 
 Notes:
 - `tx-add` does basic validation: `from`/`to` non-empty, `from != to`, `amount > 0`.
+- Signed txs are supported (ed25519). If `--signer <name>` is provided, the tx is signed using `data/keys/<name>.json`.
+  - Signed txs must use `from=<pubkey_hex>`; the CLI enforces this by setting `from` to the signer pubkey hex.
 - `tx-add` enforces simple per-sender nonces (monotonic, starting at 0). If `--nonce` is omitted, it is auto-filled from `chain.json` + current mempool.
   - Use `--chain` to point nonce enforcement at a non-default chain file.
 - `status` can also read the mempool to show pending tx count:

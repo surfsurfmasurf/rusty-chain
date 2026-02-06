@@ -64,7 +64,12 @@ Next:
 - Transactions now have an explicit signing payload, with optional signature fields
 - Tests: signature verification + tamper detection
 
+## Day 10
+- Mempool now validates tx signatures (unsigned allowed, signed must verify)
+- Signed txs are now bound to `from=<pubkey_hex>` (prevents "sign as A, send as B")
+- CLI: `tx-add --signer <name>` binds `from` to signer pubkey hex automatically
+- Tests: coverage for from/pubkey binding and mempool rejection
+
 Next:
-- Wire signed txs into CLI (`tx-add --signer <name>`)
 - Decide account model (UTXO vs account) and enforce balances during `mine`/`validate`
-- Improve tx display (fees/signature preview)
+- Improve tx display formatting (fees? signature preview?)
