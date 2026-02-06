@@ -84,6 +84,13 @@ impl Transaction {
                 anyhow::bail!("tx signature fields must be both present or both absent")
             }
             (Some(pk_hex), Some(sig_b64)) => {
+                anyhow::ensure!(
+                    self.from == *pk_hex,
+                    "signed tx must use from=<pubkey_hex> (from={} pubkey_hex={})",
+                    self.from,
+                    pk_hex
+                );
+
                 let vk = crate::core::crypto::verifying_key_from_hex(pk_hex)?;
                 crate::core::crypto::verify_bytes(&vk, &self.signing_bytes(), sig_b64)?;
                 Ok(())
