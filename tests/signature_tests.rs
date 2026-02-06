@@ -46,3 +46,17 @@ fn tx_signature_requires_both_fields() {
     let err = tx.verify_signature_if_present().unwrap_err().to_string();
     assert!(err.contains("both"), "err={err}");
 }
+
+#[test]
+fn signed_tx_requires_from_to_match_pubkey_hex() {
+    let (sk, vk) = generate_keypair();
+
+    let mut tx = Transaction::new("alice", "bob", 10, 0);
+    let sig = sign_bytes(&sk, &tx.signing_bytes());
+
+    tx.pubkey_hex = Some(verifying_key_to_hex(&vk));
+    tx.signature_b64 = Some(sig);
+
+    let err = tx.verify_signature_if_present().unwrap_err().to_string();
+    assert!(err.contains("from=<pubkey_hex>"), "err={err}");
+}

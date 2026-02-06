@@ -45,3 +45,20 @@ fn mempool_add_rejects_duplicate_tx() {
     assert!(err.contains("duplicate tx"), "unexpected error: {err}");
     assert_eq!(mp.txs.len(), 1);
 }
+
+#[test]
+fn mempool_add_rejects_signed_tx_with_from_mismatch() {
+    use rusty_chain::core::crypto::{generate_keypair, sign_bytes, verifying_key_to_hex};
+
+    let (sk, vk) = generate_keypair();
+
+    let mut tx = Transaction::new("alice", "bob", 1, 0);
+    let sig = sign_bytes(&sk, &tx.signing_bytes());
+    tx.pubkey_hex = Some(verifying_key_to_hex(&vk));
+    tx.signature_b64 = Some(sig);
+
+    let mut mp = Mempool::default();
+    let err = mp.add_tx(tx).unwrap_err().to_string();
+    assert!(err.contains("from=<pubkey_hex>"), "unexpected error: {err}");
+    assert_eq!(mp.txs.len(), 0);
+}
