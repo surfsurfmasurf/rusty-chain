@@ -149,10 +149,8 @@ impl Chain {
             let cur = &self.blocks[i];
 
             for (j, tx) in cur.txs.iter().enumerate() {
-                tx.validate_basic()
+                tx.validate_accept()
                     .with_context(|| format!("invalid tx in block={i} index={j}"))?;
-                tx.verify_signature_if_present()
-                    .with_context(|| format!("invalid tx signature in block={i} index={j}"))?;
             }
 
             let prev_hash = hash_block(prev);
