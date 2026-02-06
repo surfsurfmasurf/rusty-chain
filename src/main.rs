@@ -270,7 +270,22 @@ fn main() -> anyhow::Result<()> {
         } => {
             let chain_path = chain_path(chain);
             let chain = load_or_genesis(&chain_path)?;
-            let base_nonce = chain.next_nonce_for(&from);
+
+            // If we're signing, bind `from` to the signer's address (pubkey hex).
+            let (effective_from, signer_name, signer_pubkey_hex) = if let Some(name) = signer {
+                let kp_path = KeyFile::path_for(&name);
+                anyhow::ensure!(kp_path.exists(), "key not found: {}", kp_path.display());
+                let key_file = KeyFile::load(&kp_path)?;
+                (
+                    key_file.verifying_key_hex.clone(),
+                    Some(name),
+                    Some(key_file.verifying_key_hex),
+                )
+            } else {
+                (from, None, None)
+            };
+
+            let base_nonce = chain.next_nonce_for(&effective_from);
 
             let mp_path = mempool_path(mempool);
             let mut mp = if mp_path.exists() {
@@ -279,18 +294,17 @@ fn main() -> anyhow::Result<()> {
                 Mempool::default()
             };
 
-            let filled_nonce = nonce.unwrap_or_else(|| mp.next_nonce_for(&from, base_nonce));
+            let filled_nonce = nonce.unwrap_or_else(|| mp.next_nonce_for(&effective_from, base_nonce));
 
-            let mut tx = Transaction::new(from, to, amount, filled_nonce);
+            let mut tx = Transaction::new(effective_from, to, amount, filled_nonce);
 
-            if let Some(name) = signer {
+            if let (Some(name), Some(pk_hex)) = (signer_name, signer_pubkey_hex) {
                 let kp_path = KeyFile::path_for(&name);
-                anyhow::ensure!(kp_path.exists(), "key not found: {}", kp_path.display());
                 let key_file = KeyFile::load(&kp_path)?;
                 let sk = key_file.signing_key()?;
 
                 let sig = rusty_chain::core::crypto::sign_bytes(&sk, &tx.signing_bytes());
-                tx.pubkey_hex = Some(key_file.verifying_key_hex.clone());
+                tx.pubkey_hex = Some(pk_hex);
                 tx.signature_b64 = Some(sig);
             }
 
