@@ -292,7 +292,8 @@ fn main() -> anyhow::Result<()> {
                 Mempool::default()
             };
 
-            let filled_nonce = nonce.unwrap_or_else(|| mp.next_nonce_for(&effective_from, base_nonce));
+            let filled_nonce =
+                nonce.unwrap_or_else(|| mp.next_nonce_for(&effective_from, base_nonce));
 
             let mut tx = Transaction::new(effective_from, to, amount, filled_nonce);
 
