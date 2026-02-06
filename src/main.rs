@@ -272,18 +272,18 @@ fn main() -> anyhow::Result<()> {
             let chain = load_or_genesis(&chain_path)?;
 
             // If we're signing, bind `from` to the signer's address (pubkey hex).
-            let (effective_from, signer_name, signer_pubkey_hex) = if let Some(name) = signer {
+            let signer_file: Option<KeyFile> = if let Some(name) = signer {
                 let kp_path = KeyFile::path_for(&name);
                 anyhow::ensure!(kp_path.exists(), "key not found: {}", kp_path.display());
-                let key_file = KeyFile::load(&kp_path)?;
-                (
-                    key_file.verifying_key_hex.clone(),
-                    Some(name),
-                    Some(key_file.verifying_key_hex),
-                )
+                Some(KeyFile::load(&kp_path)?)
             } else {
-                (from, None, None)
+                None
             };
+
+            let effective_from = signer_file
+                .as_ref()
+                .map(|f| f.verifying_key_hex.clone())
+                .unwrap_or(from);
 
             let base_nonce = chain.next_nonce_for(&effective_from);
 
@@ -298,13 +298,11 @@ fn main() -> anyhow::Result<()> {
 
             let mut tx = Transaction::new(effective_from, to, amount, filled_nonce);
 
-            if let (Some(name), Some(pk_hex)) = (signer_name, signer_pubkey_hex) {
-                let kp_path = KeyFile::path_for(&name);
-                let key_file = KeyFile::load(&kp_path)?;
-                let sk = key_file.signing_key()?;
+            if let Some(file) = signer_file {
+                let sk = file.signing_key()?;
 
                 let sig = rusty_chain::core::crypto::sign_bytes(&sk, &tx.signing_bytes());
-                tx.pubkey_hex = Some(pk_hex);
+                tx.pubkey_hex = Some(file.verifying_key_hex);
                 tx.signature_b64 = Some(sig);
             }
 
