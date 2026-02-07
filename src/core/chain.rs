@@ -1,4 +1,5 @@
 use crate::core::hash::{sha256_hex, tx_hash};
+use crate::core::state::State;
 use crate::core::time::now_ms;
 use crate::core::types::{Block, BlockHeader, Transaction};
 use anyhow::Context;
@@ -130,6 +131,14 @@ impl Chain {
         self.mine_block(vec![], new_difficulty)
     }
 
+    pub fn compute_state(&self) -> anyhow::Result<State> {
+        let mut state = State::new();
+        for (i, block) in self.blocks.iter().enumerate() {
+            state.apply_block(block).with_context(|| format!("block {}", i))?;
+        }
+        Ok(state)
+    }
+
     /// Basic chain validation (linkage + merkle placeholder).
     pub fn validate(&self) -> anyhow::Result<()> {
         anyhow::ensure!(!self.blocks.is_empty(), "chain has no blocks");
@@ -143,6 +152,10 @@ impl Chain {
             genesis.header.merkle_root == merkle_root(&genesis.txs),
             "genesis merkle_root mismatch"
         );
+
+        // Validate state transitions (balances, nonces)
+        // This ensures every block in the chain is valid according to the state rules.
+        self.compute_state().context("state validation failed")?;
 
         for i in 1..self.blocks.len() {
             let prev = &self.blocks[i - 1];
