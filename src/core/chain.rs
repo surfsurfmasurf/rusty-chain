@@ -90,11 +90,27 @@ impl Chain {
     }
 
     /// Mine and append a block with provided transactions.
+    ///
+    /// If `miner_address` is provided, a coinbase transaction (50 coins) is prepended.
     pub fn mine_block(
         &mut self,
-        txs: Vec<Transaction>,
+        mut txs: Vec<Transaction>,
         new_difficulty: usize,
+        miner_address: Option<&str>,
     ) -> anyhow::Result<Block> {
+        // Prepend coinbase if miner specified
+        if let Some(miner) = miner_address {
+            let coinbase = Transaction {
+                from: "SYSTEM".to_string(),
+                to: miner.to_string(),
+                amount: 50,
+                nonce: 0, // TODO: Use block height?
+                pubkey_hex: None,
+                signature_b64: None,
+            };
+            txs.insert(0, coinbase);
+        }
+
         // Persist difficulty so later `validate` has the right context.
         self.pow_difficulty = new_difficulty;
         let difficulty = self.pow_difficulty;
@@ -128,7 +144,7 @@ impl Chain {
 
     /// Mine and append an empty block (demo PoW).
     pub fn mine_empty_block(&mut self, new_difficulty: usize) -> anyhow::Result<Block> {
-        self.mine_block(vec![], new_difficulty)
+        self.mine_block(vec![], new_difficulty, None)
     }
 
     pub fn compute_state(&self) -> anyhow::Result<State> {
