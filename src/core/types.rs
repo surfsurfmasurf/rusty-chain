@@ -60,6 +60,10 @@ impl Transaction {
         serde_json::to_vec(&self.signing_payload()).expect("serialize signing payload")
     }
 
+    pub fn is_coinbase(&self) -> bool {
+        self.from == "SYSTEM"
+    }
+
     /// Basic sanity checks (Week 1/early Week 2 demo).
     ///
     /// Note: signatures/balances/nonces will be enforced later.
@@ -68,6 +72,12 @@ impl Transaction {
         anyhow::ensure!(!self.to.trim().is_empty(), "tx.to must be non-empty");
         anyhow::ensure!(self.from != self.to, "tx.from and tx.to must differ");
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
+        
+        if self.is_coinbase() {
+             // Coinbase rules: no signature required (for now), but maybe nonce should be block height?
+             // For simplicity, we just allow it. The state application logic will ensure it's only valid as the first tx in a block.
+        }
+        
         Ok(())
     }
 
