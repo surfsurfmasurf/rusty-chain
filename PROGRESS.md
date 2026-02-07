@@ -73,3 +73,15 @@ Next:
 Next:
 - Decide account model (UTXO vs account) and enforce balances during `mine`/`validate`
 - Improve tx display formatting (fees? signature preview?)
+
+## Day 11
+- Added `Account` and `State` structures (balance/nonce tracking)
+- Implemented state validation: check balances and nonces when validating blocks
+- Added coinbase transaction support (System -> Miner, +50 coins)
+- CLI: `mine` now accepts `--miner <address>` to earn block rewards
+- Tests: added state transition tests (insufficient funds, invalid nonces, balance updates)
+
+Next:
+- Improve tx display formatting (fees? signature preview?)
+- Start Week 3: P2P networking baseline
+
