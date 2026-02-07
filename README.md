@@ -40,12 +40,13 @@ cargo run -- init
 # show status
 cargo run -- status
 
-# validate chain invariants (includes PoW check using difficulty stored in chain.json)
+# validate chain invariants (includes PoW check and balance/nonce state validation)
 cargo run -- validate
 
 # mine a block (uses mempool txs if available)
 # note: the chosen --difficulty is persisted into chain.json
-cargo run -- mine --difficulty 3
+# optionally provide --miner <address> to receive the block reward (50 coins)
+cargo run -- mine --difficulty 3 --miner alice
 
 # add a tx to mempool (prints tx hash)
 cargo run -- tx-add --from alice --to bob --amount 10
