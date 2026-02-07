@@ -15,7 +15,7 @@ fn chain_next_nonce_for_is_max_plus_one() {
     let tx1 = Transaction::new("alice", "bob", 1, 0);
     let tx2 = Transaction::new("alice", "bob", 1, 5);
 
-    c.mine_block(vec![tx1, tx2], 0).unwrap();
+    c.mine_block(vec![tx1, tx2], 0, None).unwrap();
 
     assert_eq!(c.next_nonce_for("alice"), 6);
     assert_eq!(c.next_nonce_for("bob"), 0);

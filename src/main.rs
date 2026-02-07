@@ -75,6 +75,10 @@ enum Commands {
         /// PoW difficulty (leading '0' hex chars)
         #[arg(long, default_value_t = 3)]
         difficulty: usize,
+
+        /// Address to receive block reward (coinbase)
+        #[arg(long)]
+        miner: Option<String>,
     },
 
     /// Add a transaction to the mempool
@@ -224,6 +228,7 @@ fn main() -> anyhow::Result<()> {
             path,
             mempool,
             difficulty,
+            miner,
         } => {
             let p = chain_path(path);
             let mut chain = load_or_genesis(&p)?;
@@ -244,11 +249,14 @@ fn main() -> anyhow::Result<()> {
             validate_nonce_sequence(&chain, &mp.txs)?;
 
             let txs = mp.drain();
-            let mined = chain.mine_block(txs, difficulty)?;
+            let mined = chain.mine_block(txs, difficulty, miner.as_deref())?;
             chain.save(&p)?;
             mp.save(&mp_path)?;
 
             println!("Mined block at height={}", chain.height());
+            if let Some(m) = miner {
+                println!("Miner reward sent to: {}", m);
+            }
             println!(
                 "nonce={} tip={} difficulty={} txs={}",
                 mined.header.nonce,
