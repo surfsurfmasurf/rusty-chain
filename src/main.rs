@@ -96,6 +96,9 @@ enum Commands {
         #[arg(long)]
         amount: u64,
 
+        #[arg(long, default_value_t = 0)]
+        fee: u64,
+
         /// Optional local key name (data/keys/<name>.json) to sign this tx.
         #[arg(long)]
         signer: Option<String>,
@@ -270,6 +273,7 @@ fn main() -> anyhow::Result<()> {
             from,
             to,
             amount,
+            fee,
             signer,
             nonce,
             mempool,
@@ -303,7 +307,7 @@ fn main() -> anyhow::Result<()> {
             let filled_nonce =
                 nonce.unwrap_or_else(|| mp.next_nonce_for(&effective_from, base_nonce));
 
-            let mut tx = Transaction::new(effective_from, to, amount, filled_nonce);
+            let mut tx = Transaction::new_with_fee(effective_from, to, amount, fee, filled_nonce);
 
             if let Some(file) = signer_file {
                 let sk = file.signing_key()?;
@@ -341,8 +345,8 @@ fn main() -> anyhow::Result<()> {
                     "unsigned"
                 };
                 println!(
-                    "{i}: {short} {} -> {} amount={} nonce={} ({signed})",
-                    tx.from, tx.to, tx.amount, tx.nonce
+                    "{i}: {short} {} -> {} amount={} fee={} nonce={} ({signed})",
+                    tx.from, tx.to, tx.amount, tx.fee, tx.nonce
                 );
             }
         }
