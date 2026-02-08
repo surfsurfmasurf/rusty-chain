@@ -17,6 +17,7 @@ fn coinbase_tx_increases_balance() {
         from: "SYSTEM".to_string(),
         to: "alice".to_string(),
         amount: 50,
+        fee: 0,
         nonce: 0, // coinbase nonce doesn't matter for now
         pubkey_hex: None,
         signature_b64: None,
@@ -37,6 +38,7 @@ fn transfer_tx_updates_balances() {
         from: "SYSTEM".to_string(),
         to: "alice".to_string(),
         amount: 50,
+        fee: 0,
         nonce: 0,
         pubkey_hex: None,
         signature_b64: None,
@@ -75,6 +77,7 @@ fn invalid_nonce_makes_chain_invalid() {
         from: "SYSTEM".to_string(),
         to: "alice".to_string(),
         amount: 50,
+        fee: 0,
         nonce: 0,
         pubkey_hex: None,
         signature_b64: None,
@@ -87,4 +90,61 @@ fn invalid_nonce_makes_chain_invalid() {
     
     let err = c.validate().unwrap_err();
     assert!(format!("{:?}", err).contains("Invalid nonce"), "got error: {:?}", err);
+}
+
+#[test]
+fn fees_are_collected_by_miner() {
+    let mut c = Chain::new_genesis();
+
+    // 1. Give Alice some starting funds (100)
+    let cb = Transaction {
+        from: "SYSTEM".to_string(),
+        to: "alice".to_string(),
+        amount: 100,
+        fee: 0,
+        nonce: 0,
+        pubkey_hex: None,
+        signature_b64: None,
+    };
+    c.mine_block(vec![cb], 1, None).unwrap();
+
+    // 2. Alice sends 10 to Bob with 5 fee. Miner is 'charlie'.
+    let tx = Transaction::new_with_fee("alice", "bob", 10, 5, 0);
+    c.mine_block(vec![tx], 1, Some("charlie")).unwrap();
+
+    let state = c.compute_state().unwrap();
+
+    // Alice: 100 - 10 - 5 = 85
+    assert_eq!(state.get_balance("alice"), 85);
+    // Bob: 10
+    assert_eq!(state.get_balance("bob"), 10);
+    // Charlie (miner): 50 (block reward) + 5 (fee) = 55
+    assert_eq!(state.get_balance("charlie"), 55);
+}
+
+#[test]
+fn insufficient_balance_for_fee_fails() {
+    let mut c = Chain::new_genesis();
+
+    // Alice has 10. Tries to send 10 with 1 fee (needs 11).
+    let cb = Transaction {
+        from: "SYSTEM".to_string(),
+        to: "alice".to_string(),
+        amount: 10,
+        fee: 0,
+        nonce: 0,
+        pubkey_hex: None,
+        signature_b64: None,
+    };
+    c.mine_block(vec![cb], 1, None).unwrap();
+
+    let tx = Transaction::new_with_fee("alice", "bob", 10, 1, 0);
+    c.mine_block(vec![tx], 1, None).unwrap();
+
+    let err = c.validate().unwrap_err();
+    assert!(
+        format!("{:?}", err).contains("Insufficient balance"),
+        "expected insufficient balance error, got: {:?}",
+        err
+    );
 }
