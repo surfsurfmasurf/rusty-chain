@@ -91,7 +91,7 @@ impl Chain {
 
     /// Mine and append a block with provided transactions.
     ///
-    /// If `miner_address` is provided, a coinbase transaction (50 coins) is prepended.
+    /// If `miner_address` is provided, a coinbase transaction (50 coins + fees) is prepended.
     pub fn mine_block(
         &mut self,
         mut txs: Vec<Transaction>,
@@ -100,10 +100,12 @@ impl Chain {
     ) -> anyhow::Result<Block> {
         // Prepend coinbase if miner specified
         if let Some(miner) = miner_address {
+            let total_fees: u64 = txs.iter().map(|tx| tx.fee).sum();
             let coinbase = Transaction {
                 from: "SYSTEM".to_string(),
                 to: miner.to_string(),
-                amount: 50,
+                amount: 50 + total_fees,
+                fee: 0,
                 nonce: 0, // TODO: Use block height?
                 pubkey_hex: None,
                 signature_b64: None,

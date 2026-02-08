@@ -74,13 +74,18 @@ impl State {
         }
 
         // Balance check
-        // TODO: add fee?
-        if sender.balance < tx.amount {
+        let total_needed = tx.amount.checked_add(tx.fee).ok_or_else(|| {
+            anyhow::anyhow!("Amount + Fee overflow for {}", tx.from)
+        })?;
+
+        if sender.balance < total_needed {
             anyhow::bail!(
-                "Insufficient balance for {}: has {}, needs {}",
+                "Insufficient balance for {}: has {}, needs {} (amount={} fee={})",
                 tx.from,
                 sender.balance,
-                tx.amount
+                total_needed,
+                tx.amount,
+                tx.fee
             );
         }
 
@@ -89,13 +94,13 @@ impl State {
 
     fn apply_tx(&mut self, tx: &Transaction) {
         if !tx.is_coinbase() {
-            // Deduct from sender
+            // Deduct from sender (amount + fee)
             let sender = self.accounts.entry(tx.from.clone()).or_default();
-            sender.balance -= tx.amount;
+            sender.balance -= tx.amount + tx.fee;
             sender.nonce += 1;
         }
 
-        // Add to receiver
+        // Add to receiver (amount only; fees are already collected by the miner via coinbase)
         let receiver = self.accounts.entry(tx.to.clone()).or_default();
         receiver.balance += tx.amount;
     }
