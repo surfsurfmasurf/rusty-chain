@@ -41,7 +41,8 @@ impl State {
             if i > 0 && tx.is_coinbase() {
                 anyhow::bail!("Coinbase tx at index {} invalid (only index 0 allowed)", i);
             }
-            self.validate_tx(tx).with_context(|| format!("tx index={}", i))?;
+            self.validate_tx(tx)
+                .with_context(|| format!("tx index={}", i))?;
         }
 
         // 2. Apply transactions (mutate)
@@ -74,9 +75,10 @@ impl State {
         }
 
         // Balance check
-        let total_needed = tx.amount.checked_add(tx.fee).ok_or_else(|| {
-            anyhow::anyhow!("Amount + Fee overflow for {}", tx.from)
-        })?;
+        let total_needed = tx
+            .amount
+            .checked_add(tx.fee)
+            .ok_or_else(|| anyhow::anyhow!("Amount + Fee overflow for {}", tx.from))?;
 
         if sender.balance < total_needed {
             anyhow::bail!(

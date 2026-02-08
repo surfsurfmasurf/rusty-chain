@@ -152,7 +152,9 @@ impl Chain {
     pub fn compute_state(&self) -> anyhow::Result<State> {
         let mut state = State::new();
         for (i, block) in self.blocks.iter().enumerate() {
-            state.apply_block(block).with_context(|| format!("block {}", i))?;
+            state
+                .apply_block(block)
+                .with_context(|| format!("block {}", i))?;
         }
         Ok(state)
     }
