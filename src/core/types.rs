@@ -15,6 +15,8 @@ pub struct Transaction {
     pub from: String,
     pub to: String,
     pub amount: u64,
+    #[serde(default)]
+    pub fee: u64,
     pub nonce: u64,
 
     /// Optional ed25519 public key (hex) used to verify `signature_b64`.
@@ -31,6 +33,7 @@ pub struct TxSignPayload {
     pub from: String,
     pub to: String,
     pub amount: u64,
+    pub fee: u64,
     pub nonce: u64,
 }
 
@@ -40,6 +43,25 @@ impl Transaction {
             from: from.into(),
             to: to.into(),
             amount,
+            fee: 0,
+            nonce,
+            pubkey_hex: None,
+            signature_b64: None,
+        }
+    }
+
+    pub fn new_with_fee(
+        from: impl Into<String>,
+        to: impl Into<String>,
+        amount: u64,
+        fee: u64,
+        nonce: u64,
+    ) -> Self {
+        Self {
+            from: from.into(),
+            to: to.into(),
+            amount,
+            fee,
             nonce,
             pubkey_hex: None,
             signature_b64: None,
@@ -51,6 +73,7 @@ impl Transaction {
             from: self.from.clone(),
             to: self.to.clone(),
             amount: self.amount,
+            fee: self.fee,
             nonce: self.nonce,
         }
     }
