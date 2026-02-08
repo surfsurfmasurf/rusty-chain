@@ -81,7 +81,15 @@ Next:
 - CLI: `mine` now accepts `--miner <address>` to earn block rewards
 - Tests: added state transition tests (insufficient funds, invalid nonces, balance updates)
 
+Day 12
+- Added `fee` field to `Transaction` and `TxSignPayload` (default: 0)
+- Implemented fee deduction from sender balance during state application
+- Implemented fee collection: miner reward = block reward (50) + sum(tx fees)
+- CLI: `tx-add` now supports optional `--fee`
+- CLI: `tx-list` now displays fees
+- Tests: added coverage for fee deduction, miner collection, and insufficient balance for fees
+
 Next:
-- Improve tx display formatting (fees? signature preview?)
-- Start Week 3: P2P networking baseline
+- Start Week 3: P2P networking baseline (libp2p or simple tokio tcp)
+- Block propagation
 
