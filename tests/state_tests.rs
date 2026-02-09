@@ -160,12 +160,12 @@ fn insufficient_balance_for_fee_fails() {
 #[test]
 fn saturating_math_prevents_underflow_panic() {
     let mut c = Chain::new_genesis();
-    
+
     // Construct a tx that would normally underflow if not for saturating math
     // (Though validate_tx usually catches this, apply_tx should be robust)
     let tx = Transaction::new("alice", "bob", 100, 0);
     c.mine_block(vec![tx], 1, None).unwrap();
-    
+
     // We expect validation to catch it, but we want to ensure compute_state doesn't panic
     let _ = c.compute_state();
 }
