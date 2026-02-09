@@ -1,4 +1,4 @@
-use crate::core::hash::{sha256_hex, tx_hash};
+use crate::core::hash::sha256_hex;
 use crate::core::state::State;
 use crate::core::time::now_ms;
 use crate::core::types::{Block, BlockHeader, Transaction};
@@ -225,7 +225,7 @@ pub fn merkle_root(txs: &[Transaction]) -> String {
         return sha256_hex(&[]);
     }
 
-    let joined = txs.iter().map(tx_hash).collect::<Vec<_>>().join("");
+    let joined = txs.iter().map(|t| t.id()).collect::<Vec<_>>().join("");
 
     sha256_hex(joined.as_bytes())
 }
