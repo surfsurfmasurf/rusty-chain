@@ -1,4 +1,3 @@
-use crate::core::hash::tx_hash;
 use crate::core::types::Transaction;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -31,8 +30,8 @@ impl Mempool {
     }
 
     fn ensure_unique_hash(&self, tx: &Transaction) -> anyhow::Result<()> {
-        let h = tx_hash(tx);
-        let existing: HashSet<String> = self.txs.iter().map(tx_hash).collect();
+        let h = tx.id();
+        let existing: HashSet<String> = self.txs.iter().map(|t| t.id()).collect();
         anyhow::ensure!(!existing.contains(&h), "duplicate tx (hash={h})");
         Ok(())
     }
