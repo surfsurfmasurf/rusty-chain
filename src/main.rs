@@ -2,7 +2,6 @@ use anyhow::Context;
 use clap::{Parser, Subcommand};
 
 use rusty_chain::core::chain::Chain;
-use rusty_chain::core::hash::tx_hash;
 use rusty_chain::core::keys::KeyFile;
 use rusty_chain::core::mempool::Mempool;
 use rusty_chain::core::types::Transaction;
@@ -317,7 +316,7 @@ fn main() -> anyhow::Result<()> {
                 tx.signature_b64 = Some(sig);
             }
 
-            let h = tx_hash(&tx);
+            let h = tx.id();
             mp.add_tx_checked(tx, base_nonce)?;
             mp.save(&mp_path)?;
             println!("Added tx to mempool: {}", mp_path.display());
@@ -337,7 +336,7 @@ fn main() -> anyhow::Result<()> {
             println!("mempool: {}", mp_path.display());
             println!("count={}", mp.txs.len());
             for (i, tx) in mp.txs.iter().enumerate() {
-                let h = tx_hash(tx);
+                let h = tx.id();
                 let short = h.get(..8).unwrap_or(&h);
                 let signed = if tx.signature_b64.is_some() {
                     "signed"
