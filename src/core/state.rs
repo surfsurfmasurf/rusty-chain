@@ -98,12 +98,12 @@ impl State {
         if !tx.is_coinbase() {
             // Deduct from sender (amount + fee)
             let sender = self.accounts.entry(tx.from.clone()).or_default();
-            sender.balance -= tx.amount + tx.fee;
+            sender.balance = sender.balance.saturating_sub(tx.amount + tx.fee);
             sender.nonce += 1;
         }
 
         // Add to receiver (amount only; fees are already collected by the miner via coinbase)
         let receiver = self.accounts.entry(tx.to.clone()).or_default();
-        receiver.balance += tx.amount;
+        receiver.balance = receiver.balance.saturating_add(tx.amount);
     }
 }
