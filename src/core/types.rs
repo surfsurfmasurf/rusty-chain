@@ -83,6 +83,11 @@ impl Transaction {
         serde_json::to_vec(&self.signing_payload()).expect("serialize signing payload")
     }
 
+    /// Transaction ID (hash)
+    pub fn id(&self) -> String {
+        crate::core::hash::tx_hash(self)
+    }
+
     pub fn is_coinbase(&self) -> bool {
         self.from == "SYSTEM"
     }
