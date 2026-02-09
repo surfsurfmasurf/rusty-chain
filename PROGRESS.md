@@ -89,6 +89,13 @@ Day 12
 - CLI: `tx-list` now displays fees
 - Tests: added coverage for fee deduction, miner collection, and insufficient balance for fees
 
+## Day 13
+- Added `Transaction::id()` helper for unified hash access across core and CLI
+- Refactored `Mempool`, `Chain`, and `CLI` to use `tx.id()` instead of direct hashing
+- Robustness: used saturating math for balance updates in `State` application
+- Polish: removed `expect` from `now_ms` (now uses `unwrap_or` for safety)
+- Added robustness tests for state transitions
+
 Next:
 - Start Week 3: P2P networking baseline (libp2p or simple tokio tcp)
 - Block propagation
