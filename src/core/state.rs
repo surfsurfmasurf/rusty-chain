@@ -33,7 +33,7 @@ impl State {
     /// if they modify `self` directly, but here we clone inside or assume sequential checks).
     ///
     /// For this simple implementation, we'll check everything before mutating.
-    pub fn apply_block(&mut self, block: &Block) -> anyhow::Result<()> {
+    pub fn apply_block(&mut self, block: &Block, height: usize) -> anyhow::Result<()> {
         use anyhow::Context;
 
         // 1. Verify all transactions against current state (read-only check)
@@ -41,7 +41,7 @@ impl State {
             if i > 0 && tx.is_coinbase() {
                 anyhow::bail!("Coinbase tx at index {} invalid (only index 0 allowed)", i);
             }
-            self.validate_tx(tx)
+            self.validate_tx(tx, height)
                 .with_context(|| format!("tx index={}", i))?;
         }
 
@@ -53,12 +53,18 @@ impl State {
         Ok(())
     }
 
-    fn validate_tx(&self, tx: &Transaction) -> anyhow::Result<()> {
+    fn validate_tx(&self, tx: &Transaction, height: usize) -> anyhow::Result<()> {
         if tx.is_coinbase() {
             // Coinbase validation rules:
-            // - Must be the first tx in block (checked by apply_block loop index if we pass it, but here we just check validity)
-            // - Amount logic (checked by consensus, not state?)
-            // For now, assume it's valid if it's a coinbase.
+            // - Must be the first tx in block (checked by apply_block loop index)
+            // - Nonce must match block height
+            if tx.nonce != height as u64 {
+                anyhow::bail!(
+                    "Invalid coinbase nonce: expected {}, got {}",
+                    height,
+                    tx.nonce
+                );
+            }
             return Ok(());
         }
 

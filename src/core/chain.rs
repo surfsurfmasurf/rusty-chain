@@ -153,7 +153,7 @@ impl Chain {
         let mut state = State::new();
         for (i, block) in self.blocks.iter().enumerate() {
             state
-                .apply_block(block)
+                .apply_block(block, i)
                 .with_context(|| format!("block {}", i))?;
         }
         Ok(state)
