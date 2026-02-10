@@ -61,10 +61,9 @@ fn insufficient_balance_makes_chain_invalid() {
 
     // Alice has 0. Tries to send 10.
     let tx = Transaction::new("alice", "bob", 10, 0);
-    c.mine_block(vec![tx], 1, None).unwrap();
+    let err = c.mine_block(vec![tx], 1, None).unwrap_err();
 
-    // validate should fail
-    let err = c.validate().unwrap_err();
+    // mine_block should fail
     assert!(
         format!("{:?}", err).contains("Insufficient balance"),
         "got error: {:?}",
@@ -90,9 +89,8 @@ fn invalid_nonce_makes_chain_invalid() {
 
     // Alice sends with nonce 5 (expected 0)
     let tx = Transaction::new("alice", "bob", 10, 5);
-    c.mine_block(vec![tx], 1, None).unwrap();
+    let err = c.mine_block(vec![tx], 1, None).unwrap_err();
 
-    let err = c.validate().unwrap_err();
     assert!(
         format!("{:?}", err).contains("Invalid nonce"),
         "got error: {:?}",
@@ -147,9 +145,8 @@ fn insufficient_balance_for_fee_fails() {
     c.mine_block(vec![cb], 1, None).unwrap();
 
     let tx = Transaction::new_with_fee("alice", "bob", 50, 1, 0);
-    c.mine_block(vec![tx], 1, None).unwrap();
+    let err = c.mine_block(vec![tx], 1, None).unwrap_err();
 
-    let err = c.validate().unwrap_err();
     assert!(
         format!("{:?}", err).contains("Insufficient balance"),
         "expected insufficient balance error, got: {:?}",
@@ -164,7 +161,7 @@ fn saturating_math_prevents_underflow_panic() {
     // Construct a tx that would normally underflow if not for saturating math
     // (Though validate_tx usually catches this, apply_tx should be robust)
     let tx = Transaction::new("alice", "bob", 100, 0);
-    c.mine_block(vec![tx], 1, None).unwrap();
+    let _ = c.mine_block(vec![tx], 1, None);
 
     // We expect validation to catch it, but we want to ensure compute_state doesn't panic
     let _ = c.compute_state();

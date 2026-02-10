@@ -115,6 +115,13 @@ impl Chain {
             txs.insert(0, coinbase);
         }
 
+        // Validate state transitions (balances, nonces) before mining.
+        // We create a temporary state, apply the new transactions, and see if it holds.
+        let mut state = self.compute_state()?;
+        state
+            .apply_block_txs(&txs, block_height as usize)
+            .context("mempool transactions failed state application")?;
+
         // Persist difficulty so later `validate` has the right context.
         self.pow_difficulty = new_difficulty;
         let difficulty = self.pow_difficulty;
