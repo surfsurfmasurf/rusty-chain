@@ -60,7 +60,13 @@ impl State {
         Ok(())
     }
 
-    fn validate_tx(&self, tx: &Transaction, height: usize, block_reward: u64, total_fees: u64) -> anyhow::Result<()> {
+    fn validate_tx(
+        &self,
+        tx: &Transaction,
+        height: usize,
+        block_reward: u64,
+        total_fees: u64,
+    ) -> anyhow::Result<()> {
         if tx.is_coinbase() {
             // Coinbase validation rules:
             // - Must be the first tx in block (checked by apply_block loop index)
