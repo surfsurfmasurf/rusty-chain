@@ -18,7 +18,7 @@ fn coinbase_tx_increases_balance() {
         to: "alice".to_string(),
         amount: 50,
         fee: 0,
-        nonce: 0, // coinbase nonce doesn't matter for now
+        nonce: 1, // coinbase nonce must match block height
         pubkey_hex: None,
         signature_b64: None,
     };
@@ -39,7 +39,7 @@ fn transfer_tx_updates_balances() {
         to: "alice".to_string(),
         amount: 50,
         fee: 0,
-        nonce: 0,
+        nonce: 1,
         pubkey_hex: None,
         signature_b64: None,
     };
@@ -82,7 +82,7 @@ fn invalid_nonce_makes_chain_invalid() {
         to: "alice".to_string(),
         amount: 50,
         fee: 0,
-        nonce: 0,
+        nonce: 1,
         pubkey_hex: None,
         signature_b64: None,
     };
@@ -108,9 +108,9 @@ fn fees_are_collected_by_miner() {
     let cb = Transaction {
         from: "SYSTEM".to_string(),
         to: "alice".to_string(),
-        amount: 100,
+        amount: 50,
         fee: 0,
-        nonce: 0,
+        nonce: 1,
         pubkey_hex: None,
         signature_b64: None,
     };
@@ -122,8 +122,8 @@ fn fees_are_collected_by_miner() {
 
     let state = c.compute_state().unwrap();
 
-    // Alice: 100 - 10 - 5 = 85
-    assert_eq!(state.get_balance("alice"), 85);
+    // Alice: 50 - 10 - 5 = 35
+    assert_eq!(state.get_balance("alice"), 35);
     // Bob: 10
     assert_eq!(state.get_balance("bob"), 10);
     // Charlie (miner): 50 (block reward) + 5 (fee) = 55
@@ -134,19 +134,19 @@ fn fees_are_collected_by_miner() {
 fn insufficient_balance_for_fee_fails() {
     let mut c = Chain::new_genesis();
 
-    // Alice has 10. Tries to send 10 with 1 fee (needs 11).
+    // Alice has 50. Tries to send 50 with 1 fee (needs 51).
     let cb = Transaction {
         from: "SYSTEM".to_string(),
         to: "alice".to_string(),
-        amount: 10,
+        amount: 50,
         fee: 0,
-        nonce: 0,
+        nonce: 1,
         pubkey_hex: None,
         signature_b64: None,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
 
-    let tx = Transaction::new_with_fee("alice", "bob", 10, 1, 0);
+    let tx = Transaction::new_with_fee("alice", "bob", 50, 1, 0);
     c.mine_block(vec![tx], 1, None).unwrap();
 
     let err = c.validate().unwrap_err();

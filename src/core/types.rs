@@ -92,12 +92,6 @@ impl Transaction {
         self.from == "SYSTEM"
     }
 
-    pub fn total_reward(&self) -> u64 {
-        let block_reward = 50;
-        let fees: u64 = self.txs.iter().map(|tx| tx.fee).sum();
-        block_reward + fees
-    }
-
     /// Basic sanity checks (Week 1/early Week 2 demo).
     ///
     /// Note: signatures/balances/nonces will be enforced later.
@@ -155,4 +149,16 @@ impl Transaction {
 pub struct Block {
     pub header: BlockHeader,
     pub txs: Vec<Transaction>,
+}
+
+impl Block {
+    pub fn is_coinbase(&self) -> bool {
+        self.txs.first().map_or(false, |tx| tx.is_coinbase())
+    }
+
+    pub fn total_reward(&self) -> u64 {
+        let block_reward = 50;
+        let fees: u64 = self.txs.iter().map(|tx| tx.fee).sum();
+        block_reward + fees
+    }
 }
