@@ -98,6 +98,8 @@ impl Chain {
         new_difficulty: usize,
         miner_address: Option<&str>,
     ) -> anyhow::Result<Block> {
+        let block_height = self.height() as u64 + 1;
+
         // Prepend coinbase if miner specified
         if let Some(miner) = miner_address {
             let total_fees: u64 = txs.iter().map(|tx| tx.fee).sum();
@@ -106,7 +108,7 @@ impl Chain {
                 to: miner.to_string(),
                 amount: 50 + total_fees,
                 fee: 0,
-                nonce: self.height() as u64 + 1, // Use future block height for coinbase nonce
+                nonce: block_height,
                 pubkey_hex: None,
                 signature_b64: None,
             };
