@@ -12,12 +12,25 @@ fn chain_next_nonce_for_starts_at_zero() {
 fn chain_next_nonce_for_is_max_plus_one() {
     let mut c = Chain::new_genesis();
 
+    // Fund alice
+    let cb = Transaction {
+        from: "SYSTEM".to_string(),
+        to: "alice".to_string(),
+        amount: 50,
+        fee: 0,
+        nonce: 1,
+        pubkey_hex: None,
+        signature_b64: None,
+    };
+    c.mine_block(vec![cb], 0, None).unwrap();
+
     let tx1 = Transaction::new("alice", "bob", 1, 0);
-    let tx2 = Transaction::new("alice", "bob", 1, 5);
+    c.mine_block(vec![tx1], 0, None).unwrap();
 
-    c.mine_block(vec![tx1, tx2], 0, None).unwrap();
+    let tx2 = Transaction::new("alice", "bob", 1, 1);
+    c.mine_block(vec![tx2], 0, None).unwrap();
 
-    assert_eq!(c.next_nonce_for("alice"), 6);
+    assert_eq!(c.next_nonce_for("alice"), 2);
     assert_eq!(c.next_nonce_for("bob"), 0);
 }
 

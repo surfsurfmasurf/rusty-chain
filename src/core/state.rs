@@ -34,13 +34,17 @@ impl State {
     ///
     /// For this simple implementation, we'll check everything before mutating.
     pub fn apply_block(&mut self, block: &Block, height: usize) -> anyhow::Result<()> {
+        self.apply_block_txs(&block.txs, height)
+    }
+
+    pub fn apply_block_txs(&mut self, txs: &[Transaction], height: usize) -> anyhow::Result<()> {
         use anyhow::Context;
 
         let block_reward = 50;
-        let total_fees: u64 = block.txs.iter().map(|tx| tx.fee).sum();
+        let total_fees: u64 = txs.iter().map(|tx| tx.fee).sum();
 
         // 1. Verify all transactions against current state (read-only check)
-        for (i, tx) in block.txs.iter().enumerate() {
+        for (i, tx) in txs.iter().enumerate() {
             if i > 0 && tx.is_coinbase() {
                 anyhow::bail!("Coinbase tx at index {} invalid (only index 0 allowed)", i);
             }
@@ -49,7 +53,7 @@ impl State {
         }
 
         // 2. Apply transactions (mutate)
-        for tx in &block.txs {
+        for tx in txs {
             self.apply_tx(tx);
         }
 
