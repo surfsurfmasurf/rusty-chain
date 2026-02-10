@@ -89,6 +89,10 @@ impl Chain {
         Ok(())
     }
 
+    pub fn tip_header(&self) -> &BlockHeader {
+        &self.blocks.last().expect("genesis exists").header
+    }
+
     /// Mine and append a block with provided transactions.
     ///
     /// If `miner_address` is provided, a coinbase transaction (50 coins + fees) is prepended.
