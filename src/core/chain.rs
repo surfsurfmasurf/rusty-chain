@@ -106,7 +106,7 @@ impl Chain {
                 to: miner.to_string(),
                 amount: 50 + total_fees,
                 fee: 0,
-                nonce: 0, // TODO: Use block height?
+                nonce: self.height() as u64 + 1, // Use future block height for coinbase nonce
                 pubkey_hex: None,
                 signature_b64: None,
             };
