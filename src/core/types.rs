@@ -153,7 +153,7 @@ pub struct Block {
 
 impl Block {
     pub fn is_coinbase(&self) -> bool {
-        self.txs.first().map_or(false, |tx| tx.is_coinbase())
+        self.txs.first().is_some_and(|tx| tx.is_coinbase())
     }
 
     pub fn total_reward(&self) -> u64 {
