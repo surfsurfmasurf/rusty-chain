@@ -96,6 +96,13 @@ Day 12
 - Polish: removed `expect` from `now_ms` (now uses `unwrap_or` for safety)
 - Added robustness tests for state transitions
 
+## Day 14
+- Refactored coinbase transactions: nonce now matches block height for easier indexing
+- Enhanced state validation: enforce coinbase nonce and reward amount (block reward + fees)
+- Improved mining safety: pre-validate mempool transactions against ledger state before committing to PoW
+- Added `Block` and `Chain` helpers (`is_coinbase`, `total_reward`, `tip_header`)
+- Fixed and updated test suite to comply with new consensus and state rules
+
 Next:
 - Start Week 3: P2P networking baseline (libp2p or simple tokio tcp)
 - Block propagation
