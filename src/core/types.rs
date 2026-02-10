@@ -92,6 +92,12 @@ impl Transaction {
         self.from == "SYSTEM"
     }
 
+    pub fn total_reward(&self) -> u64 {
+        let block_reward = 50;
+        let fees: u64 = self.txs.iter().map(|tx| tx.fee).sum();
+        block_reward + fees
+    }
+
     /// Basic sanity checks (Week 1/early Week 2 demo).
     ///
     /// Note: signatures/balances/nonces will be enforced later.
