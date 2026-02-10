@@ -36,12 +36,15 @@ impl State {
     pub fn apply_block(&mut self, block: &Block, height: usize) -> anyhow::Result<()> {
         use anyhow::Context;
 
+        let block_reward = 50;
+        let total_fees: u64 = block.txs.iter().map(|tx| tx.fee).sum();
+
         // 1. Verify all transactions against current state (read-only check)
         for (i, tx) in block.txs.iter().enumerate() {
             if i > 0 && tx.is_coinbase() {
                 anyhow::bail!("Coinbase tx at index {} invalid (only index 0 allowed)", i);
             }
-            self.validate_tx(tx, height)
+            self.validate_tx(tx, height, block_reward, total_fees)
                 .with_context(|| format!("tx index={}", i))?;
         }
 
@@ -53,7 +56,7 @@ impl State {
         Ok(())
     }
 
-    fn validate_tx(&self, tx: &Transaction, height: usize) -> anyhow::Result<()> {
+    fn validate_tx(&self, tx: &Transaction, height: usize, block_reward: u64, total_fees: u64) -> anyhow::Result<()> {
         if tx.is_coinbase() {
             // Coinbase validation rules:
             // - Must be the first tx in block (checked by apply_block loop index)
@@ -63,6 +66,15 @@ impl State {
                     "Invalid coinbase nonce: expected {}, got {}",
                     height,
                     tx.nonce
+                );
+            }
+            // - Reward must match block_reward + fees
+            let expected_reward = block_reward + total_fees;
+            if tx.amount != expected_reward {
+                anyhow::bail!(
+                    "Invalid coinbase reward: expected {}, got {}",
+                    expected_reward,
+                    tx.amount
                 );
             }
             return Ok(());
