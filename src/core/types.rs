@@ -26,6 +26,10 @@ pub struct Transaction {
     /// Optional ed25519 signature (base64) over the signing payload.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub signature_b64: Option<String>,
+
+    /// Optional comment/metadata for the transaction (limit: 64 chars)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memo: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -35,6 +39,8 @@ pub struct TxSignPayload {
     pub amount: u64,
     pub fee: u64,
     pub nonce: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memo: Option<String>,
 }
 
 impl Transaction {
@@ -47,6 +53,7 @@ impl Transaction {
             nonce,
             pubkey_hex: None,
             signature_b64: None,
+            memo: None,
         }
     }
 
@@ -65,6 +72,7 @@ impl Transaction {
             nonce,
             pubkey_hex: None,
             signature_b64: None,
+            memo: None,
         }
     }
 
@@ -75,6 +83,7 @@ impl Transaction {
             amount: self.amount,
             fee: self.fee,
             nonce: self.nonce,
+            memo: self.memo.clone(),
         }
     }
 
@@ -100,6 +109,10 @@ impl Transaction {
         anyhow::ensure!(!self.to.trim().is_empty(), "tx.to must be non-empty");
         anyhow::ensure!(self.from != self.to, "tx.from and tx.to must differ");
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
+
+        if let Some(memo) = &self.memo {
+            anyhow::ensure!(memo.len() <= 64, "memo must be <= 64 characters");
+        }
 
         if self.is_coinbase() {
             // Coinbase rules: no signature required (for now), but maybe nonce should be block height?

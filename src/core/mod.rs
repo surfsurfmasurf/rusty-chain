@@ -3,6 +3,7 @@ pub mod crypto;
 pub mod hash;
 pub mod keys;
 pub mod mempool;
+pub mod network;
 pub mod state;
 pub mod time;
 pub mod types;

@@ -109,6 +109,10 @@ enum Commands {
         /// Optional path for mempool JSON
         #[arg(long)]
         mempool: Option<String>,
+
+        /// Optional memo (max 64 chars)
+        #[arg(long)]
+        memo: Option<String>,
     },
 
     /// List mempool transactions
@@ -276,6 +280,7 @@ fn main() -> anyhow::Result<()> {
             signer,
             nonce,
             mempool,
+            memo,
         } => {
             let chain_path = chain_path(chain);
             let chain = load_or_genesis(&chain_path)?;
@@ -307,6 +312,7 @@ fn main() -> anyhow::Result<()> {
                 nonce.unwrap_or_else(|| mp.next_nonce_for(&effective_from, base_nonce));
 
             let mut tx = Transaction::new_with_fee(effective_from, to, amount, fee, filled_nonce);
+            tx.memo = memo;
 
             if let Some(file) = signer_file {
                 let sk = file.signing_key()?;

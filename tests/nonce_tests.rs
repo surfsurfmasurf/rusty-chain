@@ -21,6 +21,7 @@ fn chain_next_nonce_for_is_max_plus_one() {
         nonce: 1,
         pubkey_hex: None,
         signature_b64: None,
+        memo: None,
     };
     c.mine_block(vec![cb], 0, None).unwrap();
 
