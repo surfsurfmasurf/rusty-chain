@@ -21,6 +21,7 @@ fn coinbase_tx_increases_balance() {
         nonce: 1, // coinbase nonce must match block height
         pubkey_hex: None,
         signature_b64: None,
+        memo: None,
     };
 
     c.mine_block(vec![coinbase], 1, None).unwrap();
@@ -42,6 +43,7 @@ fn transfer_tx_updates_balances() {
         nonce: 1,
         pubkey_hex: None,
         signature_b64: None,
+        memo: None,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
@@ -84,6 +86,7 @@ fn invalid_nonce_makes_chain_invalid() {
         nonce: 1,
         pubkey_hex: None,
         signature_b64: None,
+        memo: None,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
@@ -111,6 +114,7 @@ fn fees_are_collected_by_miner() {
         nonce: 1,
         pubkey_hex: None,
         signature_b64: None,
+        memo: None,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
 
@@ -141,6 +145,7 @@ fn insufficient_balance_for_fee_fails() {
         nonce: 1,
         pubkey_hex: None,
         signature_b64: None,
+        memo: None,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
 
