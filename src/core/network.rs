@@ -83,3 +83,36 @@ impl Message {
         Ok(msg)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn test_message_roundtrip() {
+        let msg = Message::Ping;
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+    }
+
+    #[tokio::test]
+    async fn test_message_async_roundtrip() {
+        let msg = Message::Status {
+            height: 10,
+            tip_hash: "abcd".to_string(),
+        };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode_async(Cursor::new(encoded)).await.unwrap();
+        assert_eq!(msg, decoded);
+    }
+
+    #[test]
+    fn test_message_too_large() {
+        let mut buf = Vec::new();
+        buf.extend_from_slice(&(11 * 1024 * 1024u32).to_be_bytes());
+        let res = Message::decode(Cursor::new(buf));
+        assert!(res.is_err());
+    }
+}
