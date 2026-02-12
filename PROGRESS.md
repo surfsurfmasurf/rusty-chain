@@ -107,3 +107,11 @@ Next:
 - Start Week 3: P2P networking baseline (libp2p or simple tokio tcp)
 - Block propagation
 
+## Day 15
+- Expanded P2P `Message` types to support block/transaction propagation and sync
+- Added `tokio` and `futures` dependencies for async networking
+- Implemented `Message` encoding/decoding with length-prefixed JSON
+- Added sync and async send/decode helpers for `TcpStream` and generic async readers/writers
+- Added message size sanity checks (10MB limit) to prevent OOM/DoS
+- Added comprehensive tests for P2P message roundtrips and size limits
+
