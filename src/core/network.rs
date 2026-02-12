@@ -46,4 +46,28 @@ impl Message {
         stream.flush()?;
         Ok(())
     }
+
+    pub async fn send_async<W: tokio::io::AsyncWrite + Unpin>(
+        &self,
+        writer: &mut W,
+    ) -> anyhow::Result<()> {
+        use tokio::io::AsyncWriteExt;
+        let buf = self.encode()?;
+        writer.write_all(&buf).await?;
+        writer.flush().await?;
+        Ok(())
+    }
+
+    pub async fn decode_async<R: tokio::io::AsyncRead + Unpin>(
+        mut reader: R,
+    ) -> anyhow::Result<Self> {
+        use tokio::io::AsyncReadExt;
+        let mut len_buf = [0u8; 4];
+        reader.read_exact(&mut len_buf).await?;
+        let len = u32::from_be_bytes(len_buf) as usize;
+        let mut json_buf = vec![0u8; len];
+        reader.read_exact(&mut json_buf).await?;
+        let msg = serde_json::from_slice(&json_buf)?;
+        Ok(msg)
+    }
 }
