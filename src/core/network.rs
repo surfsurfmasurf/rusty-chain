@@ -34,6 +34,12 @@ impl Message {
         let mut len_buf = [0u8; 4];
         reader.read_exact(&mut len_buf)?;
         let len = u32::from_be_bytes(len_buf) as usize;
+
+        // Sanity check: limit message size to 10MB
+        if len > 10 * 1024 * 1024 {
+            return Err(anyhow::anyhow!("Message too large: {} bytes", len));
+        }
+
         let mut json_buf = vec![0u8; len];
         reader.read_exact(&mut json_buf)?;
         let msg = serde_json::from_slice(&json_buf)?;
@@ -65,6 +71,12 @@ impl Message {
         let mut len_buf = [0u8; 4];
         reader.read_exact(&mut len_buf).await?;
         let len = u32::from_be_bytes(len_buf) as usize;
+        
+        // Sanity check: limit message size to 10MB
+        if len > 10 * 1024 * 1024 {
+            return Err(anyhow::anyhow!("Message too large: {} bytes", len));
+        }
+
         let mut json_buf = vec![0u8; len];
         reader.read_exact(&mut json_buf).await?;
         let msg = serde_json::from_slice(&json_buf)?;
