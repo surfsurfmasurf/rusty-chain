@@ -8,13 +8,8 @@ pub enum Message {
     Ping,
     Pong,
     GetStatus,
-    Status {
-        height: u64,
-        tip_hash: String,
-    },
-    GetBlocks {
-        start_height: u64,
-    },
+    Status { height: u64, tip_hash: String },
+    GetBlocks { start_height: u64 },
     Blocks(Vec<Block>),
     NewTransaction(Transaction),
     NewBlock(Block),
@@ -71,7 +66,7 @@ impl Message {
         let mut len_buf = [0u8; 4];
         reader.read_exact(&mut len_buf).await?;
         let len = u32::from_be_bytes(len_buf) as usize;
-        
+
         // Sanity check: limit message size to 10MB
         if len > 10 * 1024 * 1024 {
             return Err(anyhow::anyhow!("Message too large: {} bytes", len));
