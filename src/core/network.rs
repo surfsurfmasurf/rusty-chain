@@ -111,6 +111,17 @@ mod tests {
         assert_eq!(msg, decoded);
     }
 
+    #[tokio::test]
+    async fn test_message_inventory_roundtrip() {
+        let msg = Message::Inventory {
+            tx_hashes: vec!["tx1".to_string()],
+            block_hashes: vec!["blk1".to_string()],
+        };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode_async(Cursor::new(encoded)).await.unwrap();
+        assert_eq!(msg, decoded);
+    }
+
     #[test]
     fn test_message_too_large() {
         let mut buf = Vec::new();
