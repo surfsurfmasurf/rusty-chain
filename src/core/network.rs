@@ -13,6 +13,8 @@ pub enum Message {
     Blocks(Vec<Block>),
     NewTransaction(Transaction),
     NewBlock(Block),
+    RequestStatus,
+    ResponseStatus { height: u64, tip_hash: String },
 }
 
 impl Message {
