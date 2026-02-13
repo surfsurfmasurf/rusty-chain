@@ -63,6 +63,10 @@ impl Message {
         Ok(())
     }
 
+    pub fn size_limit() -> usize {
+        10 * 1024 * 1024 // 10MB
+    }
+
     pub async fn decode_async<R: tokio::io::AsyncRead + Unpin>(
         mut reader: R,
     ) -> anyhow::Result<Self> {
