@@ -121,6 +121,25 @@ enum Commands {
         #[arg(long)]
         mempool: Option<String>,
     },
+
+    /// Start a P2P node
+    Node {
+        /// Port to listen on
+        #[arg(long, default_value_t = 9000)]
+        port: u16,
+
+        /// Peer address to connect to (e.g. 127.0.0.1:9001)
+        #[arg(long)]
+        peer: Vec<String>,
+
+        /// Path for chain JSON
+        #[arg(long)]
+        path: Option<String>,
+
+        /// Path for mempool JSON
+        #[arg(long)]
+        mempool: Option<String>,
+    },
 }
 
 fn chain_path(path: Option<String>) -> std::path::PathBuf {
@@ -354,6 +373,18 @@ fn main() -> anyhow::Result<()> {
                     tx.from, tx.to, tx.amount, tx.fee, tx.nonce
                 );
             }
+        }
+        Commands::Node {
+            port,
+            peer,
+            path,
+            mempool,
+        } => {
+            println!("Starting node on port {}...", port);
+            println!("Peers: {:?}", peer);
+            println!("Chain: {}", chain_path(path).display());
+            println!("Mempool: {}", mempool_path(mempool).display());
+            println!("(P2P loop not yet implemented)");
         }
     }
 
