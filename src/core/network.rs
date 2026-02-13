@@ -16,6 +16,7 @@ pub enum Message {
     RequestStatus,
     ResponseStatus { height: u64, tip_hash: String },
     Inventory { tx_hashes: Vec<String>, block_hashes: Vec<String> },
+    GetMempool,
 }
 
 impl Message {
