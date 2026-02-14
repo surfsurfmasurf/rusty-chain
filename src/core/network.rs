@@ -140,4 +140,15 @@ mod tests {
         let res = Message::decode(Cursor::new(buf));
         assert!(res.is_err());
     }
+
+    #[test]
+    fn test_message_inventory_empty() {
+        let msg = Message::Inventory {
+            tx_hashes: vec![],
+            block_hashes: vec![],
+        };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+    }
 }
