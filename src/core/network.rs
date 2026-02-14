@@ -8,14 +8,25 @@ pub enum Message {
     Ping,
     Pong,
     GetStatus,
-    Status { height: u64, tip_hash: String },
-    GetBlocks { start_height: u64 },
+    Status {
+        height: u64,
+        tip_hash: String,
+    },
+    GetBlocks {
+        start_height: u64,
+    },
     Blocks(Vec<Block>),
     NewTransaction(Transaction),
     NewBlock(Block),
     RequestStatus,
-    ResponseStatus { height: u64, tip_hash: String },
-    Inventory { tx_hashes: Vec<String>, block_hashes: Vec<String> },
+    ResponseStatus {
+        height: u64,
+        tip_hash: String,
+    },
+    Inventory {
+        tx_hashes: Vec<String>,
+        block_hashes: Vec<String>,
+    },
     GetMempool,
 }
 
