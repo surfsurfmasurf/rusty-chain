@@ -136,7 +136,7 @@ mod tests {
     #[test]
     fn test_message_too_large() {
         let mut buf = Vec::new();
-        buf.extend_from_slice(&(11 * 1024 * 1024u32).to_be_bytes());
+        buf.extend_from_slice(&(20 * 1024 * 1024u32).to_be_bytes());
         let res = Message::decode(Cursor::new(buf));
         assert!(res.is_err());
     }
