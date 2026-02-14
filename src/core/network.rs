@@ -75,7 +75,7 @@ impl Message {
     }
 
     pub fn size_limit() -> usize {
-        10 * 1024 * 1024 // 10MB
+        15 * 1024 * 1024 // Increased to 15MB
     }
 
     pub async fn decode_async<R: tokio::io::AsyncRead + Unpin>(
