@@ -35,6 +35,32 @@ impl P2PNode {
         let listener = TcpListener::bind(format!("0.0.0.0:{}", self.port)).await?;
         println!("Listening on P2P port: {}", self.port);
 
+        // Outbound connection attempts
+        let peers = self.peers.clone();
+        tokio::spawn(async move {
+            let peer_list: Vec<String> = {
+                let p = peers.lock().await;
+                p.iter().cloned().collect()
+            };
+
+            for addr in peer_list {
+                println!("Attempting to connect to peer: {}", addr);
+                match TcpStream::connect(&addr).await {
+                    Ok(stream) => {
+                        println!("Successfully connected to peer: {}", addr);
+                        tokio::spawn(async move {
+                            if let Err(e) = handle_peer(stream).await {
+                                eprintln!("Outbound peer handler error ({}): {}", addr, e);
+                            }
+                        });
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to connect to peer {}: {}", addr, e);
+                    }
+                }
+            }
+        });
+
         loop {
             let (stream, addr) = listener.accept().await?;
             println!("New peer connected: {}", addr);
