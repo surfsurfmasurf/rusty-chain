@@ -189,7 +189,8 @@ fn validate_nonce_sequence(chain: &Chain, txs: &[Transaction]) -> anyhow::Result
     Ok(())
 }
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
@@ -377,14 +378,11 @@ fn main() -> anyhow::Result<()> {
         Commands::Node {
             port,
             peer,
-            path,
-            mempool,
+            path: _,
+            mempool: _,
         } => {
-            println!("Starting node on port {}...", port);
-            println!("Peers: {:?}", peer);
-            println!("Chain: {}", chain_path(path).display());
-            println!("Mempool: {}", mempool_path(mempool).display());
-            println!("(P2P loop not yet implemented)");
+            let node = rusty_chain::core::P2PNode::new(port, peer);
+            node.start().await?;
         }
     }
 
