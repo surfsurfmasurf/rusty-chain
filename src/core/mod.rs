@@ -46,8 +46,12 @@ impl P2PNode {
             for addr in peer_list {
                 println!("Attempting to connect to peer: {}", addr);
                 match TcpStream::connect(&addr).await {
-                    Ok(stream) => {
+                    Ok(mut stream) => {
                         println!("Successfully connected to peer: {}", addr);
+                        // Send initial Ping
+                        if let Err(e) = Message::Ping.send_async(&mut stream).await {
+                            eprintln!("Failed to send initial Ping to {}: {}", addr, e);
+                        }
                         tokio::spawn(async move {
                             if let Err(e) = handle_peer(stream).await {
                                 eprintln!("Outbound peer handler error ({}): {}", addr, e);
