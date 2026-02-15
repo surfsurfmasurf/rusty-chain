@@ -50,16 +50,23 @@ impl P2PNode {
 async fn handle_peer(mut stream: TcpStream) -> anyhow::Result<()> {
     let (mut reader, mut writer) = stream.split();
     loop {
-        let msg = Message::decode_async(&mut reader).await?;
-        println!("Received message: {:?}", msg);
-
-        match msg {
-            Message::Ping => {
-                Message::Pong.send_async(&mut writer).await?;
+        match Message::decode_async(&mut reader).await {
+            Ok(msg) => {
+                println!("Received message: {:?}", msg);
+                match msg {
+                    Message::Ping => {
+                        Message::Pong.send_async(&mut writer).await?;
+                    }
+                    _ => {
+                        // Ignore other messages for now
+                    }
+                }
             }
-            _ => {
-                // Ignore other messages for now
+            Err(e) => {
+                println!("Peer disconnected or error: {}", e);
+                break;
             }
         }
     }
+    Ok(())
 }
