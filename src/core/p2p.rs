@@ -17,13 +17,21 @@ impl P2PNode {
         println!("P2P server listening on {}", self.addr);
 
         loop {
-            let (stream, peer_addr) = listener.accept().await?;
-            println!("New inbound connection from {}", peer_addr);
-            tokio::spawn(async move {
-                if let Err(e) = handle_peer(stream, peer_addr).await {
-                    eprintln!("Error handling peer {}: {}", peer_addr, e);
+            match listener.accept().await {
+                Ok((stream, peer_addr)) => {
+                    println!("New inbound connection from {}", peer_addr);
+                    tokio::spawn(async move {
+                        if let Err(e) = handle_peer(stream, peer_addr).await {
+                            eprintln!("Peer {} disconnected with error: {}", peer_addr, e);
+                        } else {
+                            println!("Peer {} disconnected gracefully", peer_addr);
+                        }
+                    });
                 }
-            });
+                Err(e) => {
+                    eprintln!("Failed to accept connection: {}", e);
+                }
+            }
         }
     }
 
