@@ -114,14 +114,18 @@ Next:
 - Improved P2P unit tests with `Inventory` roundtrip coverage
 - Pushed progress to main branch (Day 16 of 30)
 
-## Day 17 (Today)
-- P2P: Expanded `Message` enum for more robust synchronization (Inventory, GetMempool, Status).
-- P2P: Increased message size limit to 15MB to accommodate larger block batches.
-- P2P: Added async message encoding/decoding helpers using `tokio`.
-- P2P: Added unit tests for new message variants and size limit enforcement.
+## Day 18 (Today)
+- P2P: Implemented baseline P2P background server using `tokio`.
+- P2P: Added `P2PNode` with support for both inbound listeners and outbound connection attempts.
+- P2P: Added initial `Handshake` message for P2P versioning and height exchange.
+- P2P: Implemented basic `Ping`/`Pong` message handling in the async peer loop.
+- P2P: Improved peer handler with robust disconnection and error handling.
+- Tests: Added P2P message handshake unit tests.
 
 Next:
-- Implement the actual P2P background server loop.
-- Simple peer-to-peer discovery.
+- Implement `GetStatus`/`Status` exchange for version handshake and fork detection.
+- Integrate P2P node into the main CLI.
+- Add inventory broadcasting for new blocks and transactions.
+- Peer discovery mechanism.
 
 
