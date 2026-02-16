@@ -29,15 +29,14 @@ impl P2PNode {
 
     pub async fn connect(&self, target: SocketAddr) -> anyhow::Result<()> {
         println!("Connecting to {}...", target);
-        let stream = TcpStream::connect(target).await.context("Failed to connect to peer")?;
+        let mut stream = TcpStream::connect(target).await.context("Failed to connect to peer")?;
         println!("Connected to outbound peer {}", target);
         
         // Send initial Ping
-        let mut writer = stream;
-        Message::Ping.send_async(&mut writer).await?;
+        Message::Ping.send_async(&mut stream).await?;
 
         tokio::spawn(async move {
-            if let Err(e) = handle_peer(writer, target).await {
+            if let Err(e) = handle_peer(stream, target).await {
                 eprintln!("Error handling peer {}: {}", target, e);
             }
         });
