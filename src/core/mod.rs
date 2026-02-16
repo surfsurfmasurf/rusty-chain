@@ -1,4 +1,5 @@
 pub mod chain;
+pub mod p2p;
 pub mod crypto;
 pub mod hash;
 pub mod keys;
