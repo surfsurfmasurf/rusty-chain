@@ -28,6 +28,10 @@ pub enum Message {
         block_hashes: Vec<String>,
     },
     GetMempool,
+    Handshake {
+        version: u32,
+        best_height: u64,
+    },
 }
 
 impl Message {
