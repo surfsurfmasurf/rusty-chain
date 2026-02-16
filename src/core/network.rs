@@ -155,4 +155,15 @@ mod tests {
         let decoded = Message::decode(Cursor::new(encoded)).unwrap();
         assert_eq!(msg, decoded);
     }
+
+    #[test]
+    fn test_message_handshake() {
+        let msg = Message::Handshake {
+            version: 1,
+            best_height: 123,
+        };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+    }
 }
