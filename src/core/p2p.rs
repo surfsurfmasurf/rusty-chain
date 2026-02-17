@@ -24,7 +24,7 @@ impl P2PNode {
                     println!("New inbound connection from {}", peer_addr);
                     tokio::spawn(async move {
                         if let Err(e) = handle_peer(stream, peer_addr).await {
-                            eprintln!("Peer {} disconnected with error: {}", peer_addr, e);
+                            eprintln!("Peer {} disconnected with error: {:?}", peer_addr, e);
                         } else {
                             println!("Peer {} disconnected gracefully", peer_addr);
                         }
