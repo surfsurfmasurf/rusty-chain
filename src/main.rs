@@ -378,10 +378,25 @@ async fn main() -> anyhow::Result<()> {
         Commands::Node {
             port,
             peer,
-            path: _,
+            path,
             mempool: _,
         } => {
-            let node = rusty_chain::core::P2PNode::new(port, peer);
+            use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+            let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
+            let node = rusty_chain::core::p2p::P2PNode::new(addr);
+
+            let chain_path = chain_path(path);
+            let height = if chain_path.exists() {
+                load_chain(&chain_path)?.height()
+            } else {
+                0
+            };
+
+            for p in peer {
+                let target: SocketAddr = p.parse().context("Invalid peer address")?;
+                node.connect(target, height).await?;
+            }
+
             node.start().await?;
         }
     }
