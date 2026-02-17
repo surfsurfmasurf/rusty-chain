@@ -387,7 +387,7 @@ async fn main() -> anyhow::Result<()> {
 
             let chain_path = chain_path(path);
             let height = if chain_path.exists() {
-                load_chain(&chain_path)?.height()
+                load_chain(&chain_path)?.height() as u64
             } else {
                 0
             };
