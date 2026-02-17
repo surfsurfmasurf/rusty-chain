@@ -13,7 +13,9 @@ impl P2PNode {
     }
 
     pub async fn start(&self) -> anyhow::Result<()> {
-        let listener = TcpListener::bind(self.addr).await.context("Failed to bind P2P listener")?;
+        let listener = TcpListener::bind(self.addr)
+            .await
+            .context("Failed to bind P2P listener")?;
         println!("P2P server listening on {}", self.addr);
 
         loop {
@@ -35,13 +37,20 @@ impl P2PNode {
         }
     }
 
-    pub async fn connect(&self, target: SocketAddr) -> anyhow::Result<()> {
+    pub async fn connect(&self, target: SocketAddr, best_height: u64) -> anyhow::Result<()> {
         println!("Connecting to {}...", target);
-        let mut stream = TcpStream::connect(target).await.context("Failed to connect to peer")?;
+        let mut stream = TcpStream::connect(target)
+            .await
+            .context("Failed to connect to peer")?;
         println!("Connected to outbound peer {}", target);
-        
-        // Send initial Ping
-        Message::Ping.send_async(&mut stream).await?;
+
+        // Send initial Handshake
+        Message::Handshake {
+            version: 1,
+            best_height,
+        }
+        .send_async(&mut stream)
+        .await?;
 
         tokio::spawn(async move {
             if let Err(e) = handle_peer(stream, target).await {
@@ -55,7 +64,9 @@ impl P2PNode {
 
 async fn handle_peer(mut stream: TcpStream, addr: SocketAddr) -> anyhow::Result<()> {
     loop {
-        let msg = Message::decode_async(&mut stream).await.context("Failed to decode peer message")?;
+        let msg = Message::decode_async(&mut stream)
+            .await
+            .context("Failed to decode peer message")?;
         println!("Received message from {}: {:?}", addr, msg);
 
         match msg {
