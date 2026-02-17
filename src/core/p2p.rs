@@ -63,6 +63,7 @@ impl P2PNode {
 }
 
 async fn handle_peer(mut stream: TcpStream, addr: SocketAddr) -> anyhow::Result<()> {
+    println!("Starting message loop for {}", addr);
     loop {
         let msg = Message::decode_async(&mut stream)
             .await
