@@ -32,6 +32,8 @@ impl P2PNode {
                 }
                 Err(e) => {
                     eprintln!("Failed to accept connection: {}", e);
+                    // Add a small delay to prevent tight loop on persistent errors
+                    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
                 }
             }
         }
