@@ -114,18 +114,18 @@ Next:
 - Improved P2P unit tests with `Inventory` roundtrip coverage
 - Pushed progress to main branch (Day 16 of 30)
 
-## Day 18 (Today)
+## Day 18
 - P2P: Implemented baseline P2P background server using `tokio`.
 - P2P: Added `P2PNode` with support for both inbound listeners and outbound connection attempts.
 - P2P: Added initial `Handshake` message for P2P versioning and height exchange.
 - P2P: Implemented basic `Ping`/`Pong` message handling in the async peer loop.
 - P2P: Improved peer handler with robust disconnection and error handling.
+- CLI: Integrated `node` command to launch the P2P listener and connect to peers.
 - Tests: Added P2P message handshake unit tests.
 
 Next:
-- Implement `GetStatus`/`Status` exchange for version handshake and fork detection.
-- Integrate P2P node into the main CLI.
-- Add inventory broadcasting for new blocks and transactions.
-- Peer discovery mechanism.
+- Implement block and transaction propagation.
+- Sync mechanism (GetBlocks / GetHeaders).
+- Peer discovery.
 
 
