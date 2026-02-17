@@ -72,13 +72,23 @@ async fn handle_peer(mut stream: TcpStream, addr: SocketAddr) -> anyhow::Result<
 
         match msg {
             Message::Ping => {
+                println!("Responding to Ping from {}", addr);
                 Message::Pong.send_async(&mut stream).await?;
             }
             Message::Pong => {
-                // Ignore for now
+                println!("Received Pong from {}", addr);
+            }
+            Message::Handshake {
+                version,
+                best_height,
+            } => {
+                println!(
+                    "Handshake from {}: version={}, height={}",
+                    addr, version, best_height
+                );
             }
             _ => {
-                // To be implemented: sync, inv, etc.
+                println!("Received unhandled message from {}: {:?}", addr, msg);
             }
         }
     }
