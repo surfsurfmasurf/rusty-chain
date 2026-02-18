@@ -1,15 +1,26 @@
 use crate::core::network::Message;
 use anyhow::Context;
 use std::net::SocketAddr;
+use std::sync::Arc;
 use tokio::net::{TcpListener, TcpStream};
+use tokio::sync::Mutex;
+
+/// Shared node state for concurrent peer handling
+pub struct NodeState {
+    pub peers: Vec<SocketAddr>,
+}
 
 pub struct P2PNode {
     pub addr: SocketAddr,
+    pub state: Arc<Mutex<NodeState>>,
 }
 
 impl P2PNode {
     pub fn new(addr: SocketAddr) -> Self {
-        Self { addr }
+        Self {
+            addr,
+            state: Arc::new(Mutex::new(NodeState { peers: Vec::new() })),
+        }
     }
 
     pub async fn start(&self) -> anyhow::Result<()> {
@@ -22,8 +33,9 @@ impl P2PNode {
             match listener.accept().await {
                 Ok((stream, peer_addr)) => {
                     println!("New inbound connection from {}", peer_addr);
+                    let state = Arc::clone(&self.state);
                     tokio::spawn(async move {
-                        if let Err(e) = handle_peer(stream, peer_addr).await {
+                        if let Err(e) = handle_peer(stream, peer_addr, state).await {
                             eprintln!("Peer {} disconnected with error: {:?}", peer_addr, e);
                         } else {
                             println!("Peer {} disconnected gracefully", peer_addr);
@@ -32,7 +44,6 @@ impl P2PNode {
                 }
                 Err(e) => {
                     eprintln!("Failed to accept connection: {}", e);
-                    // Add a small delay to prevent tight loop on persistent errors
                     tokio::time::sleep(std::time::Duration::from_millis(100)).await;
                 }
             }
@@ -54,8 +65,9 @@ impl P2PNode {
         .send_async(&mut stream)
         .await?;
 
+        let state = Arc::clone(&self.state);
         tokio::spawn(async move {
-            if let Err(e) = handle_peer(stream, target).await {
+            if let Err(e) = handle_peer(stream, target, state).await {
                 eprintln!("Error handling peer {}: {}", target, e);
             }
         });
@@ -64,10 +76,34 @@ impl P2PNode {
     }
 }
 
-async fn handle_peer(mut stream: TcpStream, addr: SocketAddr) -> anyhow::Result<()> {
+async fn handle_peer(
+    mut stream: TcpStream,
+    addr: SocketAddr,
+    state: Arc<Mutex<NodeState>>,
+) -> anyhow::Result<()> {
+    // Add to peer list
+    {
+        let mut s = state.lock().await;
+        if !s.peers.contains(&addr) {
+            s.peers.push(addr);
+        }
+    }
+
     println!("Starting message loop for {}", addr);
+    let res = peer_loop(&mut stream, addr).await;
+
+    // Remove from peer list
+    {
+        let mut s = state.lock().await;
+        s.peers.retain(|&p| p != addr);
+    }
+
+    res
+}
+
+async fn peer_loop(stream: &mut TcpStream, addr: SocketAddr) -> anyhow::Result<()> {
     loop {
-        let msg = Message::decode_async(&mut stream)
+        let msg = Message::decode_async(stream)
             .await
             .context("Failed to decode peer message")?;
         println!("Received message from {}: {:?}", addr, msg);
@@ -75,7 +111,7 @@ async fn handle_peer(mut stream: TcpStream, addr: SocketAddr) -> anyhow::Result<
         match msg {
             Message::Ping => {
                 println!("Responding to Ping from {}", addr);
-                Message::Pong.send_async(&mut stream).await?;
+                Message::Pong.send_async(stream).await?;
             }
             Message::Pong => {
                 println!("Received Pong from {}", addr);
