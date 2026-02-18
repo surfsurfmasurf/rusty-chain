@@ -1,5 +1,6 @@
 use crate::core::network::Message;
 use anyhow::Context;
+use std::collections::HashSet;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::{TcpListener, TcpStream};
@@ -15,6 +16,7 @@ pub enum PeerCmd {
 pub struct NodeState {
     pub peers: Vec<SocketAddr>,
     pub peer_senders: Vec<mpsc::UnboundedSender<PeerCmd>>,
+    pub seen_messages: HashSet<String>,
 }
 
 pub struct P2PNode {
@@ -29,6 +31,7 @@ impl P2PNode {
             state: Arc::new(Mutex::new(NodeState {
                 peers: Vec::new(),
                 peer_senders: Vec::new(),
+                seen_messages: HashSet::new(),
             })),
         }
     }
@@ -134,6 +137,16 @@ impl P2PNodeHandle {
         }
         Ok(())
     }
+
+    pub async fn mark_seen(&self, id: String) -> bool {
+        let mut state = self.state.lock().await;
+        state.seen_messages.insert(id)
+    }
+
+    pub async fn is_seen(&self, id: &str) -> bool {
+        let state = self.state.lock().await;
+        state.seen_messages.contains(id)
+    }
 }
 
 async fn handle_peer(
@@ -181,14 +194,20 @@ async fn handle_peer(
                     );
                 }
                 Message::NewTransaction(tx) => {
-                    println!("Gossip: Transaction {} from {}", tx.id(), addr);
-                    node.broadcast_except(Message::NewTransaction(tx), addr)
-                        .await?;
+                    let tx_id = tx.id();
+                    if node.mark_seen(tx_id.clone()).await {
+                        println!("Gossip: Transaction {} from {}", tx_id, addr);
+                        node.broadcast_except(Message::NewTransaction(tx), addr)
+                            .await?;
+                    }
                 }
                 Message::NewBlock(block) => {
-                    println!("Gossip: Block {} from {}", block.header.hash(), addr);
-                    node.broadcast_except(Message::NewBlock(block), addr)
-                        .await?;
+                    let blk_id = block.header.hash();
+                    if node.mark_seen(blk_id.clone()).await {
+                        println!("Gossip: Block {} from {}", blk_id, addr);
+                        node.broadcast_except(Message::NewBlock(block), addr)
+                            .await?;
+                    }
                 }
                 _ => {
                     println!("Received unhandled message from {}: {:?}", addr, msg);
