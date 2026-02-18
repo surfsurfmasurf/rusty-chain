@@ -92,6 +92,19 @@ impl P2PNode {
         }
         Ok(())
     }
+
+    /// Broadcast a message to all peers except the specified one
+    pub async fn broadcast_except(&self, msg: Message, except: SocketAddr) -> anyhow::Result<()> {
+        let state = self.state.lock().await;
+        for (i, addr) in state.peers.iter().enumerate() {
+            if *addr != except {
+                if let Some(tx) = state.peer_senders.get(i) {
+                    let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 async fn handle_peer(
