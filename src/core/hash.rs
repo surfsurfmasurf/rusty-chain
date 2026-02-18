@@ -15,3 +15,8 @@ pub fn sha256_hex(bytes: &[u8]) -> String {
 pub fn tx_hash(tx: &Transaction) -> String {
     sha256_hex(&tx.signing_bytes())
 }
+
+pub fn header_hash(header: &crate::core::types::BlockHeader) -> String {
+    let json = serde_json::to_vec(header).expect("header serialization");
+    sha256_hex(&json)
+}

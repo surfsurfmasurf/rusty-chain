@@ -9,6 +9,12 @@ pub struct BlockHeader {
     pub merkle_root: String,
 }
 
+impl BlockHeader {
+    pub fn hash(&self) -> String {
+        crate::core::hash::header_hash(self)
+    }
+}
+
 /// A minimal transaction (Week 2: add optional signatures).
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Transaction {

@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::{TcpListener, TcpStream};
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{Mutex, mpsc};
 
 /// Commands that can be sent to the peer handler
 #[derive(Debug)]
@@ -161,7 +161,7 @@ impl P2PNodeHandle {
 }
 
 async fn handle_peer(
-    mut stream: TcpStream,
+    stream: TcpStream,
     addr: SocketAddr,
     state: Arc<Mutex<NodeState>>,
     node: P2PNodeHandle,
@@ -178,9 +178,12 @@ async fn handle_peer(
     }
 
     println!("Starting message loop for {}", addr);
-    let (mut reader, mut writer) = stream.split();
+    let (reader, writer) = stream.into_split();
+    let mut reader = reader;
+    let writer = Arc::new(Mutex::new(writer));
 
-    let peer_reader = async {
+    let writer_clone = Arc::clone(&writer);
+    let peer_reader = async move {
         loop {
             let msg = Message::decode_async(&mut reader)
                 .await
@@ -190,7 +193,8 @@ async fn handle_peer(
             match msg {
                 Message::Ping => {
                     println!("Responding to Ping from {}", addr);
-                    Message::Pong.send_async(&mut writer).await?;
+                    let mut w = writer_clone.lock().await;
+                    Message::Pong.send_async(&mut *w).await?;
                 }
                 Message::Pong => {
                     println!("Received Pong from {}", addr);
@@ -227,11 +231,12 @@ async fn handle_peer(
         }
     };
 
-    let peer_writer = async {
+    let peer_writer = async move {
         while let Some(cmd) = rx.recv().await {
             match cmd {
                 PeerCmd::SendMessage(msg) => {
-                    msg.send_async(&mut writer).await?;
+                    let mut w = writer.lock().await;
+                    msg.send_async(&mut *w).await?;
                 }
             }
         }
