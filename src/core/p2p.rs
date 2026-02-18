@@ -106,6 +106,7 @@ impl P2PNode {
     }
 
     /// Broadcast a message to all peers except the specified one
+    #[allow(clippy::collapsible_if)]
     pub async fn broadcast_except(&self, msg: Message, except: SocketAddr) -> anyhow::Result<()> {
         let state = self.state.lock().await;
         for (i, addr) in state.peers.iter().enumerate() {
@@ -132,6 +133,7 @@ pub struct P2PNodeHandle {
 }
 
 impl P2PNodeHandle {
+    #[allow(clippy::collapsible_if)]
     pub async fn broadcast_except(&self, msg: Message, except: SocketAddr) -> anyhow::Result<()> {
         let state = self.state.lock().await;
         for (i, addr) in state.peers.iter().enumerate() {
