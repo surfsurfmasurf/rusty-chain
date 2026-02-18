@@ -3,11 +3,18 @@ use anyhow::Context;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::{TcpListener, TcpStream};
-use tokio::sync::Mutex;
+use tokio::sync::{mpsc, Mutex};
+
+/// Commands that can be sent to the peer handler
+#[derive(Debug)]
+pub enum PeerCmd {
+    SendMessage(Message),
+}
 
 /// Shared node state for concurrent peer handling
 pub struct NodeState {
     pub peers: Vec<SocketAddr>,
+    pub peer_senders: Vec<mpsc::UnboundedSender<PeerCmd>>,
 }
 
 pub struct P2PNode {
@@ -19,7 +26,10 @@ impl P2PNode {
     pub fn new(addr: SocketAddr) -> Self {
         Self {
             addr,
-            state: Arc::new(Mutex::new(NodeState { peers: Vec::new() })),
+            state: Arc::new(Mutex::new(NodeState {
+                peers: Vec::new(),
+                peer_senders: Vec::new(),
+            })),
         }
     }
 
@@ -74,6 +84,14 @@ impl P2PNode {
 
         Ok(())
     }
+
+    pub async fn broadcast(&self, msg: Message) -> anyhow::Result<()> {
+        let state = self.state.lock().await;
+        for tx in &state.peer_senders {
+            let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
+        }
+        Ok(())
+    }
 }
 
 async fn handle_peer(
@@ -81,53 +99,75 @@ async fn handle_peer(
     addr: SocketAddr,
     state: Arc<Mutex<NodeState>>,
 ) -> anyhow::Result<()> {
+    let (tx, mut rx) = mpsc::unbounded_channel::<PeerCmd>();
+
     // Add to peer list
     {
         let mut s = state.lock().await;
         if !s.peers.contains(&addr) {
             s.peers.push(addr);
+            s.peer_senders.push(tx);
         }
     }
 
     println!("Starting message loop for {}", addr);
-    let res = peer_loop(&mut stream, addr).await;
+    let (mut reader, mut writer) = stream.split();
+
+    let peer_reader = async {
+        loop {
+            let msg = Message::decode_async(&mut reader)
+                .await
+                .context("Failed to decode peer message")?;
+            println!("Received message from {}: {:?}", addr, msg);
+
+            match msg {
+                Message::Ping => {
+                    println!("Responding to Ping from {}", addr);
+                    Message::Pong.send_async(&mut writer).await?;
+                }
+                Message::Pong => {
+                    println!("Received Pong from {}", addr);
+                }
+                Message::Handshake {
+                    version,
+                    best_height,
+                } => {
+                    println!(
+                        "Handshake from {}: version={}, height={}",
+                        addr, version, best_height
+                    );
+                }
+                _ => {
+                    println!("Received unhandled message from {}: {:?}", addr, msg);
+                }
+            }
+        }
+    };
+
+    let peer_writer = async {
+        while let Some(cmd) = rx.recv().await {
+            match cmd {
+                PeerCmd::SendMessage(msg) => {
+                    msg.send_async(&mut writer).await?;
+                }
+            }
+        }
+        anyhow::Ok(())
+    };
+
+    let res = tokio::select! {
+        r = peer_reader => r,
+        w = peer_writer => w,
+    };
 
     // Remove from peer list
     {
         let mut s = state.lock().await;
-        s.peers.retain(|&p| p != addr);
+        if let Some(pos) = s.peers.iter().position(|&p| p == addr) {
+            s.peers.remove(pos);
+            s.peer_senders.remove(pos);
+        }
     }
 
     res
-}
-
-async fn peer_loop(stream: &mut TcpStream, addr: SocketAddr) -> anyhow::Result<()> {
-    loop {
-        let msg = Message::decode_async(stream)
-            .await
-            .context("Failed to decode peer message")?;
-        println!("Received message from {}: {:?}", addr, msg);
-
-        match msg {
-            Message::Ping => {
-                println!("Responding to Ping from {}", addr);
-                Message::Pong.send_async(stream).await?;
-            }
-            Message::Pong => {
-                println!("Received Pong from {}", addr);
-            }
-            Message::Handshake {
-                version,
-                best_height,
-            } => {
-                println!(
-                    "Handshake from {}: version={}, height={}",
-                    addr, version, best_height
-                );
-            }
-            _ => {
-                println!("Received unhandled message from {}: {:?}", addr, msg);
-            }
-        }
-    }
 }
