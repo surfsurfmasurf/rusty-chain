@@ -39,13 +39,15 @@ impl P2PNode {
             .context("Failed to bind P2P listener")?;
         println!("P2P server listening on {}", self.addr);
 
+        let node_state = Arc::clone(&self.state);
         loop {
             match listener.accept().await {
                 Ok((stream, peer_addr)) => {
                     println!("New inbound connection from {}", peer_addr);
-                    let state = Arc::clone(&self.state);
+                    let state = Arc::clone(&node_state);
+                    let node_handle = self.clone_handle();
                     tokio::spawn(async move {
-                        if let Err(e) = handle_peer(stream, peer_addr, state).await {
+                        if let Err(e) = handle_peer(stream, peer_addr, state, node_handle).await {
                             eprintln!("Peer {} disconnected with error: {:?}", peer_addr, e);
                         } else {
                             println!("Peer {} disconnected gracefully", peer_addr);
@@ -76,8 +78,9 @@ impl P2PNode {
         .await?;
 
         let state = Arc::clone(&self.state);
+        let node_handle = self.clone_handle();
         tokio::spawn(async move {
-            if let Err(e) = handle_peer(stream, target, state).await {
+            if let Err(e) = handle_peer(stream, target, state, node_handle).await {
                 eprintln!("Error handling peer {}: {}", target, e);
             }
         });
@@ -105,12 +108,39 @@ impl P2PNode {
         }
         Ok(())
     }
+
+    fn clone_handle(&self) -> P2PNodeHandle {
+        P2PNodeHandle {
+            state: Arc::clone(&self.state),
+        }
+    }
+}
+
+/// A lightweight handle to the P2PNode to avoid circular Arc or complex lifetimes in handlers
+#[derive(Clone)]
+pub struct P2PNodeHandle {
+    pub state: Arc<Mutex<NodeState>>,
+}
+
+impl P2PNodeHandle {
+    pub async fn broadcast_except(&self, msg: Message, except: SocketAddr) -> anyhow::Result<()> {
+        let state = self.state.lock().await;
+        for (i, addr) in state.peers.iter().enumerate() {
+            if *addr != except {
+                if let Some(tx) = state.peer_senders.get(i) {
+                    let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 async fn handle_peer(
     mut stream: TcpStream,
     addr: SocketAddr,
     state: Arc<Mutex<NodeState>>,
+    node: P2PNodeHandle,
 ) -> anyhow::Result<()> {
     let (tx, mut rx) = mpsc::unbounded_channel::<PeerCmd>();
 
@@ -149,6 +179,16 @@ async fn handle_peer(
                         "Handshake from {}: version={}, height={}",
                         addr, version, best_height
                     );
+                }
+                Message::NewTransaction(tx) => {
+                    println!("Gossip: Transaction {} from {}", tx.id(), addr);
+                    node.broadcast_except(Message::NewTransaction(tx), addr)
+                        .await?;
+                }
+                Message::NewBlock(block) => {
+                    println!("Gossip: Block {} from {}", block.header.hash(), addr);
+                    node.broadcast_except(Message::NewBlock(block), addr)
+                        .await?;
                 }
                 _ => {
                     println!("Received unhandled message from {}: {:?}", addr, msg);
