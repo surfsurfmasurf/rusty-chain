@@ -153,6 +153,11 @@ impl P2PNodeHandle {
         let state = self.state.lock().await;
         state.seen_messages.contains(id)
     }
+
+    pub async fn get_peer_count(&self) -> usize {
+        let state = self.state.lock().await;
+        state.peers.len()
+    }
 }
 
 async fn handle_peer(
