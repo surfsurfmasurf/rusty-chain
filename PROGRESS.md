@@ -123,9 +123,18 @@ Next:
 - CLI: Integrated `node` command to launch the P2P listener and connect to peers.
 - Tests: Added P2P message handshake unit tests.
 
+## Day 19
+- P2P: Implemented thread-safe `NodeState` with active peer tracking and `peer_senders` list.
+- P2P: Added `mpsc` channel-based communication for each peer to handle concurrent reads/writes.
+- P2P: Implemented `broadcast` and `broadcast_except` for efficient message dissemination.
+- P2P: Implemented a basic gossip protocol for `NewTransaction` and `NewBlock` propagation.
+- P2P: Added `seen_messages` (HashSet) cache to prevent infinite gossip loops.
+- P2P: Introduced `P2PNodeHandle` for lightweight, shared access to node state from peer handlers.
+- Refactor: Split `handle_peer` into reader/writer loops using `tokio::select!`.
+
 Next:
-- Implement block and transaction propagation.
+- Implement block and transaction validation within the P2P layer.
 - Sync mechanism (GetBlocks / GetHeaders).
-- Peer discovery.
+- Peer discovery (DNS seeds or addr gossip).
 
 
