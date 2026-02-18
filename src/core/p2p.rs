@@ -67,10 +67,16 @@ impl P2PNode {
 
     pub async fn connect(&self, target: SocketAddr, best_height: u64) -> anyhow::Result<()> {
         println!("Connecting to {}...", target);
-        let mut stream = TcpStream::connect(target)
-            .await
-            .context("Failed to connect to peer")?;
+        let stream = match TcpStream::connect(target).await {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("Failed to connect to {}: {}", target, e);
+                return Err(e.into());
+            }
+        };
         println!("Connected to outbound peer {}", target);
+
+        let mut stream = stream;
 
         // Send initial Handshake
         Message::Handshake {
