@@ -86,6 +86,7 @@ impl Message {
         matches!(self, Message::NewTransaction(_) | Message::NewBlock(_))
     }
 
+    /// Returns the unique ID for gossip messages to prevent loops.
     pub fn gossip_id(&self) -> Option<String> {
         match self {
             Message::NewTransaction(tx) => Some(tx.id()),
