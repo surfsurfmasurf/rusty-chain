@@ -132,9 +132,17 @@ Next:
 - P2P: Introduced `P2PNodeHandle` for lightweight, shared access to node state from peer handlers.
 - Refactor: Split `handle_peer` into reader/writer loops using `tokio::select!`.
 
+## Day 20
+- Validation: Implemented `validate_transaction` and `validate_block` in `Chain` to unify state checks across CLI and P2P.
+- P2P: Implemented `process_message` to handle incoming gossip (TXs and Blocks) with full validation.
+- P2P: Node now tracks `Chain` and `Mempool` state, enabling real-time validation of gossiped data.
+- P2P: Automatic mempool clearing when blocks are accepted via P2P.
+- CLI: Updated `node` command to load/initialize local chain and mempool before starting the P2P server.
+- Tests: Added unit tests for P2P gossip identification.
+
 Next:
-- Implement block and transaction validation within the P2P layer.
-- Sync mechanism (GetBlocks / GetHeaders).
+- Implement block and transaction sync (GetBlocks / GetHeaders) for new nodes.
 - Peer discovery (DNS seeds or addr gossip).
+- Better logging and error reporting in the P2P loop.
 
 
