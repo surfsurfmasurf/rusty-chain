@@ -173,6 +173,7 @@ impl Chain {
         Ok(state)
     }
 
+    /// Validates a single transaction against the current ledger state.
     pub fn validate_transaction(&self, tx: &Transaction) -> anyhow::Result<()> {
         tx.validate_accept().context("TX baseline validation failed")?;
         let state = self.compute_state()?;
@@ -180,6 +181,7 @@ impl Chain {
         Ok(())
     }
 
+    /// Validates a block's structure, PoW, and state transitions.
     pub fn validate_block(&self, block: &Block) -> anyhow::Result<()> {
         // 1. Baseline header/merkle/PoW
         let prev_hash = self.tip_hash();
@@ -215,6 +217,7 @@ impl Chain {
         Ok(())
     }
 
+    /// Appends a validated block to the chain.
     pub fn append_block(&mut self, block: Block) -> anyhow::Result<()> {
         self.validate_block(&block)?;
         self.blocks.push(block);
