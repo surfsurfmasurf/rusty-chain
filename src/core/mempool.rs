@@ -91,6 +91,7 @@ impl Mempool {
         out
     }
 
+    /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
         self.txs.retain(|t| t.id() != tx_id);
     }
