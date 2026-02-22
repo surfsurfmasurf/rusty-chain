@@ -207,7 +207,7 @@ impl P2PNodeHandle {
                         return Ok(());
                     }
                     // 3. Clear mempool txs
-                    for tx in &block.transactions {
+                    for tx in &block.txs {
                         state.mempool.remove_tx(&tx.id());
                     }
                     // 4. Re-gossip

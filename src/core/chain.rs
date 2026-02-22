@@ -175,7 +175,8 @@ impl Chain {
 
     /// Validates a single transaction against the current ledger state.
     pub fn validate_transaction(&self, tx: &Transaction) -> anyhow::Result<()> {
-        tx.validate_accept().context("TX baseline validation failed")?;
+        tx.validate_accept()
+            .context("TX baseline validation failed")?;
         let state = self.compute_state()?;
         state.validate_transaction(tx, self.height() + 1)?;
         Ok(())

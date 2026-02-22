@@ -37,6 +37,12 @@ impl State {
         self.apply_block_txs(&block.txs, height)
     }
 
+    pub fn validate_transaction(&self, tx: &Transaction, height: usize) -> anyhow::Result<()> {
+        // Since we don't know the block reward/fees for an individual mempool tx,
+        // we use 0/0. Coinbase txs should not be in mempool anyway.
+        self.validate_tx(tx, height, 0, 0)
+    }
+
     pub fn apply_block_txs(&mut self, txs: &[Transaction], height: usize) -> anyhow::Result<()> {
         use anyhow::Context;
 

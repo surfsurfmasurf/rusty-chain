@@ -182,8 +182,19 @@ mod tests {
 
     #[test]
     fn test_message_is_gossip() {
-        assert!(Message::NewTransaction(Transaction::default()).is_gossip());
-        assert!(Message::NewBlock(Block::default()).is_gossip());
+        assert!(Message::NewTransaction(Transaction::new("a", "b", 10, 0)).is_gossip());
+        assert!(
+            Message::NewBlock(Block {
+                header: crate::core::types::BlockHeader {
+                    prev_hash: "".to_string(),
+                    merkle_root: "".to_string(),
+                    timestamp_ms: 0,
+                    nonce: 0,
+                },
+                txs: vec![],
+            })
+            .is_gossip()
+        );
         assert!(!Message::Ping.is_gossip());
     }
 }
