@@ -173,6 +173,54 @@ impl Chain {
         Ok(state)
     }
 
+    pub fn validate_transaction(&self, tx: &Transaction) -> anyhow::Result<()> {
+        tx.validate_accept().context("TX baseline validation failed")?;
+        let state = self.compute_state()?;
+        state.validate_transaction(tx, self.height() + 1)?;
+        Ok(())
+    }
+
+    pub fn validate_block(&self, block: &Block) -> anyhow::Result<()> {
+        // 1. Baseline header/merkle/PoW
+        let prev_hash = self.tip_hash();
+        anyhow::ensure!(
+            block.header.prev_hash == prev_hash,
+            "prev_hash mismatch: expected {} got {}",
+            prev_hash,
+            block.header.prev_hash
+        );
+
+        let merkle = merkle_root(&block.txs);
+        anyhow::ensure!(
+            block.header.merkle_root == merkle,
+            "merkle mismatch: expected {} got {}",
+            merkle,
+            block.header.merkle_root
+        );
+
+        let h = hash_block(block);
+        anyhow::ensure!(
+            pow_ok(&h, self.pow_difficulty),
+            "PoW fail: hash {} does not match difficulty {}",
+            h,
+            self.pow_difficulty
+        );
+
+        // 2. State transition
+        let mut state = self.compute_state()?;
+        state
+            .apply_block(block, self.height() + 1)
+            .context("state transition failed for block")?;
+
+        Ok(())
+    }
+
+    pub fn append_block(&mut self, block: Block) -> anyhow::Result<()> {
+        self.validate_block(&block)?;
+        self.blocks.push(block);
+        Ok(())
+    }
+
     /// Basic chain validation (linkage + merkle placeholder).
     pub fn validate(&self) -> anyhow::Result<()> {
         anyhow::ensure!(!self.blocks.is_empty(), "chain has no blocks");

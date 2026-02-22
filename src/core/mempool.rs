@@ -90,4 +90,8 @@ impl Mempool {
         std::mem::swap(&mut self.txs, &mut out);
         out
     }
+
+    pub fn remove_tx(&mut self, tx_id: &str) {
+        self.txs.retain(|t| t.id() != tx_id);
+    }
 }

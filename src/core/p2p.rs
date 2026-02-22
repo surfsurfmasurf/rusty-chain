@@ -1,3 +1,5 @@
+use crate::core::chain::Chain;
+use crate::core::mempool::Mempool;
 use crate::core::network::Message;
 use anyhow::Context;
 use std::collections::HashSet;
@@ -17,6 +19,8 @@ pub struct NodeState {
     pub peers: Vec<SocketAddr>,
     pub peer_senders: Vec<mpsc::UnboundedSender<PeerCmd>>,
     pub seen_messages: HashSet<String>,
+    pub chain: Chain,
+    pub mempool: Mempool,
 }
 
 pub struct P2PNode {
@@ -25,13 +29,15 @@ pub struct P2PNode {
 }
 
 impl P2PNode {
-    pub fn new(addr: SocketAddr) -> Self {
+    pub fn new(addr: SocketAddr, chain: Chain, mempool: Mempool) -> Self {
         Self {
             addr,
             state: Arc::new(Mutex::new(NodeState {
                 peers: Vec::new(),
                 peer_senders: Vec::new(),
                 seen_messages: HashSet::new(),
+                chain,
+                mempool,
             })),
         }
     }
@@ -160,6 +166,60 @@ impl P2PNodeHandle {
         let state = self.state.lock().await;
         state.peers.len()
     }
+
+    pub async fn process_message(&self, msg: Message, from: SocketAddr) -> anyhow::Result<()> {
+        match msg {
+            Message::NewTransaction(tx) => {
+                let tx_id = tx.id();
+                if self.mark_seen(tx_id.clone()).await {
+                    println!("Gossip: New Transaction {} from {}", tx_id, from);
+                    // 1. Validate tx
+                    let mut state = self.state.lock().await;
+                    if let Err(e) = state.chain.validate_transaction(&tx) {
+                        println!("Invalid transaction {} from {}: {}", tx_id, from, e);
+                        return Ok(());
+                    }
+                    // 2. Add to mempool
+                    let base_nonce = state.chain.next_nonce_for(&tx.from);
+                    if let Err(e) = state.mempool.add_tx_checked(tx.clone(), base_nonce) {
+                        println!("Failed to add tx {} to mempool: {}", tx_id, e);
+                        return Ok(());
+                    }
+                    // 3. Re-gossip
+                    drop(state);
+                    self.broadcast_except(Message::NewTransaction(tx), from)
+                        .await?;
+                }
+            }
+            Message::NewBlock(block) => {
+                let blk_id = block.header.hash();
+                if self.mark_seen(blk_id.clone()).await {
+                    println!("Gossip: New Block {} from {}", blk_id, from);
+                    // 1. Validate block
+                    let mut state = self.state.lock().await;
+                    if let Err(e) = state.chain.validate_block(&block) {
+                        println!("Invalid block {} from {}: {}", blk_id, from, e);
+                        return Ok(());
+                    }
+                    // 2. Append to chain
+                    if let Err(e) = state.chain.append_block(block.clone()) {
+                        println!("Failed to append block {} to chain: {}", blk_id, e);
+                        return Ok(());
+                    }
+                    // 3. Clear mempool txs
+                    for tx in &block.transactions {
+                        state.mempool.remove_tx(&tx.id());
+                    }
+                    // 4. Re-gossip
+                    drop(state);
+                    self.broadcast_except(Message::NewBlock(block), from)
+                        .await?;
+                }
+            }
+            _ => {}
+        }
+        Ok(())
+    }
 }
 
 async fn handle_peer(
@@ -210,21 +270,8 @@ async fn handle_peer(
                         addr, version, best_height
                     );
                 }
-                Message::NewTransaction(tx) => {
-                    let tx_id = tx.id();
-                    if node.mark_seen(tx_id.clone()).await {
-                        println!("Gossip: Transaction {} from {}", tx_id, addr);
-                        node.broadcast_except(Message::NewTransaction(tx), addr)
-                            .await?;
-                    }
-                }
-                Message::NewBlock(block) => {
-                    let blk_id = block.header.hash();
-                    if node.mark_seen(blk_id.clone()).await {
-                        println!("Gossip: Block {} from {}", blk_id, addr);
-                        node.broadcast_except(Message::NewBlock(block), addr)
-                            .await?;
-                    }
+                m if m.is_gossip() => {
+                    node.process_message(m, addr).await?;
                 }
                 _ => {
                     println!("Received unhandled message from {}: {:?}", addr, msg);

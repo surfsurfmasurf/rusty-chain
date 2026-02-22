@@ -82,6 +82,18 @@ impl Message {
         15 * 1024 * 1024 // 15MB
     }
 
+    pub fn is_gossip(&self) -> bool {
+        matches!(self, Message::NewTransaction(_) | Message::NewBlock(_))
+    }
+
+    pub fn gossip_id(&self) -> Option<String> {
+        match self {
+            Message::NewTransaction(tx) => Some(tx.id()),
+            Message::NewBlock(block) => Some(block.header.hash()),
+            _ => None,
+        }
+    }
+
     pub async fn decode_async<R: tokio::io::AsyncRead + Unpin>(
         mut reader: R,
     ) -> anyhow::Result<Self> {
@@ -165,5 +177,12 @@ mod tests {
         let encoded = msg.encode().unwrap();
         let decoded = Message::decode(Cursor::new(encoded)).unwrap();
         assert_eq!(msg, decoded);
+    }
+
+    #[test]
+    fn test_message_is_gossip() {
+        assert!(Message::NewTransaction(Transaction::default()).is_gossip());
+        assert!(Message::NewBlock(Block::default()).is_gossip());
+        assert!(!Message::Ping.is_gossip());
     }
 }

@@ -379,18 +379,24 @@ async fn main() -> anyhow::Result<()> {
             port,
             peer,
             path,
-            mempool: _,
+            mempool,
         } => {
             use std::net::{IpAddr, Ipv4Addr, SocketAddr};
             let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
-            let node = rusty_chain::core::p2p::P2PNode::new(addr);
 
             let chain_path = chain_path(path);
-            let height = if chain_path.exists() {
-                load_chain(&chain_path)?.height() as u64
+            let chain = load_or_genesis(&chain_path)?;
+
+            let mp_path = mempool_path(mempool);
+            let mp = if mp_path.exists() {
+                Mempool::load(&mp_path)?
             } else {
-                0
+                Mempool::default()
             };
+
+            let height = chain.height() as u64;
+
+            let node = rusty_chain::core::p2p::P2PNode::new(addr, chain, mp);
 
             for p in peer {
                 let target: SocketAddr = p.parse().context("Invalid peer address")?;
