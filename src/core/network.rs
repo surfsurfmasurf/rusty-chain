@@ -205,4 +205,25 @@ mod tests {
         );
         assert!(!Message::Ping.is_gossip());
     }
+
+    #[test]
+    fn test_message_get_headers_roundtrip() {
+        let msg = Message::GetHeaders {
+            start_height: 10,
+            limit: 100,
+        };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(std::io::Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+    }
+
+    #[test]
+    fn test_message_get_data_roundtrip() {
+        let msg = Message::GetData {
+            block_hashes: vec!["abc".to_string(), "def".to_string()],
+        };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(std::io::Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+    }
 }
