@@ -194,19 +194,27 @@ impl P2PNodeHandle {
                 if self.mark_seen(tx_id.clone()).await {
                     println!("Gossip: New Transaction {} from {}", tx_id, from);
                     // 1. Validate tx
-                    let mut state = self.state.lock().await;
+                    let state = self.state.lock().await;
                     if let Err(e) = state.chain.validate_transaction(&tx) {
                         println!("Invalid transaction {} from {}: {}", tx_id, from, e);
                         return Ok(());
                     }
                     // 2. Add to mempool
                     let base_nonce = state.chain.next_nonce_for(&tx.from);
-                    if let Err(e) = state.mempool.add_tx_checked(tx.clone(), base_nonce) {
+                    let mut mempool = state.mempool.clone(); // In-memory mempool might need careful locking if it's large, but this is a demo
+                    drop(state);
+
+                    if let Err(e) = mempool.add_tx_checked(tx.clone(), base_nonce) {
                         println!("Failed to add tx {} to mempool: {}", tx_id, e);
                         return Ok(());
                     }
-                    // 3. Re-gossip
+
+                    // Update state mempool
+                    let mut state = self.state.lock().await;
+                    state.mempool = mempool;
                     drop(state);
+
+                    // 3. Re-gossip
                     self.broadcast_except(Message::NewTransaction(tx), from)
                         .await?;
                 }
