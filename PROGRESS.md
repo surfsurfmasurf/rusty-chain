@@ -145,4 +145,11 @@ Next:
 - Peer discovery (DNS seeds or addr gossip).
 - Better logging and error reporting in the P2P loop.
 
+## Day 21
+- P2P: Added `GetHeaders` and `GetData` messages to the network protocol.
+- P2P: Implemented server-side handlers for `GetHeaders` (retrieving block headers) and `GetData` (retrieving full blocks by hash).
+- P2P: Enhanced `P2PNodeHandle` with `get_headers` and `get_blocks_by_hash` thread-safe helpers.
+- Network: Added unit tests for new message types and P2P roundtrip logic.
+- Pushed progress to main branch (Day 21 of 30).
+
 
