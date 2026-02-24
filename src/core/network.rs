@@ -1,4 +1,4 @@
-use crate::core::types::{Block, Transaction};
+use crate::core::types::{Block, BlockHeader, Transaction};
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
 use std::net::TcpStream;
@@ -31,6 +31,14 @@ pub enum Message {
     Handshake {
         version: u32,
         best_height: u64,
+    },
+    GetHeaders {
+        start_height: u64,
+        limit: u32,
+    },
+    Headers(Vec<BlockHeader>),
+    GetData {
+        block_hashes: Vec<String>,
     },
 }
 
