@@ -167,6 +167,16 @@ impl P2PNodeHandle {
         state.peers.len()
     }
 
+    pub async fn send_to(&self, target: SocketAddr, msg: Message) -> anyhow::Result<()> {
+        let state = self.state.lock().await;
+        if let Some(pos) = state.peers.iter().position(|&p| p == target) {
+            if let Some(tx) = state.peer_senders.get(pos) {
+                let _ = tx.send(PeerCmd::SendMessage(msg));
+            }
+        }
+        Ok(())
+    }
+
     pub async fn get_headers(
         &self,
         start_height: u64,
@@ -201,6 +211,18 @@ impl P2PNodeHandle {
 
     pub async fn process_message(&self, msg: Message, from: SocketAddr) -> anyhow::Result<()> {
         match msg {
+            Message::Handshake {
+                version,
+                best_height,
+            } => {
+                println!(
+                    "Handshake from {}: version={}, height={}",
+                    from, version, best_height
+                );
+                // If they are ahead, we might want to sync headers later.
+                // For now, just respond with our own status if we were the ones receiving.
+                // In a real handshake, both sides exchange their heights.
+            }
             Message::NewTransaction(tx) => {
                 let tx_id = tx.id();
                 if self.mark_seen(tx_id.clone()).await {
@@ -249,7 +271,20 @@ impl P2PNodeHandle {
                         .await?;
                 }
             }
-            _ => {}
+            Message::GetHeaders {
+                start_height,
+                limit,
+            } => {
+                let headers = self.get_headers(start_height, limit).await;
+                self.send_to(from, Message::Headers(headers)).await?;
+            }
+            Message::GetData { block_hashes } => {
+                let blocks = self.get_blocks_by_hash(block_hashes).await;
+                self.send_to(from, Message::Blocks(blocks)).await?;
+            }
+            _ => {
+                println!("Received unhandled message from {}: {:?}", from, msg);
+            }
         }
         Ok(())
     }
@@ -294,33 +329,8 @@ async fn handle_peer(
                 Message::Pong => {
                     println!("Received Pong from {}", addr);
                 }
-                Message::Handshake {
-                    version,
-                    best_height,
-                } => {
-                    println!(
-                        "Handshake from {}: version={}, height={}",
-                        addr, version, best_height
-                    );
-                }
-                Message::GetHeaders {
-                    start_height,
-                    limit,
-                } => {
-                    let headers = node.get_headers(start_height, limit).await;
-                    let mut w = writer_clone.lock().await;
-                    Message::Headers(headers).send_async(&mut *w).await?;
-                }
-                Message::GetData { block_hashes } => {
-                    let blocks = node.get_blocks_by_hash(block_hashes).await;
-                    let mut w = writer_clone.lock().await;
-                    Message::Blocks(blocks).send_async(&mut *w).await?;
-                }
-                m if m.is_gossip() => {
+                m => {
                     node.process_message(m, addr).await?;
-                }
-                _ => {
-                    println!("Received unhandled message from {}: {:?}", addr, msg);
                 }
             }
         }
