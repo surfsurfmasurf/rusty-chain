@@ -211,6 +211,10 @@ impl P2PNodeHandle {
 
     pub async fn process_message(&self, msg: Message, from: SocketAddr) -> anyhow::Result<()> {
         match msg {
+            Message::Ping => {
+                println!("Responding to Ping from {}", from);
+                self.send_to(from, Message::Pong).await?;
+            }
             Message::Handshake {
                 version,
                 best_height,
@@ -321,11 +325,6 @@ async fn handle_peer(
             println!("Received message from {}: {:?}", addr, msg);
 
             match msg {
-                Message::Ping => {
-                    println!("Responding to Ping from {}", addr);
-                    let mut w = writer_clone.lock().await;
-                    Message::Pong.send_async(&mut *w).await?;
-                }
                 Message::Pong => {
                     println!("Received Pong from {}", addr);
                 }
