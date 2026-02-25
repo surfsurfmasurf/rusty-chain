@@ -167,9 +167,16 @@ impl P2PNodeHandle {
         state.peers.len()
     }
 
-    pub async fn get_headers(&self, start_height: u64, limit: u32) -> Vec<crate::core::types::BlockHeader> {
+    pub async fn get_headers(
+        &self,
+        start_height: u64,
+        limit: u32,
+    ) -> Vec<crate::core::types::BlockHeader> {
         let state = self.state.lock().await;
-        state.chain.blocks.iter()
+        state
+            .chain
+            .blocks
+            .iter()
             .skip(start_height as usize)
             .take(limit as usize)
             .map(|b| b.header.clone())
@@ -180,7 +187,12 @@ impl P2PNodeHandle {
         let state = self.state.lock().await;
         let mut results = Vec::new();
         for hash in hashes {
-            if let Some(block) = state.chain.blocks.iter().find(|b| crate::core::chain::hash_block(b) == hash) {
+            if let Some(block) = state
+                .chain
+                .blocks
+                .iter()
+                .find(|b| crate::core::chain::hash_block(b) == hash)
+            {
                 results.push(block.clone());
             }
         }
@@ -291,7 +303,10 @@ async fn handle_peer(
                         addr, version, best_height
                     );
                 }
-                Message::GetHeaders { start_height, limit } => {
+                Message::GetHeaders {
+                    start_height,
+                    limit,
+                } => {
                     let headers = node.get_headers(start_height, limit).await;
                     let mut w = writer_clone.lock().await;
                     Message::Headers(headers).send_async(&mut *w).await?;
