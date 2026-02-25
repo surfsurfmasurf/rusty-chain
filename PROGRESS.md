@@ -152,4 +152,14 @@ Next:
 - Network: Added unit tests for new message types and P2P roundtrip logic.
 - Pushed progress to main branch (Day 21 of 30).
 
+## Day 26
+- P2P: Major refactor of peer message handling to simplify the async loop.
+- P2P: Consolidated all message processing logic into `process_message` for consistency.
+- P2P: Moved `Ping`/`Pong` response logic into `process_message`.
+- P2P: Simplified `P2PNode` and `handle_peer` by removing redundant handles and clones.
+- Network: Removed unused `RequestStatus` and `ResponseStatus` message variants.
+- Cleanup: Fixed clippy warnings and applied standard formatting.
+- Tests: Verified all core, state, and networking tests pass.
+- Pushed progress to main branch (Day 26 of 30).
+
 
