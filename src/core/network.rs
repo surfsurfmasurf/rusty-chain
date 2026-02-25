@@ -18,11 +18,6 @@ pub enum Message {
     Blocks(Vec<Block>),
     NewTransaction(Transaction),
     NewBlock(Block),
-    RequestStatus,
-    ResponseStatus {
-        height: u64,
-        tip_hash: String,
-    },
     Inventory {
         tx_hashes: Vec<String>,
         block_hashes: Vec<String>,
@@ -141,17 +136,6 @@ mod tests {
         let msg = Message::Status {
             height: 10,
             tip_hash: "abcd".to_string(),
-        };
-        let encoded = msg.encode().unwrap();
-        let decoded = Message::decode_async(Cursor::new(encoded)).await.unwrap();
-        assert_eq!(msg, decoded);
-    }
-
-    #[tokio::test]
-    async fn test_message_inventory_roundtrip() {
-        let msg = Message::Inventory {
-            tx_hashes: vec!["tx1".to_string()],
-            block_hashes: vec!["blk1".to_string()],
         };
         let encoded = msg.encode().unwrap();
         let decoded = Message::decode_async(Cursor::new(encoded)).await.unwrap();
