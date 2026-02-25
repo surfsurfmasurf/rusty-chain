@@ -167,6 +167,7 @@ impl P2PNodeHandle {
         state.peers.len()
     }
 
+    #[allow(clippy::collapsible_if)]
     pub async fn send_to(&self, target: SocketAddr, msg: Message) -> anyhow::Result<()> {
         let state = self.state.lock().await;
         if let Some(pos) = state.peers.iter().position(|&p| p == target) {
