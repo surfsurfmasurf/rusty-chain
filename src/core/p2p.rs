@@ -316,7 +316,6 @@ async fn handle_peer(
     let mut reader = reader;
     let writer = Arc::new(Mutex::new(writer));
 
-    let writer_clone = Arc::clone(&writer);
     let peer_reader = async move {
         loop {
             let msg = Message::decode_async(&mut reader)
