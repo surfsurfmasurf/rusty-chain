@@ -54,7 +54,9 @@ impl P2PNode {
                 Ok((stream, peer_addr)) => {
                     println!("New inbound connection from {}", peer_addr);
                     let state = Arc::clone(&node_state);
-                    let node_handle = self.clone_handle();
+                    let node_handle = P2PNodeHandle {
+                        state: Arc::clone(&state),
+                    };
                     tokio::spawn(async move {
                         if let Err(e) = handle_peer(stream, peer_addr, state, node_handle).await {
                             eprintln!("Peer {} disconnected with error: {:?}", peer_addr, e);
@@ -93,7 +95,9 @@ impl P2PNode {
         .await?;
 
         let state = Arc::clone(&self.state);
-        let node_handle = self.clone_handle();
+        let node_handle = P2PNodeHandle {
+            state: Arc::clone(&state),
+        };
         tokio::spawn(async move {
             if let Err(e) = handle_peer(stream, target, state, node_handle).await {
                 eprintln!("Error handling peer {}: {}", target, e);
@@ -101,34 +105,6 @@ impl P2PNode {
         });
 
         Ok(())
-    }
-
-    pub async fn broadcast(&self, msg: Message) -> anyhow::Result<()> {
-        let state = self.state.lock().await;
-        for tx in &state.peer_senders {
-            let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
-        }
-        Ok(())
-    }
-
-    /// Broadcast a message to all peers except the specified one
-    #[allow(clippy::collapsible_if)]
-    pub async fn broadcast_except(&self, msg: Message, except: SocketAddr) -> anyhow::Result<()> {
-        let state = self.state.lock().await;
-        for (i, addr) in state.peers.iter().enumerate() {
-            if *addr != except {
-                if let Some(tx) = state.peer_senders.get(i) {
-                    let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
-                }
-            }
-        }
-        Ok(())
-    }
-
-    fn clone_handle(&self) -> P2PNodeHandle {
-        P2PNodeHandle {
-            state: Arc::clone(&self.state),
-        }
     }
 }
 
@@ -170,10 +146,19 @@ impl P2PNodeHandle {
     #[allow(clippy::collapsible_if)]
     pub async fn send_to(&self, target: SocketAddr, msg: Message) -> anyhow::Result<()> {
         let state = self.state.lock().await;
-        if let Some(pos) = state.peers.iter().position(|&p| p == target) {
+        let pos = state.peers.iter().position(|&p| p == target);
+        if let Some(pos) = pos {
             if let Some(tx) = state.peer_senders.get(pos) {
                 let _ = tx.send(PeerCmd::SendMessage(msg));
             }
+        }
+        Ok(())
+    }
+
+    pub async fn broadcast(&self, msg: Message) -> anyhow::Result<()> {
+        let state = self.state.lock().await;
+        for tx in &state.peer_senders {
+            let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
         }
         Ok(())
     }
