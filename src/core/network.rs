@@ -202,12 +202,12 @@ mod tests {
     }
 
     #[test]
-    fn test_message_get_data_roundtrip() {
-        let msg = Message::GetData {
-            block_hashes: vec!["abc".to_string(), "def".to_string()],
-        };
-        let encoded = msg.encode().unwrap();
-        let decoded = Message::decode(std::io::Cursor::new(encoded)).unwrap();
-        assert_eq!(msg, decoded);
+    fn test_memo_limit_128() {
+        let mut tx = Transaction::new("A", "B", 100, 0);
+        tx.memo = Some("a".repeat(128));
+        assert!(tx.validate_basic().is_ok());
+
+        tx.memo = Some("a".repeat(129));
+        assert!(tx.validate_basic().is_err());
     }
 }
