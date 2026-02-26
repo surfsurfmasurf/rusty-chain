@@ -289,6 +289,19 @@ impl P2PNodeHandle {
                     // Request blocks for these headers
                     let hashes = headers.iter().map(|h| h.hash()).collect();
                     self.send_to(from, Message::GetData { block_hashes: hashes }).await?;
+
+                    // If we got a full batch, request the next batch
+                    if headers.len() == 100 {
+                         let last_height = {
+                            let state = self.state.lock().await;
+                            state.chain.blocks.len() as u64
+                         };
+                         println!("Requesting next batch of headers starting at {}", last_height + 100);
+                         self.send_to(from, Message::GetHeaders {
+                            start_height: last_height + 100,
+                            limit: 100,
+                         }).await?;
+                    }
                 }
             }
             Message::Blocks(blocks) => {
