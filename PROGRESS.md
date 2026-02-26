@@ -140,26 +140,19 @@ Next:
 - CLI: Updated `node` command to load/initialize local chain and mempool before starting the P2P server.
 - Tests: Added unit tests for P2P gossip identification.
 
+## Day 27
+- P2P Sync: Implemented initial blockchain sync logic (Handshake -> GetHeaders -> GetData -> Blocks).
+- P2P Sync: Added support for multi-batch header synchronization (100 headers per batch).
+- P2P Sync: Integrated peer height check during handshake to trigger sync when behind.
+- P2P Sync: Optimized block processing with duplicate checks to prevent redundant validation.
+- Polish: Increased transaction memo character limit from 64 to 128 for more flexibility.
+- Tests: Added unit tests for memo length constraints and message roundtrips.
+- Refactor: Cleaned up P2P message handlers and fixed clippy warnings.
+- Pushed progress to main branch (Day 27 of 30).
+
 Next:
-- Implement block and transaction sync (GetBlocks / GetHeaders) for new nodes.
-- Peer discovery (DNS seeds or addr gossip).
-- Better logging and error reporting in the P2P loop.
-
-## Day 21
-- P2P: Added `GetHeaders` and `GetData` messages to the network protocol.
-- P2P: Implemented server-side handlers for `GetHeaders` (retrieving block headers) and `GetData` (retrieving full blocks by hash).
-- P2P: Enhanced `P2PNodeHandle` with `get_headers` and `get_blocks_by_hash` thread-safe helpers.
-- Network: Added unit tests for new message types and P2P roundtrip logic.
-- Pushed progress to main branch (Day 21 of 30).
-
-## Day 26
-- P2P: Major refactor of peer message handling to simplify the async loop.
-- P2P: Consolidated all message processing logic into `process_message` for consistency.
-- P2P: Moved `Ping`/`Pong` response logic into `process_message`.
-- P2P: Simplified `P2PNode` and `handle_peer` by removing redundant handles and clones.
-- Network: Removed unused `RequestStatus` and `ResponseStatus` message variants.
-- Cleanup: Fixed clippy warnings and applied standard formatting.
-- Tests: Verified all core, state, and networking tests pass.
-- Pushed progress to main branch (Day 26 of 30).
+- Peer discovery improvements (addr gossip).
+- Persist peer list to disk.
+- P2P stress testing.
 
 
