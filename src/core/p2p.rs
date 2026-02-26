@@ -187,12 +187,39 @@ impl P2PNodeHandle {
                 .chain
                 .blocks
                 .iter()
-                .find(|b| crate::core::chain::hash_block(b) == hash)
+                .find(|b| b.header.hash() == hash)
             {
                 results.push(block.clone());
             }
         }
         results
+    }
+
+    async fn process_new_block(&self, block: crate::core::types::Block, from: SocketAddr) -> anyhow::Result<()> {
+        let blk_id = block.header.hash();
+        if self.mark_seen(blk_id.clone()).await {
+            println!("Gossip: New Block {} from {}", blk_id, from);
+            // 1. Validate block
+            let mut state = self.state.lock().await;
+            if let Err(e) = state.chain.validate_block(&block) {
+                println!("Invalid block {} from {}: {}", blk_id, from, e);
+                return Ok(());
+            }
+            // 2. Append to chain
+            if let Err(e) = state.chain.append_block(block.clone()) {
+                println!("Failed to append block {} to chain: {}", blk_id, e);
+                return Ok(());
+            }
+            // 3. Clear mempool txs
+            for tx in &block.txs {
+                state.mempool.remove_tx(&tx.id());
+            }
+            // 4. Re-gossip
+            drop(state);
+            self.broadcast_except(Message::NewBlock(block), from)
+                .await?;
+        }
+        Ok(())
     }
 
     pub async fn process_message(&self, msg: Message, from: SocketAddr) -> anyhow::Result<()> {
@@ -209,9 +236,19 @@ impl P2PNodeHandle {
                     "Handshake from {}: version={}, height={}",
                     from, version, best_height
                 );
-                // If they are ahead, we might want to sync headers later.
-                // For now, just respond with our own status if we were the ones receiving.
-                // In a real handshake, both sides exchange their heights.
+                // Sync logic: if they are ahead, request headers
+                let our_height = {
+                    let state = self.state.lock().await;
+                    state.chain.blocks.len() as u64
+                };
+
+                if best_height > our_height {
+                    println!("Peer {} is ahead ({} > {}), requesting headers...", from, best_height, our_height);
+                    self.send_to(from, Message::GetHeaders {
+                        start_height: our_height,
+                        limit: 100,
+                    }).await?;
+                }
             }
             Message::NewTransaction(tx) => {
                 let tx_id = tx.id();
@@ -237,29 +274,7 @@ impl P2PNodeHandle {
                 }
             }
             Message::NewBlock(block) => {
-                let blk_id = block.header.hash();
-                if self.mark_seen(blk_id.clone()).await {
-                    println!("Gossip: New Block {} from {}", blk_id, from);
-                    // 1. Validate block
-                    let mut state = self.state.lock().await;
-                    if let Err(e) = state.chain.validate_block(&block) {
-                        println!("Invalid block {} from {}: {}", blk_id, from, e);
-                        return Ok(());
-                    }
-                    // 2. Append to chain
-                    if let Err(e) = state.chain.append_block(block.clone()) {
-                        println!("Failed to append block {} to chain: {}", blk_id, e);
-                        return Ok(());
-                    }
-                    // 3. Clear mempool txs
-                    for tx in &block.txs {
-                        state.mempool.remove_tx(&tx.id());
-                    }
-                    // 4. Re-gossip
-                    drop(state);
-                    self.broadcast_except(Message::NewBlock(block), from)
-                        .await?;
-                }
+                self.process_new_block(block, from).await?;
             }
             Message::GetHeaders {
                 start_height,
@@ -267,6 +282,20 @@ impl P2PNodeHandle {
             } => {
                 let headers = self.get_headers(start_height, limit).await;
                 self.send_to(from, Message::Headers(headers)).await?;
+            }
+            Message::Headers(headers) => {
+                if !headers.is_empty() {
+                    println!("Received {} headers from {}", headers.len(), from);
+                    // Request blocks for these headers
+                    let hashes = headers.iter().map(|h| h.hash()).collect();
+                    self.send_to(from, Message::GetData { block_hashes: hashes }).await?;
+                }
+            }
+            Message::Blocks(blocks) => {
+                println!("Received {} blocks from {}", blocks.len(), from);
+                for block in blocks {
+                    self.process_new_block(block, from).await?;
+                }
             }
             Message::GetData { block_hashes } => {
                 let blocks = self.get_blocks_by_hash(block_hashes).await;
