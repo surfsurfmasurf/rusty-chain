@@ -198,7 +198,7 @@ impl P2PNodeHandle {
     async fn process_new_block(&self, block: crate::core::types::Block, from: SocketAddr) -> anyhow::Result<()> {
         let blk_id = block.header.hash();
         if self.mark_seen(blk_id.clone()).await {
-            let mut state = self.state.lock().await;
+            let state = self.state.lock().await;
 
             // Basic duplicate check against local chain
             if state.chain.blocks.iter().any(|b| b.header.hash() == blk_id) {
