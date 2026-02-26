@@ -33,7 +33,7 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub signature_b64: Option<String>,
 
-    /// Optional comment/metadata for the transaction (limit: 64 chars)
+    /// Optional comment/metadata for the transaction (limit: 128 chars)
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub memo: Option<String>,
 }
@@ -117,7 +117,7 @@ impl Transaction {
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
 
         if let Some(memo) = &self.memo {
-            anyhow::ensure!(memo.len() <= 64, "memo must be <= 64 characters");
+            anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
         }
 
         if self.is_coinbase() {
