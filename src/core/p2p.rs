@@ -232,7 +232,6 @@ impl P2PNodeHandle {
         println!("Processing {} message from {}", msg.get_type_name(), from);
         match msg {
             Message::Ping => {
-                println!("Responding to Ping from {}", from);
                 self.send_to(from, Message::Pong).await?;
             }
             Message::Handshake {
