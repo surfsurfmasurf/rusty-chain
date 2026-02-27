@@ -221,6 +221,16 @@ mod tests {
     }
 
     #[test]
+    fn test_message_type_name() {
+        assert_eq!(Message::Ping.get_type_name(), "Ping");
+        assert_eq!(Message::GetMempool.get_type_name(), "GetMempool");
+        assert_eq!(
+            Message::NewTransaction(Transaction::new("a", "b", 10, 0)).get_type_name(),
+            "NewTransaction"
+        );
+    }
+
+    #[test]
     fn test_memo_limit_128() {
         let mut tx = Transaction::new("A", "B", 100, 0);
         tx.memo = Some("a".repeat(128));
