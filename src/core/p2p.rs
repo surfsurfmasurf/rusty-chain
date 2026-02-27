@@ -151,6 +151,8 @@ impl P2PNodeHandle {
             if let Some(tx) = state.peer_senders.get(pos) {
                 let _ = tx.send(PeerCmd::SendMessage(msg));
             }
+        } else {
+            eprintln!("Failed to send {}: Peer {} not found", msg.get_type_name(), target);
         }
         Ok(())
     }
