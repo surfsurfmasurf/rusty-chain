@@ -150,6 +150,14 @@ Next:
 - Refactor: Cleaned up P2P message handlers and fixed clippy warnings.
 - Pushed progress to main branch (Day 27 of 30).
 
+## Day 28
+- P2P Logging: Added `Message::get_type_name()` to simplify and unify P2P message logging.
+- P2P: Improved `process_message` logging to automatically include the message type.
+- P2P: Added error logging in `send_to` when a target peer is not found in the state.
+- Refactor: Cleaned up redundant ping/pong logging in peer handlers.
+- Tests: Added unit tests for new message type name helper.
+- Pushed progress to main branch (Day 28 of 30).
+
 Next:
 - Peer discovery improvements (addr gossip).
 - Persist peer list to disk.
