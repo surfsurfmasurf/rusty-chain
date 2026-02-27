@@ -98,6 +98,25 @@ impl Message {
         }
     }
 
+    pub fn get_type_name(&self) -> &'static str {
+        match self {
+            Message::Ping => "Ping",
+            Message::Pong => "Pong",
+            Message::GetStatus => "GetStatus",
+            Message::Status { .. } => "Status",
+            Message::GetBlocks { .. } => "GetBlocks",
+            Message::Blocks(_) => "Blocks",
+            Message::NewTransaction(_) => "NewTransaction",
+            Message::NewBlock(_) => "NewBlock",
+            Message::Inventory { .. } => "Inventory",
+            Message::GetMempool => "GetMempool",
+            Message::Handshake { .. } => "Handshake",
+            Message::GetHeaders { .. } => "GetHeaders",
+            Message::Headers(_) => "Headers",
+            Message::GetData { .. } => "GetData",
+        }
+    }
+
     pub async fn decode_async<R: tokio::io::AsyncRead + Unpin>(
         mut reader: R,
     ) -> anyhow::Result<Self> {
