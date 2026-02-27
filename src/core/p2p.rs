@@ -183,19 +183,18 @@ impl P2PNodeHandle {
         let state = self.state.lock().await;
         let mut results = Vec::new();
         for hash in hashes {
-            if let Some(block) = state
-                .chain
-                .blocks
-                .iter()
-                .find(|b| b.header.hash() == hash)
-            {
+            if let Some(block) = state.chain.blocks.iter().find(|b| b.header.hash() == hash) {
                 results.push(block.clone());
             }
         }
         results
     }
 
-    async fn process_new_block(&self, block: crate::core::types::Block, from: SocketAddr) -> anyhow::Result<()> {
+    async fn process_new_block(
+        &self,
+        block: crate::core::types::Block,
+        from: SocketAddr,
+    ) -> anyhow::Result<()> {
         let blk_id = block.header.hash();
         if self.mark_seen(blk_id.clone()).await {
             let state = self.state.lock().await;
@@ -230,6 +229,7 @@ impl P2PNodeHandle {
     }
 
     pub async fn process_message(&self, msg: Message, from: SocketAddr) -> anyhow::Result<()> {
+        println!("Processing {} message from {}", msg.get_type_name(), from);
         match msg {
             Message::Ping => {
                 println!("Responding to Ping from {}", from);
@@ -250,11 +250,18 @@ impl P2PNodeHandle {
                 };
 
                 if best_height > our_height {
-                    println!("Peer {} is ahead ({} > {}), requesting headers...", from, best_height, our_height);
-                    self.send_to(from, Message::GetHeaders {
-                        start_height: our_height,
-                        limit: 100,
-                    }).await?;
+                    println!(
+                        "Peer {} is ahead ({} > {}), requesting headers...",
+                        from, best_height, our_height
+                    );
+                    self.send_to(
+                        from,
+                        Message::GetHeaders {
+                            start_height: our_height,
+                            limit: 100,
+                        },
+                    )
+                    .await?;
                 }
             }
             Message::NewTransaction(tx) => {
@@ -295,19 +302,32 @@ impl P2PNodeHandle {
                     println!("Received {} headers from {}", headers.len(), from);
                     // Request blocks for these headers
                     let hashes = headers.iter().map(|h| h.hash()).collect();
-                    self.send_to(from, Message::GetData { block_hashes: hashes }).await?;
+                    self.send_to(
+                        from,
+                        Message::GetData {
+                            block_hashes: hashes,
+                        },
+                    )
+                    .await?;
 
                     // If we got a full batch, request the next batch
                     if headers.len() == 100 {
-                         let last_height = {
+                        let last_height = {
                             let state = self.state.lock().await;
                             state.chain.blocks.len() as u64
-                         };
-                         println!("Requesting next batch of headers starting at {}", last_height + 100);
-                         self.send_to(from, Message::GetHeaders {
-                            start_height: last_height + 100,
-                            limit: 100,
-                         }).await?;
+                        };
+                        println!(
+                            "Requesting next batch of headers starting at {}",
+                            last_height + 100
+                        );
+                        self.send_to(
+                            from,
+                            Message::GetHeaders {
+                                start_height: last_height + 100,
+                                limit: 100,
+                            },
+                        )
+                        .await?;
                     }
                 }
             }
