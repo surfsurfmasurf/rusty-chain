@@ -275,6 +275,9 @@ impl P2PNodeHandle {
                     )
                     .await?;
                 }
+
+                // Request addresses during handshake
+                self.send_to(from, Message::GetAddr).await?;
             }
             Message::NewTransaction(tx) => {
                 let tx_id = tx.id();
