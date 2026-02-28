@@ -17,6 +17,7 @@ pub enum PeerCmd {
 /// Shared node state for concurrent peer handling
 pub struct NodeState {
     pub peers: Vec<SocketAddr>,
+    pub known_addrs: HashSet<SocketAddr>,
     pub peer_senders: Vec<mpsc::UnboundedSender<PeerCmd>>,
     pub seen_messages: HashSet<String>,
     pub chain: Chain,
@@ -30,10 +31,14 @@ pub struct P2PNode {
 
 impl P2PNode {
     pub fn new(addr: SocketAddr, chain: Chain, mempool: Mempool) -> Self {
+        let mut known_addrs = HashSet::new();
+        known_addrs.insert(addr);
+
         Self {
             addr,
             state: Arc::new(Mutex::new(NodeState {
                 peers: Vec::new(),
+                known_addrs,
                 peer_senders: Vec::new(),
                 seen_messages: HashSet::new(),
                 chain,
@@ -83,6 +88,12 @@ impl P2PNode {
             }
         };
         println!("Connected to outbound peer {}", target);
+
+        // Add to known addrs
+        {
+            let mut s = self.state.lock().await;
+            s.known_addrs.insert(target);
+        }
 
         let mut stream = stream;
 
@@ -361,6 +372,7 @@ async fn handle_peer(
     // Add to peer list
     {
         let mut s = state.lock().await;
+        s.known_addrs.insert(addr);
         if !s.peers.contains(&addr) {
             s.peers.push(addr);
             s.peer_senders.push(tx);
