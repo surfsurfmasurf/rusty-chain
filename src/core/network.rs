@@ -35,6 +35,10 @@ pub enum Message {
     GetData {
         block_hashes: Vec<String>,
     },
+    Addr {
+        addrs: Vec<SocketAddr>,
+    },
+    GetAddr,
 }
 
 impl Message {
@@ -114,6 +118,8 @@ impl Message {
             Message::GetHeaders { .. } => "GetHeaders",
             Message::Headers(_) => "Headers",
             Message::GetData { .. } => "GetData",
+            Message::Addr { .. } => "Addr",
+            Message::GetAddr => "GetAddr",
         }
     }
 
@@ -228,6 +234,21 @@ mod tests {
             Message::NewTransaction(Transaction::new("a", "b", 10, 0)).get_type_name(),
             "NewTransaction"
         );
+    }
+
+    #[test]
+    fn test_message_addr_getaddr() {
+        let msg = Message::Addr {
+            addrs: vec!["127.0.0.1:8080".parse().unwrap()],
+        };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+
+        let msg2 = Message::GetAddr;
+        let encoded2 = msg2.encode().unwrap();
+        let decoded2 = Message::decode(Cursor::new(encoded2)).unwrap();
+        assert_eq!(msg2, decoded2);
     }
 
     #[test]
