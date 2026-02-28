@@ -1,7 +1,7 @@
 use crate::core::types::{Block, BlockHeader, Transaction};
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
-use std::net::TcpStream;
+use std::net::{SocketAddr, TcpStream};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Message {
@@ -90,7 +90,10 @@ impl Message {
     }
 
     pub fn is_gossip(&self) -> bool {
-        matches!(self, Message::NewTransaction(_) | Message::NewBlock(_))
+        matches!(
+            self,
+            Message::NewTransaction(_) | Message::NewBlock(_) | Message::Addr { .. }
+        )
     }
 
     /// Returns the unique ID for gossip messages to prevent loops.
@@ -98,6 +101,16 @@ impl Message {
         match self {
             Message::NewTransaction(tx) => Some(tx.id()),
             Message::NewBlock(block) => Some(block.header.hash()),
+            Message::Addr { addrs } => {
+                // For Addr messages, we hash the sorted list of addresses
+                use std::collections::hash_map::DefaultHasher;
+                use std::hash::{Hash, Hasher};
+                let mut sorted_addrs = addrs.clone();
+                sorted_addrs.sort();
+                let mut hasher = DefaultHasher::new();
+                sorted_addrs.hash(&mut hasher);
+                Some(format!("addr_{}", hasher.finish()))
+            }
             _ => None,
         }
     }
