@@ -353,6 +353,30 @@ impl P2PNodeHandle {
                 let blocks = self.get_blocks_by_hash(block_hashes).await;
                 self.send_to(from, Message::Blocks(blocks)).await?;
             }
+            Message::GetAddr => {
+                let addrs = {
+                    let state = self.state.lock().await;
+                    state.known_addrs.iter().cloned().collect::<Vec<_>>()
+                };
+                self.send_to(from, Message::Addr { addrs }).await?;
+            }
+            Message::Addr { addrs } => {
+                let mut new_addrs = Vec::new();
+                {
+                    let mut state = self.state.lock().await;
+                    for addr in addrs {
+                        if state.known_addrs.insert(addr) {
+                            new_addrs.push(addr);
+                        }
+                    }
+                }
+                if !new_addrs.is_empty() {
+                    println!("Received {} new addresses from {}", new_addrs.len(), from);
+                    // Gossip new addresses
+                    self.broadcast_except(Message::Addr { addrs: new_addrs }, from)
+                        .await?;
+                }
+            }
             _ => {
                 println!("Received unhandled message from {}: {:?}", from, msg);
             }
