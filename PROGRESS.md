@@ -158,9 +158,18 @@ Next:
 - Tests: Added unit tests for new message type name helper.
 - Pushed progress to main branch (Day 28 of 30).
 
+## Day 29
+- P2P: Added `GetAddr` and `Addr` messages for peer discovery.
+- P2P: Implemented `known_addrs` tracking in `NodeState`.
+- P2P: Integrated peer discovery into the handshake process.
+- P2P: Implemented gossip for `Addr` messages to spread discovery across the network.
+- P2P: Added gossip loop prevention for `Addr` messages using address set hashing.
+- Tests: Added unit tests for `Addr` and `GetAddr` message serialization.
+- Pushed progress to main branch (Day 29 of 30).
+
 Next:
-- Peer discovery improvements (addr gossip).
 - Persist peer list to disk.
 - P2P stress testing.
+- Day 30: Final cleanup and release.
 
 
