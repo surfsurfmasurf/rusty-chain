@@ -163,7 +163,11 @@ impl P2PNodeHandle {
                 let _ = tx.send(PeerCmd::SendMessage(msg));
             }
         } else {
-            eprintln!("Failed to send {}: Peer {} not found", msg.get_type_name(), target);
+            eprintln!(
+                "Failed to send {}: Peer {} not found",
+                msg.get_type_name(),
+                target
+            );
         }
         Ok(())
     }
