@@ -2,26 +2,26 @@ use crate::core::chain::Chain;
 use crate::core::mempool::Mempool;
 use crate::core::network::Message;
 use anyhow::Context;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::{Mutex, mpsc};
 
 /// Commands that can be sent to the peer handler
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PeerCmd {
     SendMessage(Message),
 }
 
 /// Shared node state for concurrent peer handling
 pub struct NodeState {
-    pub peers: Vec<SocketAddr>,
     pub known_addrs: HashSet<SocketAddr>,
-    pub peer_senders: Vec<mpsc::UnboundedSender<PeerCmd>>,
+    pub peer_senders: HashMap<SocketAddr, mpsc::UnboundedSender<PeerCmd>>,
     pub seen_messages: HashSet<String>,
     pub chain: Chain,
     pub mempool: Mempool,
+    pub peer_list_path: Option<String>,
 }
 
 pub struct P2PNode {
@@ -30,19 +30,34 @@ pub struct P2PNode {
 }
 
 impl P2PNode {
-    pub fn new(addr: SocketAddr, chain: Chain, mempool: Mempool) -> Self {
+    pub fn new(
+        addr: SocketAddr,
+        chain: Chain,
+        mempool: Mempool,
+        peer_list_path: Option<String>,
+    ) -> Self {
         let mut known_addrs = HashSet::new();
         known_addrs.insert(addr);
+
+        // Load existing peers if path provided
+        if let Some(ref path) = peer_list_path {
+            if let Ok(content) = std::fs::read_to_string(path) {
+                if let Ok(addrs) = serde_json::from_str::<HashSet<SocketAddr>>(&content) {
+                    println!("Loaded {} known addresses from {}", addrs.len(), path);
+                    known_addrs.extend(addrs);
+                }
+            }
+        }
 
         Self {
             addr,
             state: Arc::new(Mutex::new(NodeState {
-                peers: Vec::new(),
                 known_addrs,
-                peer_senders: Vec::new(),
+                peer_senders: HashMap::new(),
                 seen_messages: HashSet::new(),
                 chain,
                 mempool,
+                peer_list_path,
             })),
         }
     }
@@ -54,6 +69,21 @@ impl P2PNode {
         println!("P2P server listening on {}", self.addr);
 
         let node_state = Arc::clone(&self.state);
+        let save_state = Arc::clone(&self.state);
+
+        // Background peer saver
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(std::time::Duration::from_secs(60)).await;
+                let state = save_state.lock().await;
+                if let Some(ref path) = state.peer_list_path {
+                    if let Ok(content) = serde_json::to_string_pretty(&state.known_addrs) {
+                        let _ = std::fs::write(path, content);
+                    }
+                }
+            }
+        });
+
         loop {
             match listener.accept().await {
                 Ok((stream, peer_addr)) => {
@@ -129,11 +159,9 @@ impl P2PNodeHandle {
     #[allow(clippy::collapsible_if)]
     pub async fn broadcast_except(&self, msg: Message, except: SocketAddr) -> anyhow::Result<()> {
         let state = self.state.lock().await;
-        for (i, addr) in state.peers.iter().enumerate() {
-            if *addr != except {
-                if let Some(tx) = state.peer_senders.get(i) {
-                    let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
-                }
+        for (&addr, tx) in &state.peer_senders {
+            if addr != except {
+                let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
             }
         }
         Ok(())
@@ -151,17 +179,14 @@ impl P2PNodeHandle {
 
     pub async fn get_peer_count(&self) -> usize {
         let state = self.state.lock().await;
-        state.peers.len()
+        state.peer_senders.len()
     }
 
     #[allow(clippy::collapsible_if)]
     pub async fn send_to(&self, target: SocketAddr, msg: Message) -> anyhow::Result<()> {
         let state = self.state.lock().await;
-        let pos = state.peers.iter().position(|&p| p == target);
-        if let Some(pos) = pos {
-            if let Some(tx) = state.peer_senders.get(pos) {
-                let _ = tx.send(PeerCmd::SendMessage(msg));
-            }
+        if let Some(tx) = state.peer_senders.get(&target) {
+            let _ = tx.send(PeerCmd::SendMessage(msg));
         } else {
             eprintln!(
                 "Failed to send {}: Peer {} not found",
@@ -174,7 +199,7 @@ impl P2PNodeHandle {
 
     pub async fn broadcast(&self, msg: Message) -> anyhow::Result<()> {
         let state = self.state.lock().await;
-        for tx in &state.peer_senders {
+        for tx in state.peer_senders.values() {
             let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
         }
         Ok(())
@@ -404,10 +429,7 @@ async fn handle_peer(
     {
         let mut s = state.lock().await;
         s.known_addrs.insert(addr);
-        if !s.peers.contains(&addr) {
-            s.peers.push(addr);
-            s.peer_senders.push(tx);
-        }
+        s.peer_senders.insert(addr, tx);
     }
 
     println!("Starting message loop for {}", addr);
@@ -453,10 +475,7 @@ async fn handle_peer(
     // Remove from peer list
     {
         let mut s = state.lock().await;
-        if let Some(pos) = s.peers.iter().position(|&p| p == addr) {
-            s.peers.remove(pos);
-            s.peer_senders.remove(pos);
-        }
+        s.peer_senders.remove(&addr);
     }
 
     res
