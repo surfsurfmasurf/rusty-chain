@@ -139,6 +139,10 @@ enum Commands {
         /// Path for mempool JSON
         #[arg(long)]
         mempool: Option<String>,
+
+        /// Path for peer list JSON
+        #[arg(long)]
+        peers_file: Option<String>,
     },
 }
 
@@ -380,6 +384,7 @@ async fn main() -> anyhow::Result<()> {
             peer,
             path,
             mempool,
+            peers_file,
         } => {
             use std::net::{IpAddr, Ipv4Addr, SocketAddr};
             let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
@@ -396,7 +401,7 @@ async fn main() -> anyhow::Result<()> {
 
             let height = chain.height() as u64;
 
-            let node = rusty_chain::core::p2p::P2PNode::new(addr, chain, mp);
+            let node = rusty_chain::core::p2p::P2PNode::new(addr, chain, mp, peers_file);
 
             for p in peer {
                 let target: SocketAddr = p.parse().context("Invalid peer address")?;
