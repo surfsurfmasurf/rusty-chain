@@ -40,6 +40,7 @@ impl P2PNode {
         known_addrs.insert(addr);
 
         // Load existing peers if path provided
+        #[allow(clippy::collapsible_if)]
         if let Some(ref path) = peer_list_path {
             if let Ok(content) = std::fs::read_to_string(path) {
                 if let Ok(addrs) = serde_json::from_str::<HashSet<SocketAddr>>(&content) {
@@ -76,6 +77,7 @@ impl P2PNode {
             loop {
                 tokio::time::sleep(std::time::Duration::from_secs(60)).await;
                 let state = save_state.lock().await;
+                #[allow(clippy::collapsible_if)]
                 if let Some(ref path) = state.peer_list_path {
                     if let Ok(content) = serde_json::to_string_pretty(&state.known_addrs) {
                         let _ = std::fs::write(path, content);
