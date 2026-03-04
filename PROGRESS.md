@@ -167,9 +167,16 @@ Next:
 - Tests: Added unit tests for `Addr` and `GetAddr` message serialization.
 - Pushed progress to main branch (Day 29 of 30).
 
+## Day 30
+- P2P: Implemented peer list persistence to disk (`--peers-file`).
+- P2P: Added background task to periodically save known addresses to JSON.
+- P2P: Automatic loading of peers from file on node startup.
+- Refactor: Replaced `Vec` with `HashMap` for peer tracking in `NodeState` for O(1) lookups and removal.
+- Polish: Final clippy and format pass for the 30-day challenge completion.
+- Pushed progress to main branch (Day 30 of 30).
+
 Next:
-- Persist peer list to disk.
-- P2P stress testing.
-- Day 30: Final cleanup and release.
+- Maintenance and further enhancements.
+- Project review and final documentation.
 
 
