@@ -123,15 +123,11 @@ impl Transaction {
         anyhow::ensure!(!self.from.trim().is_empty(), "tx.from must be non-empty");
         anyhow::ensure!(!self.to.trim().is_empty(), "tx.to must be non-empty");
         anyhow::ensure!(self.from != self.to, "tx.from and tx.to must differ");
+        // Minimum amount of 1 unit (prevents dust/negative amounts)
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
 
         if let Some(memo) = &self.memo {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
-        }
-
-        if self.is_coinbase() {
-            // Coinbase rules: no signature required (for now), but maybe nonce should be block height?
-            // For simplicity, we just allow it. The state application logic will ensure it's only valid as the first tx in a block.
         }
 
         Ok(())
