@@ -36,6 +36,10 @@ pub struct Transaction {
     /// Optional comment/metadata for the transaction (limit: 128 chars)
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub memo: Option<String>,
+
+    /// Optional sequence number for the transaction (future-proofing)
+    #[serde(default)]
+    pub sequence: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -47,6 +51,8 @@ pub struct TxSignPayload {
     pub nonce: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub memo: Option<String>,
+    #[serde(default)]
+    pub sequence: u32,
 }
 
 impl Transaction {
@@ -60,6 +66,7 @@ impl Transaction {
             pubkey_hex: None,
             signature_b64: None,
             memo: None,
+            sequence: 0,
         }
     }
 
@@ -79,6 +86,7 @@ impl Transaction {
             pubkey_hex: None,
             signature_b64: None,
             memo: None,
+            sequence: 0,
         }
     }
 
@@ -90,6 +98,7 @@ impl Transaction {
             fee: self.fee,
             nonce: self.nonce,
             memo: self.memo.clone(),
+            sequence: self.sequence,
         }
     }
 

@@ -116,6 +116,7 @@ impl Chain {
                 pubkey_hex: None,
                 signature_b64: None,
                 memo: Some(format!("Block {block_height} Reward")),
+                sequence: 0,
             };
             txs.insert(0, coinbase);
         }

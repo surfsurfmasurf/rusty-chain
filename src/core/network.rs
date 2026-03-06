@@ -39,6 +39,11 @@ pub enum Message {
         addrs: Vec<SocketAddr>,
     },
     GetAddr,
+    Reject {
+        code: u32,
+        reason: String,
+        message_type: String,
+    },
 }
 
 impl Message {
@@ -133,6 +138,7 @@ impl Message {
             Message::GetData { .. } => "GetData",
             Message::Addr { .. } => "Addr",
             Message::GetAddr => "GetAddr",
+            Message::Reject { .. } => "Reject",
         }
     }
 
@@ -262,6 +268,18 @@ mod tests {
         let encoded2 = msg2.encode().unwrap();
         let decoded2 = Message::decode(Cursor::new(encoded2)).unwrap();
         assert_eq!(msg2, decoded2);
+    }
+
+    #[test]
+    fn test_message_reject_roundtrip() {
+        let msg = Message::Reject {
+            code: 1,
+            reason: "Invalid".to_string(),
+            message_type: "NewBlock".to_string(),
+        };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
     }
 
     #[test]
