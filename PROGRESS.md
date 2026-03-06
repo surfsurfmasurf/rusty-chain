@@ -175,8 +175,16 @@ Next:
 - Polish: Final clippy and format pass for the 30-day challenge completion.
 - Pushed progress to main branch (Day 30 of 30).
 
+## Day 31
+- Added `sequence` field to `Transaction` and `TxSignPayload` for future-proofing (e.g. fee bumping, replace-by-fee).
+- Updated test suite (`state_tests.rs`, `nonce_tests.rs`) to include mandatory `sequence` in manual `Transaction` initializers.
+- Refactored `validate_basic` in `Transaction` for cleaner error handling and removed redundant coinbase-specific checks.
+- Improved P2P message documentation in `network.rs` with doc comments.
+- Polished P2P message handlers and unified validation logic.
+- Pushed 4 commits as part of the Day 31 maintenance and enhancement session.
+
 Next:
-- Maintenance and further enhancements.
-- Project review and final documentation.
+- Implement fee-bumping (RBF) mechanism using the new `sequence` field.
+- Add P2P rejection handling for peers sending invalid sequences.
 
 
