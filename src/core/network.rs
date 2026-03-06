@@ -35,10 +35,13 @@ pub enum Message {
     GetData {
         block_hashes: Vec<String>,
     },
+    /// Peer address list exchange for discovery
     Addr {
         addrs: Vec<SocketAddr>,
     },
+    /// Request a list of known peer addresses
     GetAddr,
+    /// Protocol level rejection message for invalid/malformed data or behavior
     Reject {
         code: u32,
         reason: String,
