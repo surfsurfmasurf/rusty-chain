@@ -107,7 +107,7 @@ impl Message {
     /// Returns the unique ID for gossip messages to prevent loops.
     pub fn gossip_id(&self) -> Option<String> {
         match self {
-            Message::NewTransaction(tx) => Some(tx.id()),
+            Message::NewTransaction(tx) => Some(format!("{}_{}", tx.id(), tx.fee)),
             Message::NewBlock(block) => Some(block.header.hash()),
             Message::Addr { addrs } => {
                 // For Addr messages, we hash the sorted list of addresses
