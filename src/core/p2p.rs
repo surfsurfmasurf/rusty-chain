@@ -312,8 +312,9 @@ impl P2PNodeHandle {
             }
             Message::NewTransaction(tx) => {
                 let tx_id = tx.id();
-                if self.mark_seen(tx_id.clone()).await {
-                    println!("Gossip: New Transaction {} from {}", tx_id, from);
+                let gossip_id = format!("{}_{}", tx_id, tx.fee);
+                if self.mark_seen(gossip_id).await {
+                    println!("Gossip: New Transaction {} (fee={}) from {}", tx_id, tx.fee, from);
                     // 1. Validate tx
                     let mut state = self.state.lock().await;
                     if let Err(e) = state.chain.validate_transaction(&tx) {
@@ -324,6 +325,12 @@ impl P2PNodeHandle {
                     let base_nonce = state.chain.next_nonce_for(&tx.from);
                     if let Err(e) = state.mempool.add_tx_checked(tx.clone(), base_nonce) {
                         println!("Failed to add tx {} to mempool: {}", tx_id, e);
+                        // Send rejection message for invalid RBF attempt or nonce gap
+                        let _ = self.send_to(from, Message::Reject {
+                            code: 1,
+                            reason: e.to_string(),
+                            message_type: "NewTransaction".to_string(),
+                        }).await;
                         return Ok(());
                     }
                     drop(state);
