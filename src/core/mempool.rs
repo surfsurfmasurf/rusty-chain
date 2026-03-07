@@ -51,22 +51,31 @@ impl Mempool {
     pub fn add_tx_checked(&mut self, tx: Transaction, base_nonce: u64) -> anyhow::Result<()> {
         tx.validate_accept()?;
 
+        // If a transaction with the same sender and nonce exists, we check if the new tx
+        // is an RBF candidate (same from, same nonce, higher fee).
+        if let Some(pos) = self
+            .txs
+            .iter()
+            .position(|t| t.from == tx.from && t.nonce == tx.nonce)
+        {
+            let existing = &self.txs[pos];
+            anyhow::ensure!(
+                tx.fee > existing.fee,
+                "replacement tx must have a strictly higher fee (existing={} new={})",
+                existing.fee,
+                tx.fee
+            );
+            // Replace the existing transaction
+            self.txs[pos] = tx;
+            return Ok(());
+        }
+
         let expected = self.next_nonce_for(&tx.from, base_nonce);
         anyhow::ensure!(
             tx.nonce == expected,
             "invalid nonce for sender={} (expected={} got={})",
             tx.from,
             expected,
-            tx.nonce
-        );
-
-        anyhow::ensure!(
-            !self
-                .txs
-                .iter()
-                .any(|t| t.from == tx.from && t.nonce == tx.nonce),
-            "duplicate nonce for sender={} (nonce={})",
-            tx.from,
             tx.nonce
         );
 
