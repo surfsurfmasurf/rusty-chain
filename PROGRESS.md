@@ -183,8 +183,16 @@ Next:
 - Polished P2P message handlers and unified validation logic.
 - Pushed 4 commits as part of the Day 31 maintenance and enhancement session.
 
+## Day 32
+- Implemented Replace-By-Fee (RBF) logic in the mempool.
+- Added `Transaction::new_with_sequence` helper for unified transaction creation.
+- Enhanced `add_tx_checked` to enforce both strictly higher fees and higher sequence numbers for replacements.
+- Added comprehensive unit tests for RBF logic (`tests/rbf_tests.rs`).
+- Refactored `validate_basic` to include initial sequence-related checks.
+- Pushed 8 commits as part of the Day 32 work session.
+
 Next:
-- Implement fee-bumping (RBF) mechanism using the new `sequence` field.
-- Add P2P rejection handling for peers sending invalid sequences.
+- Add CLI support for specifying sequence numbers in `tx-add`.
+- Implement RBF rejection logging in P2P handlers.
 
 
