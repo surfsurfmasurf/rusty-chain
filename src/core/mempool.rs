@@ -52,19 +52,31 @@ impl Mempool {
         tx.validate_accept()?;
 
         // If a transaction with the same sender and nonce exists, we check if the new tx
-        // is an RBF candidate (same from, same nonce, higher fee).
+        // is an RBF (Replace-By-Fee) candidate.
+        // Rule: same sender, same nonce, higher fee OR higher sequence.
         if let Some(pos) = self
             .txs
             .iter()
             .position(|t| t.from == tx.from && t.nonce == tx.nonce)
         {
             let existing = &self.txs[pos];
+
+            // RBF Rule:
+            // 1. Fee must be strictly higher (to prevent spam).
+            // 2. Sequence must be higher than the existing transaction's sequence.
             anyhow::ensure!(
                 tx.fee > existing.fee,
                 "replacement tx must have a strictly higher fee (existing={} new={})",
                 existing.fee,
                 tx.fee
             );
+            anyhow::ensure!(
+                tx.sequence > existing.sequence,
+                "replacement tx must have a higher sequence number (existing={} new={})",
+                existing.sequence,
+                tx.sequence
+            );
+
             // Replace the existing transaction
             self.txs[pos] = tx;
             return Ok(());

@@ -70,6 +70,26 @@ impl Transaction {
         }
     }
 
+    pub fn new_with_sequence(
+        from: impl Into<String>,
+        to: impl Into<String>,
+        amount: u64,
+        nonce: u64,
+        sequence: u32,
+    ) -> Self {
+        Self {
+            from: from.into(),
+            to: to.into(),
+            amount,
+            fee: 0,
+            nonce,
+            pubkey_hex: None,
+            signature_b64: None,
+            memo: None,
+            sequence,
+        }
+    }
+
     pub fn new_with_fee(
         from: impl Into<String>,
         to: impl Into<String>,
@@ -125,6 +145,8 @@ impl Transaction {
         anyhow::ensure!(self.from != self.to, "tx.from and tx.to must differ");
         // Minimum amount of 1 unit (prevents dust/negative amounts)
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
+        // Sequence should be non-negative (u32 handles this, but let's ensure it's not wrapped or used incorrectly)
+        // Add more sequence validation if rules emerge.
 
         if let Some(memo) = &self.memo {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
