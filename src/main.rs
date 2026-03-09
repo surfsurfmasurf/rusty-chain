@@ -106,6 +106,10 @@ enum Commands {
         #[arg(long)]
         nonce: Option<u64>,
 
+        /// Tx sequence number (for RBF). Default: 0.
+        #[arg(long, default_value_t = 0)]
+        sequence: u32,
+
         /// Optional path for mempool JSON
         #[arg(long)]
         mempool: Option<String>,
@@ -303,6 +307,7 @@ async fn main() -> anyhow::Result<()> {
             fee,
             signer,
             nonce,
+            sequence,
             mempool,
             memo,
         } => {
@@ -335,7 +340,14 @@ async fn main() -> anyhow::Result<()> {
             let filled_nonce =
                 nonce.unwrap_or_else(|| mp.next_nonce_for(&effective_from, base_nonce));
 
-            let mut tx = Transaction::new_with_fee(effective_from, to, amount, fee, filled_nonce);
+            let mut tx = Transaction::new_with_fee(
+                effective_from,
+                to,
+                amount,
+                fee,
+                filled_nonce,
+                sequence,
+            );
             tx.memo = memo;
 
             if let Some(file) = signer_file {
@@ -374,8 +386,8 @@ async fn main() -> anyhow::Result<()> {
                     "unsigned"
                 };
                 println!(
-                    "{i}: {short} {} -> {} amount={} fee={} nonce={} ({signed})",
-                    tx.from, tx.to, tx.amount, tx.fee, tx.nonce
+                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ({signed})",
+                    tx.from, tx.to, tx.amount, tx.fee, tx.nonce, tx.sequence
                 );
             }
         }
