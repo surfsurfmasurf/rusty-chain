@@ -14,6 +14,10 @@ impl Mempool {
         PathBuf::from("data/mempool.json")
     }
 
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn load(path: &Path) -> anyhow::Result<Self> {
         let s = fs::read_to_string(path)?;
         let m: Self = serde_json::from_str(&s)?;
