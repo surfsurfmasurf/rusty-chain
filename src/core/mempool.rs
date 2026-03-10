@@ -116,4 +116,19 @@ impl Mempool {
     pub fn remove_tx(&mut self, tx_id: &str) {
         self.txs.retain(|t| t.id() != tx_id);
     }
+
+    /// Evicts transactions from the mempool that have exceeded the time-to-live (TTL).
+    /// Returns the number of evicted transactions.
+    pub fn evict_expired(&mut self, ttl_ms: u64, now_ms: u64) -> usize {
+        let count_before = self.txs.len();
+        self.txs.retain(|t| {
+            if t.timestamp_ms == 0 {
+                // If timestamp is not set (legacy or internal), keep it for now
+                // or we could treat it as expired.
+                return true;
+            }
+            now_ms < t.timestamp_ms.saturating_add(ttl_ms)
+        });
+        count_before - self.txs.len()
+    }
 }
