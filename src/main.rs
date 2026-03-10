@@ -117,6 +117,10 @@ enum Commands {
         /// Optional memo (max 64 chars)
         #[arg(long)]
         memo: Option<String>,
+
+        /// Optional timestamp (ms). If omitted, current time is used.
+        #[arg(long)]
+        timestamp: Option<u64>,
     },
 
     /// List mempool transactions
@@ -124,6 +128,17 @@ enum Commands {
         /// Optional path for mempool JSON
         #[arg(long)]
         mempool: Option<String>,
+    },
+
+    /// Evict expired transactions from the mempool
+    TxEvict {
+        /// Optional path for mempool JSON
+        #[arg(long)]
+        mempool: Option<String>,
+
+        /// TTL in milliseconds (default: 1 hour = 3600000)
+        #[arg(long, default_value_t = 3600000)]
+        ttl: u64,
     },
 
     /// Start a P2P node
@@ -340,21 +355,23 @@ async fn main() -> anyhow::Result<()> {
             let filled_nonce =
                 nonce.unwrap_or_else(|| mp.next_nonce_for(&effective_from, base_nonce));
 
-            let mut tx = Transaction::new_with_fee(
-                effective_from,
+            let mut tx = Transaction::new(
+                effective_from.clone(),
                 to,
                 amount,
-                fee,
                 filled_nonce,
-                sequence,
             );
+            tx.fee = fee;
+            tx.sequence = sequence;
             tx.memo = memo;
+            if let Some(ts) = timestamp {
+                tx.timestamp_ms = ts;
+            }
 
             if let Some(file) = signer_file {
+                tx.pubkey_hex = Some(file.verifying_key_hex.clone());
                 let sk = file.signing_key()?;
-
                 let sig = rusty_chain::core::crypto::sign_bytes(&sk, &tx.signing_bytes());
-                tx.pubkey_hex = Some(file.verifying_key_hex);
                 tx.signature_b64 = Some(sig);
             }
 
@@ -386,10 +403,23 @@ async fn main() -> anyhow::Result<()> {
                     "unsigned"
                 };
                 println!(
-                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ({signed})",
-                    tx.from, tx.to, tx.amount, tx.fee, tx.nonce, tx.sequence
+                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed})",
+                    tx.from, tx.to, tx.amount, tx.fee, tx.nonce, tx.sequence, tx.timestamp_ms
                 );
             }
+        }
+        Commands::TxEvict { mempool, ttl } => {
+            let mp_path = mempool_path(mempool);
+            if !mp_path.exists() {
+                println!("mempool: {} (not found)", mp_path.display());
+                return Ok(());
+            }
+            let mut mp = Mempool::load(&mp_path)?;
+            let now = rusty_chain::core::time::now_ms();
+            let evicted = mp.evict_expired(ttl, now);
+            mp.save(&mp_path)?;
+            println!("Evicted {} expired transactions from mempool.", evicted);
+            println!("Current mempool size: {}", mp.txs.len());
         }
         Commands::Node {
             port,

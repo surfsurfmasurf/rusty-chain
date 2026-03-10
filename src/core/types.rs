@@ -104,6 +104,7 @@ impl Transaction {
         amount: u64,
         fee: u64,
         nonce: u64,
+        sequence: u32,
     ) -> Self {
         Self {
             from: from.into(),
@@ -114,7 +115,7 @@ impl Transaction {
             pubkey_hex: None,
             signature_b64: None,
             memo: None,
-            sequence: 0,
+            sequence,
             timestamp_ms: crate::core::time::now_ms(),
         }
     }
