@@ -40,6 +40,10 @@ pub struct Transaction {
     /// Optional sequence number for the transaction (future-proofing)
     #[serde(default)]
     pub sequence: u32,
+
+    /// Optional timestamp for when the transaction was created (Unix epoch ms)
+    #[serde(default)]
+    pub timestamp_ms: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -53,6 +57,8 @@ pub struct TxSignPayload {
     pub memo: Option<String>,
     #[serde(default)]
     pub sequence: u32,
+    #[serde(default)]
+    pub timestamp_ms: u64,
 }
 
 impl Transaction {
@@ -67,6 +73,7 @@ impl Transaction {
             signature_b64: None,
             memo: None,
             sequence: 0,
+            timestamp_ms: crate::core::time::now_ms(),
         }
     }
 
@@ -87,6 +94,7 @@ impl Transaction {
             signature_b64: None,
             memo: None,
             sequence,
+            timestamp_ms: crate::core::time::now_ms(),
         }
     }
 
@@ -107,6 +115,7 @@ impl Transaction {
             signature_b64: None,
             memo: None,
             sequence: 0,
+            timestamp_ms: crate::core::time::now_ms(),
         }
     }
 
@@ -119,6 +128,7 @@ impl Transaction {
             nonce: self.nonce,
             memo: self.memo.clone(),
             sequence: self.sequence,
+            timestamp_ms: self.timestamp_ms,
         }
     }
 
