@@ -191,8 +191,24 @@ Next:
 - Refactored `validate_basic` to include initial sequence-related checks.
 - Pushed 8 commits as part of the Day 32 work session.
 
+## Day 33
+- P2P: Implemented rejection messages for invalid RBF attempts in `process_message`.
+- CLI: Added `--sequence` flag to `tx-add` for manual RBF control.
+- CLI: `tx-list` now displays the sequence number for each transaction.
+- Tests: Added `rbf_rejects_lower_fee_even_with_higher_sequence` unit test.
+- Docs: Updated README with RBF and CLI enhancement details.
+- Pushed 5 commits (Day 33 of 30+).
+
+## Day 34
+- Core: Added `timestamp_ms` to `Transaction` and `TxSignPayload` for time-aware mempool.
+- Mempool: Implemented `evict_expired` to support TTL-based transaction eviction.
+- CLI: Added `tx-evict` command to manually prune expired transactions from mempool.
+- CLI: `tx-list` and `tx-add` now support and display transaction timestamps.
+- Tests: Added `eviction_tests` to verify TTL logic in mempool.
+- Pushed 8 commits (Day 34 of 30+).
+
 Next:
-- Add CLI support for specifying sequence numbers in `tx-add`.
-- Implement RBF rejection logging in P2P handlers.
+- Implement peer reputation scoring to P2P network.
+- Add automatic mempool eviction on interval in the P2P node.
 
 

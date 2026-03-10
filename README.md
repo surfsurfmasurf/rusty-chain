@@ -96,6 +96,7 @@ cargo run -- validate
 - [x] **RBF (Replace-By-Fee):** 트랜잭션 시퀀스 및 수수료 기반 대체 로직 구현
 - [x] **P2P Rejection:** 잘못된 RBF 요청에 대한 네트워크 거부 메시지 처리
 - [x] **CLI Enhancement:** `tx-add`에서 시퀀스 번호 지정 지원
+- [x] **Mempool TTL:** 트랜잭션 타임스탬프 기반 만료 및 `tx-evict` 명령 추가
 
 ---
 *본 프로젝트는 30일 챌린지 기간 내에 계획된 모든 핵심 기능 개발을 완료하였습니다.*
