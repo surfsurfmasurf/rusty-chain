@@ -22,7 +22,7 @@ fn coinbase_tx_increases_balance() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0,
+        sequence: 0, timestamp_ms: 0,
     };
 
     c.mine_block(vec![coinbase], 1, None).unwrap();
@@ -45,7 +45,7 @@ fn transfer_tx_updates_balances() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0,
+        sequence: 0, timestamp_ms: 0,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
@@ -89,7 +89,7 @@ fn invalid_nonce_makes_chain_invalid() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0,
+        sequence: 0, timestamp_ms: 0,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
@@ -118,12 +118,12 @@ fn fees_are_collected_by_miner() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0,
+        sequence: 0, timestamp_ms: 0,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
 
     // 2. Alice sends 10 to Bob with 5 fee. Miner is 'charlie'.
-    let tx = Transaction::new_with_fee("alice", "bob", 10, 5, 0);
+    let tx = Transaction::new_with_fee("alice", "bob", 10, 5, 0, 0);
     c.mine_block(vec![tx], 1, Some("charlie")).unwrap();
 
     let state = c.compute_state().unwrap();
@@ -150,11 +150,11 @@ fn insufficient_balance_for_fee_fails() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0,
+        sequence: 0, timestamp_ms: 0,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
 
-    let tx = Transaction::new_with_fee("alice", "bob", 50, 1, 0);
+    let tx = Transaction::new_with_fee("alice", "bob", 50, 1, 0, 0);
     let err = c.mine_block(vec![tx], 1, None).unwrap_err();
 
     assert!(

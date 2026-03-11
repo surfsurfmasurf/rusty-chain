@@ -12,7 +12,7 @@ fn rbf_replacement_requires_higher_fee_and_sequence() {
         .expect("Initial tx should be added");
 
     // 2. Replacement with higher fee but SAME sequence (should fail)
-    let mut tx2 = Transaction::new_with_fee("alice", "bob", 10, 10, 0);
+    let mut tx2 = Transaction::new_with_fee("alice", "bob", 10, 10, 0, 0);
     tx2.sequence = 0;
     let err = mp
         .add_tx_checked(tx2.clone(), base)
@@ -34,7 +34,7 @@ fn rbf_replacement_requires_higher_fee_and_sequence() {
     );
 
     // 4. Replacement with higher fee AND higher sequence (should succeed)
-    let mut tx4 = Transaction::new_with_fee("alice", "bob", 10, 10, 0);
+    let mut tx4 = Transaction::new_with_fee("alice", "bob", 10, 10, 0, 0);
     tx4.sequence = 1;
     mp.add_tx_checked(tx4.clone(), base)
         .expect("RBF should succeed with higher fee and sequence");
@@ -54,11 +54,11 @@ fn rbf_rejects_lower_fee_even_with_higher_sequence() {
     let base = 0;
 
     // 1. Initial tx (fee=10, seq=0)
-    let tx1 = Transaction::new_with_fee("alice", "bob", 10, 10, 0);
+    let tx1 = Transaction::new_with_fee("alice", "bob", 10, 10, 0, 0);
     mp.add_tx_checked(tx1, base).unwrap();
 
     // 2. Replacement with LOWER fee but higher sequence (should fail)
-    let mut tx2 = Transaction::new_with_fee("alice", "bob", 10, 5, 0);
+    let mut tx2 = Transaction::new_with_fee("alice", "bob", 10, 5, 0, 0);
     tx2.sequence = 1;
     let err = mp.add_tx_checked(tx2, base).unwrap_err().to_string();
     assert!(err.contains("strictly higher fee"), "Error should mention fee: {err}");
@@ -76,7 +76,7 @@ fn rbf_replaces_correct_transaction() {
         .unwrap();
 
     // Replace the first one (nonce=0)
-    let mut rbf = Transaction::new_with_fee("alice", "bob", 5, 10, 0);
+    let mut rbf = Transaction::new_with_fee("alice", "bob", 5, 10, 0, 0);
     rbf.sequence = 1;
     mp.add_tx_checked(rbf, base).unwrap();
 

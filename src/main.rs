@@ -325,6 +325,7 @@ async fn main() -> anyhow::Result<()> {
             sequence,
             mempool,
             memo,
+            timestamp,
         } => {
             let chain_path = chain_path(chain);
             let chain = load_or_genesis(&chain_path)?;
