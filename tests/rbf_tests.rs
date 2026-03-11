@@ -61,7 +61,10 @@ fn rbf_rejects_lower_fee_even_with_higher_sequence() {
     let mut tx2 = Transaction::new_with_fee("alice", "bob", 10, 5, 0, 0);
     tx2.sequence = 1;
     let err = mp.add_tx_checked(tx2, base).unwrap_err().to_string();
-    assert!(err.contains("strictly higher fee"), "Error should mention fee: {err}");
+    assert!(
+        err.contains("strictly higher fee"),
+        "Error should mention fee: {err}"
+    );
 }
 
 #[test]

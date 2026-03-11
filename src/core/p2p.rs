@@ -19,6 +19,7 @@ pub struct NodeState {
     pub known_addrs: HashSet<SocketAddr>,
     pub peer_senders: HashMap<SocketAddr, mpsc::UnboundedSender<PeerCmd>>,
     pub seen_messages: HashSet<String>,
+    pub peer_reputation: HashMap<SocketAddr, i32>,
     pub chain: Chain,
     pub mempool: Mempool,
     pub peer_list_path: Option<String>,
@@ -56,6 +57,7 @@ impl P2PNode {
                 known_addrs,
                 peer_senders: HashMap::new(),
                 seen_messages: HashSet::new(),
+                peer_reputation: HashMap::new(),
                 chain,
                 mempool,
                 peer_list_path,
@@ -71,6 +73,7 @@ impl P2PNode {
 
         let node_state = Arc::clone(&self.state);
         let save_state = Arc::clone(&self.state);
+        let evict_state = Arc::clone(&self.state);
 
         // Background peer saver
         tokio::spawn(async move {
@@ -82,6 +85,27 @@ impl P2PNode {
                     if let Ok(content) = serde_json::to_string_pretty(&state.known_addrs) {
                         let _ = std::fs::write(path, content);
                     }
+                }
+            }
+        });
+
+        // Background mempool evictor
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(std::time::Duration::from_secs(300)).await; // 5 minutes
+                let mut state = evict_state.lock().await;
+                let now = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_millis() as u64;
+
+                // TTL: 24 hours (86,400,000 ms)
+                let evicted = state.mempool.evict_expired(86_400_000, now);
+                if evicted > 0 {
+                    println!(
+                        "Background evictor: removed {} expired transactions",
+                        evicted
+                    );
                 }
             }
         });
@@ -184,6 +208,21 @@ impl P2PNodeHandle {
         state.peer_senders.len()
     }
 
+    pub async fn update_reputation(&self, peer: SocketAddr, delta: i32) {
+        let mut state = self.state.lock().await;
+        let score = state.peer_reputation.entry(peer).or_insert(0);
+        *score = score.saturating_add(delta);
+        println!(
+            "Peer {} reputation updated: {} (delta: {})",
+            peer, *score, delta
+        );
+    }
+
+    pub async fn get_reputation(&self, peer: SocketAddr) -> i32 {
+        let state = self.state.lock().await;
+        *state.peer_reputation.get(&peer).unwrap_or(&0)
+    }
+
     #[allow(clippy::collapsible_if)]
     pub async fn send_to(&self, target: SocketAddr, msg: Message) -> anyhow::Result<()> {
         let state = self.state.lock().await;
@@ -253,6 +292,8 @@ impl P2PNodeHandle {
             let mut state = self.state.lock().await;
             if let Err(e) = state.chain.validate_block(&block) {
                 println!("Invalid block {} from {}: {}", blk_id, from, e);
+                drop(state);
+                self.update_reputation(from, -50).await;
                 return Ok(());
             }
             // 2. Append to chain
@@ -264,8 +305,10 @@ impl P2PNodeHandle {
             for tx in &block.txs {
                 state.mempool.remove_tx(&tx.id());
             }
-            // 4. Re-gossip
+            // 4. Update reputation
             drop(state);
+            self.update_reputation(from, 10).await;
+            // 5. Re-gossip
             self.broadcast_except(Message::NewBlock(block), from)
                 .await?;
         }
@@ -322,12 +365,14 @@ impl P2PNodeHandle {
                     let mut state = self.state.lock().await;
                     if let Err(e) = state.chain.validate_transaction(&tx) {
                         println!("Invalid transaction {} from {}: {}", tx_id, from, e);
+                        drop(state);
+                        self.update_reputation(from, -10).await;
                         return Ok(());
                     }
                     // 2. Add to mempool
                     let base_nonce = state.chain.next_nonce_for(&tx.from);
                     if let Err(e) = state.mempool.add_tx_checked(tx.clone(), base_nonce) {
-                        println!("Failed to add tx {} to mempool: {}", tx_id, e);
+                        println!("Failed to add tx {} from {} to mempool: {}", tx_id, from, e);
                         // Send rejection message for invalid RBF attempt or nonce gap
                         let _ = self
                             .send_to(
@@ -342,6 +387,7 @@ impl P2PNodeHandle {
                         return Ok(());
                     }
                     drop(state);
+                    self.update_reputation(from, 1).await;
 
                     // 3. Re-gossip
                     self.broadcast_except(Message::NewTransaction(tx), from)

@@ -207,8 +207,17 @@ Next:
 - Tests: Added `eviction_tests` to verify TTL logic in mempool.
 - Pushed 8 commits (Day 34 of 30+).
 
+## Day 35
+- P2P: Implemented peer reputation scoring system.
+- P2P: Peers gain reputation for valid blocks (+10) and transactions (+1).
+- P2P: Peers lose reputation for invalid blocks (-50) and transactions (-10).
+- P2P: Added background mempool evictor to remove expired transactions every 5 minutes.
+- Refactor: Unified logging for transaction rejection with sender address inclusion.
+- Tests: Verified core reputation update logic and background task stability.
+- Pushed 8 commits (Day 35 of 30+).
+
 Next:
-- Implement peer reputation scoring to P2P network.
-- Add automatic mempool eviction on interval in the P2P node.
+- Implement automatic peer banning for extremely low reputation scores.
+- Add P2P command to query peer reputation via CLI.
 
 

@@ -22,7 +22,8 @@ fn coinbase_tx_increases_balance() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0, timestamp_ms: 0,
+        sequence: 0,
+        timestamp_ms: 0,
     };
 
     c.mine_block(vec![coinbase], 1, None).unwrap();
@@ -45,7 +46,8 @@ fn transfer_tx_updates_balances() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0, timestamp_ms: 0,
+        sequence: 0,
+        timestamp_ms: 0,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
@@ -89,7 +91,8 @@ fn invalid_nonce_makes_chain_invalid() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0, timestamp_ms: 0,
+        sequence: 0,
+        timestamp_ms: 0,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
@@ -118,7 +121,8 @@ fn fees_are_collected_by_miner() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0, timestamp_ms: 0,
+        sequence: 0,
+        timestamp_ms: 0,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
 
@@ -150,7 +154,8 @@ fn insufficient_balance_for_fee_fails() {
         pubkey_hex: None,
         signature_b64: None,
         memo: None,
-        sequence: 0, timestamp_ms: 0,
+        sequence: 0,
+        timestamp_ms: 0,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
 
