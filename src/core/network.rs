@@ -41,12 +41,23 @@ pub enum Message {
     },
     /// Request a list of known peer addresses
     GetAddr,
+    /// Request the list of peers and their reputation scores
+    GetPeers,
+    /// List of peers with metadata (reputation, etc)
+    Peers(Vec<PeerInfo>),
     /// Protocol level rejection message for invalid/malformed data or behavior
     Reject {
         code: u32,
         reason: String,
         message_type: String,
     },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct PeerInfo {
+    pub addr: SocketAddr,
+    pub reputation: i32,
+    pub is_banned: bool,
 }
 
 impl Message {
@@ -141,6 +152,8 @@ impl Message {
             Message::GetData { .. } => "GetData",
             Message::Addr { .. } => "Addr",
             Message::GetAddr => "GetAddr",
+            Message::GetPeers => "GetPeers",
+            Message::Peers(_) => "Peers",
             Message::Reject { .. } => "Reject",
         }
     }
