@@ -115,6 +115,16 @@ impl P2PNode {
         loop {
             match listener.accept().await {
                 Ok((stream, peer_addr)) => {
+                    let is_banned = {
+                        let state = node_state.lock().await;
+                        state.banned_peers.contains(&peer_addr)
+                    };
+
+                    if is_banned {
+                        println!("Rejecting connection from banned peer {}", peer_addr);
+                        continue;
+                    }
+
                     println!("New inbound connection from {}", peer_addr);
                     let state = Arc::clone(&node_state);
                     let node_handle = P2PNodeHandle {
