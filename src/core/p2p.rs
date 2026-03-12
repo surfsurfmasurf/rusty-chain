@@ -23,6 +23,7 @@ pub struct NodeState {
     pub chain: Chain,
     pub mempool: Mempool,
     pub peer_list_path: Option<String>,
+    pub banned_peers: HashSet<SocketAddr>,
 }
 
 pub struct P2PNode {
@@ -61,6 +62,7 @@ impl P2PNode {
                 chain,
                 mempool,
                 peer_list_path,
+                banned_peers: HashSet::new(),
             })),
         }
     }
