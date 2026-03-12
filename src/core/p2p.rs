@@ -218,6 +218,23 @@ impl P2PNodeHandle {
             "Peer {} reputation updated: {} (delta: {})",
             peer, *score, delta
         );
+
+        // Auto-ban threshold: -100
+        if *score <= -100 {
+            println!("Peer {} reached ban threshold ({}), banning...", peer, *score);
+            state.banned_peers.insert(peer);
+            if let Some(tx) = state.peer_senders.get(&peer) {
+                // We don't have a direct "disconnect" command in PeerCmd yet,
+                // but we can add one or just let the peer handle_peer loop check banned status.
+                // For now, let's just remove them from senders to stop outgoing traffic.
+                let _ = tx.send(PeerCmd::SendMessage(Message::Reject {
+                    code: 403,
+                    reason: "Banned due to low reputation".to_string(),
+                    message_type: "Handshake".to_string(),
+                }));
+            }
+            state.peer_senders.remove(&peer);
+        }
     }
 
     pub async fn get_reputation(&self, peer: SocketAddr) -> i32 {
