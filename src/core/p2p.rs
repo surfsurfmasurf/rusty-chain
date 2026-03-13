@@ -1,6 +1,6 @@
 use crate::core::chain::Chain;
 use crate::core::mempool::Mempool;
-use crate::core::network::Message;
+use crate::core::network::{Message, PeerInfo};
 use anyhow::Context;
 use std::collections::{HashMap, HashSet};
 use std::net::SocketAddr;
@@ -483,6 +483,30 @@ impl P2PNodeHandle {
                     state.known_addrs.iter().cloned().collect::<Vec<_>>()
                 };
                 self.send_to(from, Message::Addr { addrs }).await?;
+            }
+            Message::GetPeers => {
+                let peers = {
+                    let state = self.state.lock().await;
+                    state
+                        .peer_reputation
+                        .iter()
+                        .map(|(addr, &reputation)| PeerInfo {
+                            addr: *addr,
+                            reputation,
+                            is_banned: state.banned_peers.contains(addr),
+                        })
+                        .collect::<Vec<_>>()
+                };
+                self.send_to(from, Message::Peers(peers)).await?;
+            }
+            Message::Peers(peers) => {
+                println!("Received reputation data for {} peers", peers.len());
+                for p in peers {
+                    println!(
+                        "  - {}: reputation={} (banned: {})",
+                        p.addr, p.reputation, p.is_banned
+                    );
+                }
             }
             Message::Addr { addrs } => {
                 let mut new_addrs = Vec::new();
