@@ -508,6 +508,12 @@ impl P2PNodeHandle {
                     );
                 }
             }
+            Message::Reject { code, reason, message_type } => {
+                println!(
+                    "Peer {} rejected our {}: [{}] {}",
+                    from, message_type, code, reason
+                );
+            }
             Message::Addr { addrs } => {
                 let mut new_addrs = Vec::new();
                 {
