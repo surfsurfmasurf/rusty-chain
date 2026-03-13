@@ -221,6 +221,7 @@ impl P2PNodeHandle {
         state.peer_senders.len()
     }
 
+    /// Updates a peer's reputation score and enforces automatic banning if it falls below -100.
     pub async fn update_reputation(&self, peer: SocketAddr, delta: i32) {
         let mut state = self.state.lock().await;
         let score = state.peer_reputation.entry(peer).or_insert(0);
