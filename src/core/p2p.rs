@@ -12,6 +12,7 @@ use tokio::sync::{Mutex, mpsc};
 #[derive(Debug, Clone)]
 pub enum PeerCmd {
     SendMessage(Message),
+    Disconnect,
 }
 
 /// Shared node state for concurrent peer handling
@@ -234,16 +235,13 @@ impl P2PNodeHandle {
             println!("Peer {} reached ban threshold ({}), banning...", peer, *score);
             state.banned_peers.insert(peer);
             if let Some(tx) = state.peer_senders.get(&peer) {
-                // We don't have a direct "disconnect" command in PeerCmd yet,
-                // but we can add one or just let the peer handle_peer loop check banned status.
-                // For now, let's just remove them from senders to stop outgoing traffic.
                 let _ = tx.send(PeerCmd::SendMessage(Message::Reject {
                     code: 403,
                     reason: "Banned due to low reputation".to_string(),
                     message_type: "Handshake".to_string(),
                 }));
+                let _ = tx.send(PeerCmd::Disconnect);
             }
-            state.peer_senders.remove(&peer);
         }
     }
 
@@ -583,6 +581,9 @@ async fn handle_peer(
                 PeerCmd::SendMessage(msg) => {
                     let mut w = writer.lock().await;
                     msg.send_async(&mut *w).await?;
+                }
+                PeerCmd::Disconnect => {
+                    break;
                 }
             }
         }
