@@ -216,8 +216,16 @@ Next:
 - Tests: Verified core reputation update logic and background task stability.
 - Pushed 8 commits (Day 35 of 30+).
 
+## Day 36
+- P2P: Implemented automatic peer banning for reputation scores below -100.
+- P2P: Added `Message::Reject` handling in peer message loop for better feedback.
+- P2P: Implemented `PeerCmd::Disconnect` for explicit and clean peer disconnection.
+- Refactor: Optimized `update_reputation` to trigger immediate disconnection on ban.
+- Docs: Added documentation for reputation-based banning logic.
+- Pushed 8 commits (Day 36 of 30+).
+
 Next:
-- Implement automatic peer banning for extremely low reputation scores.
 - Add P2P command to query peer reputation via CLI.
+- Implement peer whitelisting to prevent accidental banning of trusted nodes.
 
 
