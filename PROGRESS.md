@@ -224,8 +224,17 @@ Next:
 - Docs: Added documentation for reputation-based banning logic.
 - Pushed 8 commits (Day 36 of 30+).
 
+## Day 37
+- P2P: Implemented peer whitelisting to prevent accidental banning of trusted nodes.
+- P2P: Added `Message::Whitelist` to the network protocol for peer-to-peer whitelist requests.
+- P2P: Updated `NodeState` to track `whitelisted_peers` and bypass reputation logic for them.
+- P2P: Implemented automatic reputation reset and ban removal upon whitelisting.
+- Tests: Added comprehensive P2P whitelisting tests (`tests/p2p_tests.rs`).
+- Refactor: Cleaned up P2P reputation update logic with whitelisting checks.
+- Pushed 5 commits (Day 37 of 30+).
+
 Next:
 - Add P2P command to query peer reputation via CLI.
-- Implement peer whitelisting to prevent accidental banning of trusted nodes.
+- Implement persistent whitelist storage to disk.
 
 
