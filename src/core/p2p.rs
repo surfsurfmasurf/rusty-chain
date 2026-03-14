@@ -224,9 +224,6 @@ impl P2PNodeHandle {
     }
 
     pub async fn update_reputation(&self, peer: SocketAddr, delta: i32) {
-        // Log all reputation changes for debugging
-        println!("Attempting to update reputation for peer {}: delta={}", peer, delta);
-
         let mut state = self.state.lock().await;
 
         if state.whitelisted_peers.contains(&peer) {
