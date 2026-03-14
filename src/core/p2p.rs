@@ -25,6 +25,7 @@ pub struct NodeState {
     pub mempool: Mempool,
     pub peer_list_path: Option<String>,
     pub banned_peers: HashSet<SocketAddr>,
+    pub whitelisted_peers: HashSet<SocketAddr>,
 }
 
 pub struct P2PNode {
@@ -64,6 +65,7 @@ impl P2PNode {
                 mempool,
                 peer_list_path,
                 banned_peers: HashSet::new(),
+                whitelisted_peers: HashSet::new(),
             })),
         }
     }
@@ -224,6 +226,15 @@ impl P2PNodeHandle {
     /// Updates a peer's reputation score and enforces automatic banning if it falls below -100.
     pub async fn update_reputation(&self, peer: SocketAddr, delta: i32) {
         let mut state = self.state.lock().await;
+
+        if state.whitelisted_peers.contains(&peer) {
+            println!(
+                "Skipping reputation update for whitelisted peer {} (delta: {})",
+                peer, delta
+            );
+            return;
+        }
+
         let score = state.peer_reputation.entry(peer).or_insert(0);
         *score = score.saturating_add(delta);
         println!(
@@ -233,7 +244,10 @@ impl P2PNodeHandle {
 
         // Auto-ban threshold: -100
         if *score <= -100 {
-            println!("Peer {} reached ban threshold ({}), banning...", peer, *score);
+            println!(
+                "Peer {} reached ban threshold ({}), banning...",
+                peer, *score
+            );
             state.banned_peers.insert(peer);
             if let Some(tx) = state.peer_senders.get(&peer) {
                 let _ = tx.send(PeerCmd::SendMessage(Message::Reject {
@@ -249,6 +263,14 @@ impl P2PNodeHandle {
     pub async fn get_reputation(&self, peer: SocketAddr) -> i32 {
         let state = self.state.lock().await;
         *state.peer_reputation.get(&peer).unwrap_or(&0)
+    }
+
+    pub async fn whitelist_peer(&self, peer: SocketAddr) {
+        let mut state = self.state.lock().await;
+        state.whitelisted_peers.insert(peer);
+        state.peer_reputation.remove(&peer);
+        state.banned_peers.remove(&peer);
+        println!("Peer {} has been whitelisted", peer);
     }
 
     #[allow(clippy::collapsible_if)]
@@ -498,6 +520,12 @@ impl P2PNodeHandle {
                 };
                 self.send_to(from, Message::Peers(peers)).await?;
             }
+            Message::Whitelist(addr) => {
+                println!("Received Whitelist request for {} from {}", addr, from);
+                // In a real scenario, this would require admin auth or be local-only.
+                // For this demo, we allow it.
+                self.whitelist_peer(addr).await;
+            }
             Message::Peers(peers) => {
                 println!("Received reputation data for {} peers", peers.len());
                 for p in peers {
@@ -507,7 +535,11 @@ impl P2PNodeHandle {
                     );
                 }
             }
-            Message::Reject { code, reason, message_type } => {
+            Message::Reject {
+                code,
+                reason,
+                message_type,
+            } => {
                 println!(
                     "Peer {} rejected our {}: [{}] {}",
                     from, message_type, code, reason
