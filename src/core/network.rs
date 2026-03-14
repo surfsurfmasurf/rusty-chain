@@ -45,6 +45,8 @@ pub enum Message {
     GetPeers,
     /// List of peers with metadata (reputation, etc)
     Peers(Vec<PeerInfo>),
+    /// Request to whitelist a peer (prevents banning)
+    Whitelist(SocketAddr),
     /// Protocol level rejection message for invalid/malformed data or behavior
     Reject {
         code: u32,
@@ -154,6 +156,7 @@ impl Message {
             Message::GetAddr => "GetAddr",
             Message::GetPeers => "GetPeers",
             Message::Peers(_) => "Peers",
+            Message::Whitelist(_) => "Whitelist",
             Message::Reject { .. } => "Reject",
         }
     }
