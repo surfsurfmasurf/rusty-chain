@@ -233,8 +233,17 @@ Next:
 - Refactor: Cleaned up P2P reputation update logic with whitelisting checks.
 - Pushed 5 commits (Day 37 of 30+).
 
+## Day 38
+- P2P: Implemented `peers` CLI command to query reputation scores from a running node.
+- P2P: Implemented persistent whitelist storage to disk (`data/whitelist.json`).
+- P2P: Added background whitelist saver task (periodic save every 60s).
+- P2P: Automatic loading of whitelisted peers from disk on node startup.
+- Refactor: Updated `P2PNode::new` and CLI to support the new whitelist persistence logic.
+- Tests: Updated `tests/p2p_tests.rs` to comply with the new `P2PNode` signature.
+- Pushed 8 commits (Day 38 of 30+).
+
 Next:
-- Add P2P command to query peer reputation via CLI.
-- Implement persistent whitelist storage to disk.
+- Implement a `ban` and `unban` CLI command.
+- Add P2P version negotiation and protocol upgrade support.
 
 

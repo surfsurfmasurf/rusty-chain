@@ -24,6 +24,7 @@ pub struct NodeState {
     pub chain: Chain,
     pub mempool: Mempool,
     pub peer_list_path: Option<String>,
+    pub whitelist_path: Option<String>,
     pub banned_peers: HashSet<SocketAddr>,
     pub whitelisted_peers: HashSet<SocketAddr>,
 }
@@ -39,6 +40,7 @@ impl P2PNode {
         chain: Chain,
         mempool: Mempool,
         peer_list_path: Option<String>,
+        whitelist_path: Option<String>,
     ) -> Self {
         let mut known_addrs = HashSet::new();
         known_addrs.insert(addr);
@@ -54,6 +56,17 @@ impl P2PNode {
             }
         }
 
+        let mut whitelisted_peers = HashSet::new();
+        #[allow(clippy::collapsible_if)]
+        if let Some(ref path) = whitelist_path {
+            if let Ok(content) = std::fs::read_to_string(path) {
+                if let Ok(addrs) = serde_json::from_str::<HashSet<SocketAddr>>(&content) {
+                    println!("Loaded {} whitelisted addresses from {}", addrs.len(), path);
+                    whitelisted_peers.extend(addrs);
+                }
+            }
+        }
+
         Self {
             addr,
             state: Arc::new(Mutex::new(NodeState {
@@ -64,8 +77,9 @@ impl P2PNode {
                 chain,
                 mempool,
                 peer_list_path,
+                whitelist_path,
                 banned_peers: HashSet::new(),
-                whitelisted_peers: HashSet::new(),
+                whitelisted_peers,
             })),
         }
     }
@@ -78,6 +92,7 @@ impl P2PNode {
 
         let node_state = Arc::clone(&self.state);
         let save_state = Arc::clone(&self.state);
+        let save_whitelist = Arc::clone(&self.state);
         let evict_state = Arc::clone(&self.state);
 
         // Background peer saver
@@ -88,6 +103,20 @@ impl P2PNode {
                 #[allow(clippy::collapsible_if)]
                 if let Some(ref path) = state.peer_list_path {
                     if let Ok(content) = serde_json::to_string_pretty(&state.known_addrs) {
+                        let _ = std::fs::write(path, content);
+                    }
+                }
+            }
+        });
+
+        // Background whitelist saver
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(std::time::Duration::from_secs(60)).await;
+                let state = save_whitelist.lock().await;
+                #[allow(clippy::collapsible_if)]
+                if let Some(ref path) = state.whitelist_path {
+                    if let Ok(content) = serde_json::to_string_pretty(&state.whitelisted_peers) {
                         let _ = std::fs::write(path, content);
                     }
                 }
