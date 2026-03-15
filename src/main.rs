@@ -163,6 +163,13 @@ enum Commands {
         #[arg(long)]
         peers_file: Option<String>,
     },
+
+    /// Query reputation of connected peers
+    Peers {
+        /// Peer address to query (e.g. 127.0.0.1:9001)
+        #[arg(long)]
+        addr: String,
+    },
 }
 
 fn chain_path(path: Option<String>) -> std::path::PathBuf {
@@ -417,36 +424,28 @@ async fn main() -> anyhow::Result<()> {
             println!("Evicted {} expired transactions from mempool.", evicted);
             println!("Current mempool size: {}", mp.txs.len());
         }
-        Commands::Node {
-            port,
-            peer,
-            path,
-            mempool,
-            peers_file,
-        } => {
-            use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-            let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
+        Commands::Peers { addr } => {
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+            use rusty_chain::core::network::Message;
 
-            let chain_path = chain_path(path);
-            let chain = load_or_genesis(&chain_path)?;
+            let target: SocketAddr = addr.parse().context("Invalid peer address")?;
+            let mut stream = TcpStream::connect(target).await?;
 
-            let mp_path = mempool_path(mempool);
-            let mp = if mp_path.exists() {
-                Mempool::load(&mp_path)?
+            Message::GetPeers.send_async(&mut stream).await?;
+            let response = Message::decode_async(&mut stream).await?;
+
+            if let Message::Peers(peers) = response {
+                println!("Peers seen by {}:", addr);
+                for p in peers {
+                    println!(
+                        "  - {}: reputation={} (banned: {})",
+                        p.addr, p.reputation, p.is_banned
+                    );
+                }
             } else {
-                Mempool::default()
-            };
-
-            let height = chain.height() as u64;
-
-            let node = rusty_chain::core::p2p::P2PNode::new(addr, chain, mp, peers_file);
-
-            for p in peer {
-                let target: SocketAddr = p.parse().context("Invalid peer address")?;
-                node.connect(target, height).await?;
+                println!("Unexpected response: {:?}", response);
             }
-
-            node.start().await?;
         }
     }
 
