@@ -206,6 +206,17 @@ enum Commands {
         #[arg(long)]
         node: String,
     },
+
+    /// Remove a peer from the whitelist
+    Unwhitelist {
+        /// Node address to send command to (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        node: String,
+
+        /// Peer address to unwhitelist (e.g. 127.0.0.1:9001)
+        #[arg(long)]
+        peer: String,
+    },
 }
 
 fn chain_path(path: Option<String>) -> std::path::PathBuf {
@@ -586,6 +597,18 @@ async fn main() -> anyhow::Result<()> {
             } else {
                 println!("Unexpected response: {:?}", response);
             }
+        }
+        Commands::Unwhitelist { node, peer } => {
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+            use rusty_chain::core::network::Message;
+
+            let target: SocketAddr = node.parse().context("Invalid node address")?;
+            let peer_to_unwhitelist: SocketAddr = peer.parse().context("Invalid peer address")?;
+            let mut stream = TcpStream::connect(target).await?;
+
+            Message::Unwhitelist(peer_to_unwhitelist).send_async(&mut stream).await?;
+            println!("Sent Unwhitelist command for {} to {}", peer_to_unwhitelist, target);
         }
     }
 

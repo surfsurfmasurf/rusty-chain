@@ -322,6 +322,12 @@ impl P2PNodeHandle {
         println!("Peer {} has been unbanned", peer);
     }
 
+    pub async fn unwhitelist_peer(&self, peer: SocketAddr) {
+        let mut state = self.state.lock().await;
+        state.whitelisted_peers.remove(&peer);
+        println!("Peer {} has been removed from whitelist", peer);
+    }
+
     pub async fn get_whitelisted_peers(&self) -> HashSet<SocketAddr> {
         let state = self.state.lock().await;
         state.whitelisted_peers.clone()
@@ -600,6 +606,10 @@ impl P2PNodeHandle {
             Message::GetWhitelisted => {
                 let whitelisted = self.get_whitelisted_peers().await.into_iter().collect();
                 self.send_to(from, Message::Whitelisted(whitelisted)).await?;
+            }
+            Message::Unwhitelist(addr) => {
+                println!("Received Unwhitelist request for {} from {}", addr, from);
+                self.unwhitelist_peer(addr).await;
             }
             Message::Peers(peers) => {
                 println!("Received reputation data for {} peers", peers.len());

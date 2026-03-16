@@ -65,6 +65,8 @@ pub enum Message {
     GetWhitelisted,
     /// List of whitelisted peers
     Whitelisted(Vec<SocketAddr>),
+    /// Request to remove a peer from whitelist
+    Unwhitelist(SocketAddr),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -176,6 +178,7 @@ impl Message {
             Message::Banned(_) => "Banned",
             Message::GetWhitelisted => "GetWhitelisted",
             Message::Whitelisted(_) => "Whitelisted",
+            Message::Unwhitelist(_) => "Unwhitelist",
         }
     }
 
