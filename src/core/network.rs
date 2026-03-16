@@ -53,6 +53,10 @@ pub enum Message {
         reason: String,
         message_type: String,
     },
+    /// Request to ban a peer (admin)
+    Ban(SocketAddr),
+    /// Request to unban a peer (admin)
+    Unban(SocketAddr),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -158,6 +162,8 @@ impl Message {
             Message::Peers(_) => "Peers",
             Message::Whitelist(_) => "Whitelist",
             Message::Reject { .. } => "Reject",
+            Message::Ban(_) => "Ban",
+            Message::Unban(_) => "Unban",
         }
     }
 

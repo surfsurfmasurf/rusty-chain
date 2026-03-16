@@ -170,6 +170,28 @@ enum Commands {
         #[arg(long)]
         addr: String,
     },
+
+    /// Manually ban a peer by address
+    Ban {
+        /// Node address to send command to (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        node: String,
+
+        /// Peer address to ban (e.g. 127.0.0.1:9001)
+        #[arg(long)]
+        peer: String,
+    },
+
+    /// Manually unban a peer by address
+    Unban {
+        /// Node address to send command to (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        node: String,
+
+        /// Peer address to unban (e.g. 127.0.0.1:9001)
+        #[arg(long)]
+        peer: String,
+    },
 }
 
 fn chain_path(path: Option<String>) -> std::path::PathBuf {
@@ -480,6 +502,30 @@ async fn main() -> anyhow::Result<()> {
             } else {
                 println!("Unexpected response: {:?}", response);
             }
+        }
+        Commands::Ban { node, peer } => {
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+            use rusty_chain::core::network::Message;
+
+            let target: SocketAddr = node.parse().context("Invalid node address")?;
+            let peer_to_ban: SocketAddr = peer.parse().context("Invalid peer address")?;
+            let mut stream = TcpStream::connect(target).await?;
+
+            Message::Ban(peer_to_ban).send_async(&mut stream).await?;
+            println!("Sent Ban command for {} to {}", peer_to_ban, target);
+        }
+        Commands::Unban { node, peer } => {
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+            use rusty_chain::core::network::Message;
+
+            let target: SocketAddr = node.parse().context("Invalid node address")?;
+            let peer_to_unban: SocketAddr = peer.parse().context("Invalid peer address")?;
+            let mut stream = TcpStream::connect(target).await?;
+
+            Message::Unban(peer_to_unban).send_async(&mut stream).await?;
+            println!("Sent Unban command for {} to {}", peer_to_unban, target);
         }
     }
 

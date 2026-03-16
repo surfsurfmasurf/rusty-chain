@@ -301,6 +301,27 @@ impl P2PNodeHandle {
         println!("Peer {} has been whitelisted", peer);
     }
 
+    pub async fn ban_peer(&self, peer: SocketAddr) {
+        let mut state = self.state.lock().await;
+        if state.whitelisted_peers.contains(&peer) {
+            println!("Cannot ban whitelisted peer {}", peer);
+            return;
+        }
+        state.banned_peers.insert(peer);
+        state.peer_reputation.insert(peer, -100);
+        if let Some(tx) = state.peer_senders.get(&peer) {
+            let _ = tx.send(PeerCmd::Disconnect);
+        }
+        println!("Peer {} has been manually banned", peer);
+    }
+
+    pub async fn unban_peer(&self, peer: SocketAddr) {
+        let mut state = self.state.lock().await;
+        state.banned_peers.remove(&peer);
+        state.peer_reputation.insert(peer, 0);
+        println!("Peer {} has been unbanned", peer);
+    }
+
     #[allow(clippy::collapsible_if)]
     pub async fn send_to(&self, target: SocketAddr, msg: Message) -> anyhow::Result<()> {
         let state = self.state.lock().await;
@@ -553,6 +574,14 @@ impl P2PNodeHandle {
                 // In a real scenario, this would require admin auth or be local-only.
                 // For this demo, we allow it.
                 self.whitelist_peer(addr).await;
+            }
+            Message::Ban(addr) => {
+                println!("Received Ban request for {} from {}", addr, from);
+                self.ban_peer(addr).await;
+            }
+            Message::Unban(addr) => {
+                println!("Received Unban request for {} from {}", addr, from);
+                self.unban_peer(addr).await;
             }
             Message::Peers(peers) => {
                 println!("Received reputation data for {} peers", peers.len());
