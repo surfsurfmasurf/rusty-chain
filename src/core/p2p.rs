@@ -605,7 +605,8 @@ impl P2PNodeHandle {
             }
             Message::GetWhitelisted => {
                 let whitelisted = self.get_whitelisted_peers().await.into_iter().collect();
-                self.send_to(from, Message::Whitelisted(whitelisted)).await?;
+                self.send_to(from, Message::Whitelisted(whitelisted))
+                    .await?;
             }
             Message::Unwhitelist(addr) => {
                 println!("Received Unwhitelist request for {} from {}", addr, from);

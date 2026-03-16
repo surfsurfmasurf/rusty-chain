@@ -496,7 +496,8 @@ async fn main() -> anyhow::Result<()> {
             // Optional whitelist path: data/whitelist.json
             let whitelist_path = Some("data/whitelist.json".to_string());
 
-            let node = rusty_chain::core::p2p::P2PNode::new(addr, chain, mp, peers_file, whitelist_path);
+            let node =
+                rusty_chain::core::p2p::P2PNode::new(addr, chain, mp, peers_file, whitelist_path);
 
             for p in peer {
                 let target: SocketAddr = p.parse().context("Invalid peer address")?;
@@ -506,9 +507,9 @@ async fn main() -> anyhow::Result<()> {
             node.start().await?;
         }
         Commands::Peers { addr } => {
+            use rusty_chain::core::network::Message;
             use std::net::SocketAddr;
             use tokio::net::TcpStream;
-            use rusty_chain::core::network::Message;
 
             let target: SocketAddr = addr.parse().context("Invalid peer address")?;
             let mut stream = TcpStream::connect(target).await?;
@@ -529,9 +530,9 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Ban { node, peer } => {
+            use rusty_chain::core::network::Message;
             use std::net::SocketAddr;
             use tokio::net::TcpStream;
-            use rusty_chain::core::network::Message;
 
             let target: SocketAddr = node.parse().context("Invalid node address")?;
             let peer_to_ban: SocketAddr = peer.parse().context("Invalid peer address")?;
@@ -541,21 +542,23 @@ async fn main() -> anyhow::Result<()> {
             println!("Sent Ban command for {} to {}", peer_to_ban, target);
         }
         Commands::Unban { node, peer } => {
+            use rusty_chain::core::network::Message;
             use std::net::SocketAddr;
             use tokio::net::TcpStream;
-            use rusty_chain::core::network::Message;
 
             let target: SocketAddr = node.parse().context("Invalid node address")?;
             let peer_to_unban: SocketAddr = peer.parse().context("Invalid peer address")?;
             let mut stream = TcpStream::connect(target).await?;
 
-            Message::Unban(peer_to_unban).send_async(&mut stream).await?;
+            Message::Unban(peer_to_unban)
+                .send_async(&mut stream)
+                .await?;
             println!("Sent Unban command for {} to {}", peer_to_unban, target);
         }
         Commands::Banned { node } => {
+            use rusty_chain::core::network::Message;
             use std::net::SocketAddr;
             use tokio::net::TcpStream;
-            use rusty_chain::core::network::Message;
 
             let target: SocketAddr = node.parse().context("Invalid node address")?;
             let mut stream = TcpStream::connect(target).await?;
@@ -576,9 +579,9 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Whitelisted { node } => {
+            use rusty_chain::core::network::Message;
             use std::net::SocketAddr;
             use tokio::net::TcpStream;
-            use rusty_chain::core::network::Message;
 
             let target: SocketAddr = node.parse().context("Invalid node address")?;
             let mut stream = TcpStream::connect(target).await?;
@@ -599,16 +602,21 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Unwhitelist { node, peer } => {
+            use rusty_chain::core::network::Message;
             use std::net::SocketAddr;
             use tokio::net::TcpStream;
-            use rusty_chain::core::network::Message;
 
             let target: SocketAddr = node.parse().context("Invalid node address")?;
             let peer_to_unwhitelist: SocketAddr = peer.parse().context("Invalid peer address")?;
             let mut stream = TcpStream::connect(target).await?;
 
-            Message::Unwhitelist(peer_to_unwhitelist).send_async(&mut stream).await?;
-            println!("Sent Unwhitelist command for {} to {}", peer_to_unwhitelist, target);
+            Message::Unwhitelist(peer_to_unwhitelist)
+                .send_async(&mut stream)
+                .await?;
+            println!(
+                "Sent Unwhitelist command for {} to {}",
+                peer_to_unwhitelist, target
+            );
         }
     }
 
