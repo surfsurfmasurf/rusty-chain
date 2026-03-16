@@ -57,6 +57,10 @@ pub enum Message {
     Ban(SocketAddr),
     /// Request to unban a peer (admin)
     Unban(SocketAddr),
+    /// Request the list of banned peers
+    GetBanned,
+    /// List of banned peers
+    Banned(Vec<SocketAddr>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -164,6 +168,8 @@ impl Message {
             Message::Reject { .. } => "Reject",
             Message::Ban(_) => "Ban",
             Message::Unban(_) => "Unban",
+            Message::GetBanned => "GetBanned",
+            Message::Banned(_) => "Banned",
         }
     }
 

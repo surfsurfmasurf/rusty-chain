@@ -192,6 +192,13 @@ enum Commands {
         #[arg(long)]
         peer: String,
     },
+
+    /// List all currently banned peers
+    Banned {
+        /// Node address to query (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        node: String,
+    },
 }
 
 fn chain_path(path: Option<String>) -> std::path::PathBuf {
@@ -526,6 +533,29 @@ async fn main() -> anyhow::Result<()> {
 
             Message::Unban(peer_to_unban).send_async(&mut stream).await?;
             println!("Sent Unban command for {} to {}", peer_to_unban, target);
+        }
+        Commands::Banned { node } => {
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+            use rusty_chain::core::network::Message;
+
+            let target: SocketAddr = node.parse().context("Invalid node address")?;
+            let mut stream = TcpStream::connect(target).await?;
+
+            Message::GetBanned.send_async(&mut stream).await?;
+            let response = Message::decode_async(&mut stream).await?;
+
+            if let Message::Banned(banned) = response {
+                println!("Banned peers on {}:", target);
+                for p in banned {
+                    println!("  - {}", p);
+                }
+                if banned.is_empty() {
+                    println!("  (none)");
+                }
+            } else {
+                println!("Unexpected response: {:?}", response);
+            }
         }
     }
 

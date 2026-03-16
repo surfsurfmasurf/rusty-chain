@@ -322,6 +322,11 @@ impl P2PNodeHandle {
         println!("Peer {} has been unbanned", peer);
     }
 
+    pub async fn get_banned_peers(&self) -> HashSet<SocketAddr> {
+        let state = self.state.lock().await;
+        state.banned_peers.clone()
+    }
+
     #[allow(clippy::collapsible_if)]
     pub async fn send_to(&self, target: SocketAddr, msg: Message) -> anyhow::Result<()> {
         let state = self.state.lock().await;
@@ -582,6 +587,10 @@ impl P2PNodeHandle {
             Message::Unban(addr) => {
                 println!("Received Unban request for {} from {}", addr, from);
                 self.unban_peer(addr).await;
+            }
+            Message::GetBanned => {
+                let banned = self.get_banned_peers().await.into_iter().collect();
+                self.send_to(from, Message::Banned(banned)).await?;
             }
             Message::Peers(peers) => {
                 println!("Received reputation data for {} peers", peers.len());
