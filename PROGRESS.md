@@ -242,8 +242,17 @@ Next:
 - Tests: Updated `tests/p2p_tests.rs` to comply with the new `P2PNode` signature.
 - Pushed 8 commits (Day 38 of 30+).
 
+## Day 39
+- P2P: Implemented manual `ban` and `unban` CLI commands for better network control.
+- P2P: Implemented `banned`, `whitelisted`, and `unwhitelist` CLI commands.
+- P2P: Expanded network protocol with `Ban`, `Unban`, `GetBanned`, `Banned`, `GetWhitelisted`, `Whitelisted`, and `Unwhitelist` messages.
+- P2P: Added administration logic to `NodeState` to handle manual peer management.
+- Refactor: Improved CLI output for peer lists with better formatting.
+- Fixed: Resolved move-after-borrow issues in CLI message handling.
+- Pushed 8 commits (Day 39 of 30+).
+
 Next:
-- Implement a `ban` and `unban` CLI command.
 - Add P2P version negotiation and protocol upgrade support.
+- Implement peer-to-peer reputation sharing (optional).
 
 
