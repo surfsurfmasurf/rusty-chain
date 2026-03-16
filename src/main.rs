@@ -565,7 +565,7 @@ async fn main() -> anyhow::Result<()> {
 
             if let Message::Banned(banned) = response {
                 println!("Banned peers on {}:", target);
-                for p in banned {
+                for p in &banned {
                     println!("  - {}", p);
                 }
                 if banned.is_empty() {
@@ -588,7 +588,7 @@ async fn main() -> anyhow::Result<()> {
 
             if let Message::Whitelisted(whitelisted) = response {
                 println!("Whitelisted peers on {}:", target);
-                for p in whitelisted {
+                for p in &whitelisted {
                     println!("  - {}", p);
                 }
                 if whitelisted.is_empty() {
