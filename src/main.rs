@@ -424,6 +424,40 @@ async fn main() -> anyhow::Result<()> {
             println!("Evicted {} expired transactions from mempool.", evicted);
             println!("Current mempool size: {}", mp.txs.len());
         }
+        Commands::Node {
+            port,
+            peer,
+            path,
+            mempool,
+            peers_file,
+        } => {
+            use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+            let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
+
+            let chain_path = chain_path(path);
+            let chain = load_or_genesis(&chain_path)?;
+
+            let mp_path = mempool_path(mempool);
+            let mp = if mp_path.exists() {
+                Mempool::load(&mp_path)?
+            } else {
+                Mempool::default()
+            };
+
+            let height = chain.height() as u64;
+
+            // Optional whitelist path: data/whitelist.json
+            let whitelist_path = Some("data/whitelist.json".to_string());
+
+            let node = rusty_chain::core::p2p::P2PNode::new(addr, chain, mp, peers_file, whitelist_path);
+
+            for p in peer {
+                let target: SocketAddr = p.parse().context("Invalid peer address")?;
+                node.connect(target, height).await?;
+            }
+
+            node.start().await?;
+        }
         Commands::Peers { addr } => {
             use std::net::SocketAddr;
             use tokio::net::TcpStream;

@@ -8,7 +8,7 @@ use std::sync::Arc;
 async fn test_peer_whitelisting_bypasses_reputation() {
     let chain = Chain::new_genesis();
     let mempool = Mempool::new();
-    let node = P2PNode::new("127.0.0.1:9000".parse().unwrap(), chain, mempool, None);
+    let node = P2PNode::new("127.0.0.1:9000".parse().unwrap(), chain, mempool, None, None);
     let handle = P2PNodeHandle {
         state: Arc::clone(&node.state),
     };
