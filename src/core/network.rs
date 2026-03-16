@@ -61,6 +61,10 @@ pub enum Message {
     GetBanned,
     /// List of banned peers
     Banned(Vec<SocketAddr>),
+    /// Request the list of whitelisted peers
+    GetWhitelisted,
+    /// List of whitelisted peers
+    Whitelisted(Vec<SocketAddr>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -170,6 +174,8 @@ impl Message {
             Message::Unban(_) => "Unban",
             Message::GetBanned => "GetBanned",
             Message::Banned(_) => "Banned",
+            Message::GetWhitelisted => "GetWhitelisted",
+            Message::Whitelisted(_) => "Whitelisted",
         }
     }
 

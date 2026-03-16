@@ -199,6 +199,13 @@ enum Commands {
         #[arg(long)]
         node: String,
     },
+
+    /// List all currently whitelisted peers
+    Whitelisted {
+        /// Node address to query (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        node: String,
+    },
 }
 
 fn chain_path(path: Option<String>) -> std::path::PathBuf {
@@ -551,6 +558,29 @@ async fn main() -> anyhow::Result<()> {
                     println!("  - {}", p);
                 }
                 if banned.is_empty() {
+                    println!("  (none)");
+                }
+            } else {
+                println!("Unexpected response: {:?}", response);
+            }
+        }
+        Commands::Whitelisted { node } => {
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+            use rusty_chain::core::network::Message;
+
+            let target: SocketAddr = node.parse().context("Invalid node address")?;
+            let mut stream = TcpStream::connect(target).await?;
+
+            Message::GetWhitelisted.send_async(&mut stream).await?;
+            let response = Message::decode_async(&mut stream).await?;
+
+            if let Message::Whitelisted(whitelisted) = response {
+                println!("Whitelisted peers on {}:", target);
+                for p in whitelisted {
+                    println!("  - {}", p);
+                }
+                if whitelisted.is_empty() {
                     println!("  (none)");
                 }
             } else {
