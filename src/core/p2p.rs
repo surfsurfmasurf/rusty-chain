@@ -84,11 +84,11 @@ impl P2PNode {
         }
     }
 
-    pub async fn start(&self) -> anyhow::Result<()> {
+    pub async fn start(&self, agent: String) -> anyhow::Result<()> {
         let listener = TcpListener::bind(self.addr)
             .await
             .context("Failed to bind P2P listener")?;
-        println!("P2P server listening on {}", self.addr);
+        println!("P2P server listening on {} (agent={})", self.addr, agent);
 
         let node_state = Arc::clone(&self.state);
         let save_state = Arc::clone(&self.state);
@@ -162,8 +162,11 @@ impl P2PNode {
                     let node_handle = P2PNodeHandle {
                         state: Arc::clone(&state),
                     };
+                    let agent_clone = agent.clone();
                     tokio::spawn(async move {
-                        if let Err(e) = handle_peer(stream, peer_addr, state, node_handle).await {
+                        if let Err(e) =
+                            handle_peer(stream, peer_addr, state, node_handle, agent_clone).await
+                        {
                             eprintln!("Peer {} disconnected with error: {:?}", peer_addr, e);
                         } else {
                             println!("Peer {} disconnected gracefully", peer_addr);
@@ -178,7 +181,12 @@ impl P2PNode {
         }
     }
 
-    pub async fn connect(&self, target: SocketAddr, best_height: u64) -> anyhow::Result<()> {
+    pub async fn connect(
+        &self,
+        target: SocketAddr,
+        best_height: u64,
+        agent: String,
+    ) -> anyhow::Result<()> {
         println!("Connecting to {}...", target);
         let stream = match TcpStream::connect(target).await {
             Ok(s) => s,
@@ -201,6 +209,7 @@ impl P2PNode {
         Message::Handshake {
             version: 1,
             best_height,
+            agent: agent.clone(),
         }
         .send_async(&mut stream)
         .await?;
@@ -209,8 +218,9 @@ impl P2PNode {
         let node_handle = P2PNodeHandle {
             state: Arc::clone(&state),
         };
+        let agent_clone = agent.clone();
         tokio::spawn(async move {
-            if let Err(e) = handle_peer(stream, target, state, node_handle).await {
+            if let Err(e) = handle_peer(stream, target, state, node_handle, agent_clone).await {
                 eprintln!("Error handling peer {}: {}", target, e);
             }
         });
@@ -439,11 +449,36 @@ impl P2PNodeHandle {
             Message::Handshake {
                 version,
                 best_height,
+                agent,
             } => {
                 println!(
-                    "Handshake from {}: version={}, height={}",
-                    from, version, best_height
+                    "Handshake from {}: version={}, height={}, agent={}",
+                    from, version, best_height, agent
                 );
+                // Version check: simple exact match for this demo
+                if version != 1 {
+                    println!("Incompatible version from {}: {}", from, version);
+                    self.send_to(
+                        from,
+                        Message::Reject {
+                            code: 400,
+                            reason: format!("Incompatible version: {}", version),
+                            message_type: "Handshake".to_string(),
+                        },
+                    )
+                    .await?;
+                    // Disconnect is a PeerCmd, not a Message.
+                    // We need a way to trigger disconnection from process_message.
+                    // For now, we'll just return an error or let it time out,
+                    // but better is to send a Disconnect command to the peer.
+                    // NodeState doesn't have direct access to the mpsc sender here except via PeerCmd.
+                    let state = self.state.lock().await;
+                    if let Some(tx) = state.peer_senders.get(&from) {
+                        let _ = tx.send(PeerCmd::Disconnect);
+                    }
+                    return Ok(());
+                }
+
                 // Sync logic: if they are ahead, request headers
                 let our_height = {
                     let state = self.state.lock().await;
@@ -661,6 +696,7 @@ async fn handle_peer(
     addr: SocketAddr,
     state: Arc<Mutex<NodeState>>,
     node: P2PNodeHandle,
+    agent: String,
 ) -> anyhow::Result<()> {
     let (tx, mut rx) = mpsc::unbounded_channel::<PeerCmd>();
 
@@ -676,7 +712,25 @@ async fn handle_peer(
     let mut reader = reader;
     let writer = Arc::new(Mutex::new(writer));
 
+    let writer_clone = Arc::clone(&writer);
+    let state_for_reader = Arc::clone(&state);
     let peer_reader = async move {
+        // Send initial Handshake upon connection (for both inbound and outbound)
+        {
+            let best_height = {
+                let s = state_for_reader.lock().await;
+                s.chain.height() as u64
+            };
+            let mut w = writer_clone.lock().await;
+            Message::Handshake {
+                version: 1,
+                best_height,
+                agent,
+            }
+            .send_async(&mut *w)
+            .await?;
+        }
+
         loop {
             let msg = Message::decode_async(&mut reader)
                 .await

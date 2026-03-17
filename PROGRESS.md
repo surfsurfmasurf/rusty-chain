@@ -251,8 +251,17 @@ Next:
 - Fixed: Resolved move-after-borrow issues in CLI message handling.
 - Pushed 8 commits (Day 39 of 30+).
 
+## Day 40
+- P2P: Implemented P2P version negotiation (enforcing `version: 1`).
+- P2P: Added `agent` string to `Handshake` for client identification (e.g. `rusty-chain/0.1.0`).
+- P2P: Node now broadcasts its own handshake to both inbound and outbound peers.
+- CLI: Added optional `--agent` flag to `node` command to customize node identification.
+- Refactor: Unified handshake logic in peer handlers and improved disconnection handling for version mismatches.
+- Tests: Updated P2P handshake tests to cover new `agent` field.
+- Pushed 8 commits as part of the Day 40 work session.
+
 Next:
-- Add P2P version negotiation and protocol upgrade support.
 - Implement peer-to-peer reputation sharing (optional).
+- Add support for UPnP/NAT-PMP for easier node hosting.
 
 

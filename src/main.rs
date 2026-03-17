@@ -151,6 +151,10 @@ enum Commands {
         #[arg(long)]
         peer: Vec<String>,
 
+        /// Optional agent string to identify this node
+        #[arg(long)]
+        agent: Option<String>,
+
         /// Path for chain JSON
         #[arg(long)]
         path: Option<String>,
@@ -474,6 +478,7 @@ async fn main() -> anyhow::Result<()> {
         Commands::Node {
             port,
             peer,
+            agent,
             path,
             mempool,
             peers_file,
@@ -496,15 +501,18 @@ async fn main() -> anyhow::Result<()> {
             // Optional whitelist path: data/whitelist.json
             let whitelist_path = Some("data/whitelist.json".to_string());
 
+            let agent_str =
+                agent.unwrap_or_else(|| format!("rusty-chain/{}", env!("CARGO_PKG_VERSION")));
+
             let node =
                 rusty_chain::core::p2p::P2PNode::new(addr, chain, mp, peers_file, whitelist_path);
 
             for p in peer {
                 let target: SocketAddr = p.parse().context("Invalid peer address")?;
-                node.connect(target, height).await?;
+                node.connect(target, height, agent_str.clone()).await?;
             }
 
-            node.start().await?;
+            node.start(agent_str).await?;
         }
         Commands::Peers { addr } => {
             use rusty_chain::core::network::Message;

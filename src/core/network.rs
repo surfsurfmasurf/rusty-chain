@@ -26,6 +26,7 @@ pub enum Message {
     Handshake {
         version: u32,
         best_height: u64,
+        agent: String,
     },
     GetHeaders {
         start_height: u64,
@@ -250,6 +251,7 @@ mod tests {
         let msg = Message::Handshake {
             version: 1,
             best_height: 123,
+            agent: "rusty-chain/0.1.0".to_string(),
         };
         let encoded = msg.encode().unwrap();
         let decoded = Message::decode(Cursor::new(encoded)).unwrap();
