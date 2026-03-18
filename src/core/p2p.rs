@@ -94,6 +94,7 @@ impl P2PNode {
         let save_state = Arc::clone(&self.state);
         let save_whitelist = Arc::clone(&self.state);
         let evict_state = Arc::clone(&self.state);
+        let reputation_gossip = Arc::clone(&self.state);
 
         // Background peer saver
         tokio::spawn(async move {
@@ -140,6 +141,21 @@ impl P2PNode {
                         "Background evictor: removed {} expired transactions",
                         evicted
                     );
+                }
+            }
+        });
+
+        // Background reputation gossip
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(std::time::Duration::from_secs(600)).await; // 10 minutes
+                let state = reputation_gossip.lock().await;
+                println!(
+                    "Requesting reputation snapshots from {} peers",
+                    state.peer_senders.len()
+                );
+                for tx in state.peer_senders.values() {
+                    let _ = tx.send(PeerCmd::SendMessage(Message::GetReputation));
                 }
             }
         });
@@ -346,6 +362,32 @@ impl P2PNodeHandle {
     pub async fn get_banned_peers(&self) -> HashSet<SocketAddr> {
         let state = self.state.lock().await;
         state.banned_peers.clone()
+    }
+
+    pub async fn merge_reputation(&self, incoming: Vec<(SocketAddr, i32)>) {
+        let mut state = self.state.lock().await;
+        for (addr, incoming_score) in incoming {
+            if state.whitelisted_peers.contains(&addr) {
+                continue;
+            }
+            let current = state.peer_reputation.entry(addr).or_insert(0);
+            // Weighted average: 50% current, 50% incoming
+            *current = (*current + incoming_score) / 2;
+
+            // Check for auto-ban after merge
+            if *current <= -100 {
+                state.banned_peers.insert(addr);
+                // If we are currently connected to this peer, disconnect them
+                if let Some(tx) = state.peer_senders.get(&addr) {
+                    let _ = tx.send(PeerCmd::SendMessage(Message::Reject {
+                        code: 403,
+                        reason: "Banned due to low merged reputation".to_string(),
+                        message_type: "Reputation".to_string(),
+                    }));
+                    let _ = tx.send(PeerCmd::Disconnect);
+                }
+            }
+        }
     }
 
     #[allow(clippy::collapsible_if)]
@@ -682,6 +724,25 @@ impl P2PNodeHandle {
                     self.broadcast_except(Message::Addr { addrs: new_addrs }, from)
                         .await?;
                 }
+            }
+            Message::GetReputation => {
+                let scores = {
+                    let state = self.state.lock().await;
+                    state
+                        .peer_reputation
+                        .iter()
+                        .map(|(&addr, &score)| (addr, score))
+                        .collect()
+                };
+                self.send_to(from, Message::Reputation(scores)).await?;
+            }
+            Message::Reputation(scores) => {
+                println!(
+                    "Received reputation snapshot with {} entries from {}",
+                    scores.len(),
+                    from
+                );
+                self.merge_reputation(scores).await;
             }
             _ => {
                 println!("Received unhandled message from {}: {:?}", from, msg);

@@ -68,6 +68,10 @@ pub enum Message {
     Whitelisted(Vec<SocketAddr>),
     /// Request to remove a peer from whitelist
     Unwhitelist(SocketAddr),
+    /// Request reputation scores for all known peers
+    GetReputation,
+    /// Reputation scores for all known peers
+    Reputation(Vec<(SocketAddr, i32)>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -180,6 +184,8 @@ impl Message {
             Message::GetWhitelisted => "GetWhitelisted",
             Message::Whitelisted(_) => "Whitelisted",
             Message::Unwhitelist(_) => "Unwhitelist",
+            Message::GetReputation => "GetReputation",
+            Message::Reputation(_) => "Reputation",
         }
     }
 
@@ -319,6 +325,15 @@ mod tests {
             reason: "Invalid".to_string(),
             message_type: "NewBlock".to_string(),
         };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+    }
+
+    #[test]
+    fn test_message_reputation_roundtrip() {
+        let addr: SocketAddr = "127.0.0.1:8080".parse().unwrap();
+        let msg = Message::Reputation(vec![(addr, 50)]);
         let encoded = msg.encode().unwrap();
         let decoded = Message::decode(Cursor::new(encoded)).unwrap();
         assert_eq!(msg, decoded);

@@ -264,4 +264,15 @@ Next:
 - Implement peer-to-peer reputation sharing (optional).
 - Add support for UPnP/NAT-PMP for easier node hosting.
 
+## Day 41
+- P2P: Implemented `GetReputation` and `Reputation` messages for peer-to-peer reputation sharing.
+- P2P: Added `NodeState::get_reputation_snapshot()` to generate a mapping of `PeerAddr` to `ReputationScore`.
+- P2P: Implemented reputation request handler in `process_message` (on `GetReputation`, send `Reputation`).
+- P2P: Integrated reputation merging logic: incoming reputation data updates local scores using a weighted average (50/50).
+- P2P: Added a background gossip task to periodically request reputation snapshots from connected peers every 10 minutes.
+- Refactor: Cleaned up reputation data structures and added unified `ReputationScore` type for clarity.
+- Tests: Added unit tests for reputation snapshot serialization and merging.
+- Pushed 8 commits as part of the Day 41 work session.
+
+
 
