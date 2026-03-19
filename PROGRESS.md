@@ -214,7 +214,7 @@ Next:
 - P2P: Added background mempool evictor to remove expired transactions every 5 minutes.
 - Refactor: Unified logging for transaction rejection with sender address inclusion.
 - Tests: Verified core reputation update logic and background task stability.
-- Pushed 8 commits (Day 35 of 30+).
+- Pushed 8 commits as part of the Day 35 work session.
 
 ## Day 36
 - P2P: Implemented automatic peer banning for reputation scores below -100.
@@ -222,7 +222,7 @@ Next:
 - P2P: Implemented `PeerCmd::Disconnect` for explicit and clean peer disconnection.
 - Refactor: Optimized `update_reputation` to trigger immediate disconnection on ban.
 - Docs: Added documentation for reputation-based banning logic.
-- Pushed 8 commits (Day 36 of 30+).
+- Pushed 8 commits as part of the Day 36 work session.
 
 ## Day 37
 - P2P: Implemented peer whitelisting to prevent accidental banning of trusted nodes.
@@ -260,10 +260,6 @@ Next:
 - Tests: Updated P2P handshake tests to cover new `agent` field.
 - Pushed 8 commits as part of the Day 40 work session.
 
-Next:
-- Implement peer-to-peer reputation sharing (optional).
-- Add support for UPnP/NAT-PMP for easier node hosting.
-
 ## Day 41
 - P2P: Implemented `GetReputation` and `Reputation` messages for peer-to-peer reputation sharing.
 - P2P: Added `NodeState::get_reputation_snapshot()` to generate a mapping of `PeerAddr` to `ReputationScore`.
@@ -274,5 +270,16 @@ Next:
 - Tests: Added unit tests for reputation snapshot serialization and merging.
 - Pushed 8 commits as part of the Day 41 work session.
 
+## Day 42
+- P2P: Added `GetAllAddr` message to the network protocol for complete peer discovery.
+- P2P: Narrowed `GetAddr` to return only active peers, while `GetAllAddr` returns all known addresses.
+- P2P: Implemented background reconnection task to automatically restore lost connections.
+- CLI: Added `known-addrs` command to query all seen addresses from a remote node.
+- Core: Improved P2P node state to track outgoing connections for better management.
+- Tests: Added unit test for new `GetAllAddr` message roundtrip.
+- Polish: Unified P2P message handlers and improved connection stability.
+- Pushed 8 commits as part of the Day 42 work session.
 
-
+Next:
+- Implement peer-to-peer reputation sharing (optional).
+- Add support for UPnP/NAT-PMP for easier node hosting.
