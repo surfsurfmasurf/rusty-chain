@@ -72,6 +72,8 @@ pub enum Message {
     GetReputation,
     /// Reputation scores for all known peers
     Reputation(Vec<(SocketAddr, i32)>),
+    /// Request the list of all known peer addresses from a node
+    GetAllAddr,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -186,6 +188,7 @@ impl Message {
             Message::Unwhitelist(_) => "Unwhitelist",
             Message::GetReputation => "GetReputation",
             Message::Reputation(_) => "Reputation",
+            Message::GetAllAddr => "GetAllAddr",
         }
     }
 
