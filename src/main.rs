@@ -211,6 +211,13 @@ enum Commands {
         node: String,
     },
 
+    /// List all known addresses seen by a node
+    KnownAddrs {
+        /// Node address to query (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        node: String,
+    },
+
     /// Remove a peer from the whitelist
     Unwhitelist {
         /// Node address to send command to (e.g. 127.0.0.1:9000)
@@ -603,6 +610,29 @@ async fn main() -> anyhow::Result<()> {
                     println!("  - {}", p);
                 }
                 if whitelisted.is_empty() {
+                    println!("  (none)");
+                }
+            } else {
+                println!("Unexpected response: {:?}", response);
+            }
+        }
+        Commands::KnownAddrs { node } => {
+            use rusty_chain::core::network::Message;
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+
+            let target: SocketAddr = node.parse().context("Invalid node address")?;
+            let mut stream = TcpStream::connect(target).await?;
+
+            Message::GetAllAddr.send_async(&mut stream).await?;
+            let response = Message::decode_async(&mut stream).await?;
+
+            if let Message::Addr { addrs } = response {
+                println!("Known addresses seen by {}:", target);
+                for p in &addrs {
+                    println!("  - {}", p);
+                }
+                if addrs.is_empty() {
                     println!("  (none)");
                 }
             } else {
