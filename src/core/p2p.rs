@@ -128,7 +128,9 @@ impl P2PNode {
                     let targets: Vec<SocketAddr> = state
                         .known_addrs
                         .iter()
-                        .filter(|addr| !state.peer_senders.contains_key(addr) && **addr != node_for_recon.addr)
+                        .filter(|addr| {
+                            !state.peer_senders.contains_key(addr) && **addr != node_for_recon.addr
+                        })
                         .cloned()
                         .collect();
                     (height, targets)
@@ -676,11 +678,7 @@ impl P2PNodeHandle {
             Message::GetAddr => {
                 let addrs = {
                     let state = self.state.lock().await;
-                    state
-                        .peer_senders
-                        .keys()
-                        .cloned()
-                        .collect::<Vec<_>>()
+                    state.peer_senders.keys().cloned().collect::<Vec<_>>()
                 };
                 self.send_to(from, Message::Addr { addrs }).await?;
             }
