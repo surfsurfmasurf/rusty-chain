@@ -97,6 +97,8 @@ impl P2PNode {
         let save_whitelist = Arc::clone(&self.state);
         let evict_state = Arc::clone(&self.state);
         let reputation_gossip = Arc::clone(&self.state);
+        let reconnection_task = Arc::clone(&self.state);
+        let agent_for_recon = agent.clone();
 
         // Background peer saver
         tokio::spawn(async move {
@@ -108,6 +110,34 @@ impl P2PNode {
                     if let Ok(content) = serde_json::to_string_pretty(&state.known_addrs) {
                         let _ = std::fs::write(path, content);
                     }
+                }
+            }
+        });
+
+        // Background reconnection task
+        let node_for_recon = P2PNode {
+            addr: self.addr,
+            state: Arc::clone(&reconnection_task),
+        };
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+                let (height, targets) = {
+                    let state = reconnection_task.lock().await;
+                    let height = state.chain.height() as u64;
+                    let targets: Vec<SocketAddr> = state
+                        .known_addrs
+                        .iter()
+                        .filter(|addr| !state.peer_senders.contains_key(addr) && **addr != node_for_recon.addr)
+                        .cloned()
+                        .collect();
+                    (height, targets)
+                };
+
+                for target in targets {
+                    let _ = node_for_recon
+                        .connect(target, height, agent_for_recon.clone())
+                        .await;
                 }
             }
         });
