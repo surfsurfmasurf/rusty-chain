@@ -643,6 +643,17 @@ impl P2PNodeHandle {
             Message::GetAddr => {
                 let addrs = {
                     let state = self.state.lock().await;
+                    state
+                        .peer_senders
+                        .keys()
+                        .cloned()
+                        .collect::<Vec<_>>()
+                };
+                self.send_to(from, Message::Addr { addrs }).await?;
+            }
+            Message::GetAllAddr => {
+                let addrs = {
+                    let state = self.state.lock().await;
                     state.known_addrs.iter().cloned().collect::<Vec<_>>()
                 };
                 self.send_to(from, Message::Addr { addrs }).await?;
