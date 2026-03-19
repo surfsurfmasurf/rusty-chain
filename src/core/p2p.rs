@@ -219,6 +219,7 @@ impl P2PNode {
         {
             let mut s = self.state.lock().await;
             s.known_addrs.insert(target);
+            s.outgoing_conns.insert(target);
         }
 
         let mut stream = stream;
@@ -846,6 +847,7 @@ async fn handle_peer(
     {
         let mut s = state.lock().await;
         s.peer_senders.remove(&addr);
+        s.outgoing_conns.remove(&addr);
     }
 
     res
