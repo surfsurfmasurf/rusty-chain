@@ -351,4 +351,12 @@ mod tests {
         tx.memo = Some("a".repeat(129));
         assert!(tx.validate_basic().is_err());
     }
+
+    #[test]
+    fn test_message_get_all_addr_roundtrip() {
+        let msg = Message::GetAllAddr;
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+    }
 }
