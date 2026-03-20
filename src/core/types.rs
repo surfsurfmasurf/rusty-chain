@@ -144,6 +144,7 @@ impl Transaction {
     }
 
     /// Calculate the size of the transaction in bytes when serialized.
+    /// This is used for fee estimation and network limits.
     pub fn size(&self) -> usize {
         serde_json::to_vec(self).unwrap_or_default().len()
     }
