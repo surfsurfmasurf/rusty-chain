@@ -280,6 +280,13 @@ Next:
 - Polish: Unified P2P message handlers and improved connection stability.
 - Pushed 8 commits as part of the Day 42 work session.
 
+## Day 43
+- Core: Added `size()` helper to `Transaction` and `Block` for serialization size (used for fee estimation).
+- P2P: Added `GetFeeEstimate` and `FeeEstimate` messages to the network protocol.
+- Refactor: Improved `total_reward` to correctly handle coinbase vs normal transaction fees.
+- Tests: Added `size_tests.rs` and updated `network.rs` with fee estimate roundtrip tests.
+- Pushed 8+ commits for Day 43 (maintaining the streak).
+
 Next:
-- Implement peer-to-peer reputation sharing (optional).
-- Add support for UPnP/NAT-PMP for easier node hosting.
+- Implement a basic fee estimation algorithm based on recent block fee rates.
+- Add UPnP support for better connectivity.
