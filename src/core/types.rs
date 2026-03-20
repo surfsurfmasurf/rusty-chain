@@ -220,7 +220,12 @@ impl Block {
 
     pub fn total_reward(&self) -> u64 {
         let block_reward = 50;
-        let fees: u64 = self.txs.iter().filter(|tx| !tx.is_coinbase()).map(|tx| tx.fee).sum();
+        let fees: u64 = self
+            .txs
+            .iter()
+            .filter(|tx| !tx.is_coinbase())
+            .map(|tx| tx.fee)
+            .sum();
         block_reward + fees
     }
 

@@ -1,4 +1,4 @@
-use crate::core::types::{Transaction, Block};
+use rusty_chain::core::types::{Block, Transaction};
 
 #[test]
 fn test_transaction_size() {
@@ -11,7 +11,7 @@ fn test_transaction_size() {
 fn test_block_size() {
     let tx = Transaction::new("A", "B", 100, 1);
     let block = Block {
-        header: crate::core::types::BlockHeader {
+        header: rusty_chain::core::types::BlockHeader {
             prev_hash: "abc".to_string(),
             merkle_root: "def".to_string(),
             timestamp_ms: 1000,
