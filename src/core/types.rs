@@ -143,7 +143,7 @@ impl Transaction {
         crate::core::hash::tx_hash(self)
     }
 
-    /// Return the serialized size.
+    /// Return size.
     pub fn size(&self) -> usize {
         serde_json::to_vec(self).unwrap_or_default().len()
     }
