@@ -143,8 +143,7 @@ impl Transaction {
         crate::core::hash::tx_hash(self)
     }
 
-    /// Calculate the size of the transaction in bytes when serialized.
-    /// Used for fee estimation.
+    /// Return the serialized size.
     pub fn size(&self) -> usize {
         serde_json::to_vec(self).unwrap_or_default().len()
     }
