@@ -74,6 +74,15 @@ pub enum Message {
     Reputation(Vec<(SocketAddr, i32)>),
     /// Request the list of all known peer addresses from a node
     GetAllAddr,
+    /// Request the fee estimation for a transaction
+    GetFeeEstimate {
+        tx_size: usize,
+    },
+    /// Fee estimation response
+    FeeEstimate {
+        fee_per_byte: u64,
+        estimated_total: u64,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -189,6 +198,8 @@ impl Message {
             Message::GetReputation => "GetReputation",
             Message::Reputation(_) => "Reputation",
             Message::GetAllAddr => "GetAllAddr",
+            Message::GetFeeEstimate { .. } => "GetFeeEstimate",
+            Message::FeeEstimate { .. } => "FeeEstimate",
         }
     }
 
@@ -242,6 +253,22 @@ mod tests {
         buf.extend_from_slice(&(20 * 1024 * 1024u32).to_be_bytes());
         let res = Message::decode(Cursor::new(buf));
         assert!(res.is_err());
+    }
+
+    #[test]
+    fn test_message_fee_estimate_roundtrip() {
+        let msg = Message::GetFeeEstimate { tx_size: 250 };
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+
+        let msg2 = Message::FeeEstimate {
+            fee_per_byte: 10,
+            estimated_total: 2500,
+        };
+        let encoded2 = msg2.encode().unwrap();
+        let decoded2 = Message::decode(Cursor::new(encoded2)).unwrap();
+        assert_eq!(msg2, decoded2);
     }
 
     #[test]

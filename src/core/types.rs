@@ -143,6 +143,11 @@ impl Transaction {
         crate::core::hash::tx_hash(self)
     }
 
+    /// Calculate the size of the transaction in bytes when serialized.
+    pub fn size(&self) -> usize {
+        serde_json::to_vec(self).unwrap_or_default().len()
+    }
+
     pub fn is_coinbase(&self) -> bool {
         self.from == "SYSTEM"
     }
@@ -215,7 +220,12 @@ impl Block {
 
     pub fn total_reward(&self) -> u64 {
         let block_reward = 50;
-        let fees: u64 = self.txs.iter().map(|tx| tx.fee).sum();
+        let fees: u64 = self.txs.iter().filter(|tx| !tx.is_coinbase()).map(|tx| tx.fee).sum();
         block_reward + fees
+    }
+
+    /// Calculate the size of the block in bytes when serialized.
+    pub fn size(&self) -> usize {
+        serde_json::to_vec(self).unwrap_or_default().len()
     }
 }
