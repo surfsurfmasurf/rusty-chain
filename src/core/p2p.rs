@@ -675,6 +675,31 @@ impl P2PNodeHandle {
                 let blocks = self.get_blocks_by_hash(block_hashes).await;
                 self.send_to(from, Message::Blocks(blocks)).await?;
             }
+            Message::GetFeeEstimate { tx_size } => {
+                let rate = {
+                    let state = self.state.lock().await;
+                    state.chain.estimate_fee_rate(10) // Window of 10 blocks
+                };
+                let fee_per_byte = rate.ceil() as u64;
+                let estimated_total = (tx_size as f64 * rate).ceil() as u64;
+                self.send_to(
+                    from,
+                    Message::FeeEstimate {
+                        fee_per_byte,
+                        estimated_total,
+                    },
+                )
+                .await?;
+            }
+            Message::FeeEstimate {
+                fee_per_byte,
+                estimated_total,
+            } => {
+                println!(
+                    "Received fee estimate from {}: {} units (rate: {}/byte)",
+                    from, estimated_total, fee_per_byte
+                );
+            }
             Message::GetAddr => {
                 let addrs = {
                     let state = self.state.lock().await;

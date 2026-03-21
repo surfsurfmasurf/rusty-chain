@@ -287,6 +287,16 @@ Next:
 - Tests: Added `size_tests.rs` and updated `network.rs` with fee estimate roundtrip tests.
 - Pushed 8+ commits for Day 43 (maintaining the streak).
 
+## Day 44
+- Core: Implemented `estimate_fee_rate` in `Chain` based on a rolling window of recent blocks.
+- Core: Optimized fee calculation to exclude coinbase transactions from the average.
+- P2P: Added `GetFeeEstimate` and `FeeEstimate` message handlers to `process_message`.
+- P2P: Fee estimates now use the rolling average from the last 10 blocks.
+- CLI: Added `fee-estimate` command to query network-wide fee rates from any node.
+- CLI: Improved output formatting for fee estimates with size-specific details.
+- Tests: Added `tests/fee_tests.rs` for verifying rolling average logic and edge cases.
+- Pushed 8 commits as part of the Day 44 maintenance and enhancement session.
+
 Next:
-- Implement a basic fee estimation algorithm based on recent block fee rates.
 - Add UPnP support for better connectivity.
+- P2P sync checkpointing.

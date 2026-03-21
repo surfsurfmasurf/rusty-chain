@@ -227,6 +227,37 @@ impl Chain {
         Ok(())
     }
 
+    /// Calculates the average fee rate (fee/size) of recent blocks.
+    pub fn estimate_fee_rate(&self, window: usize) -> f64 {
+        let n = self.blocks.len();
+        if n <= 1 {
+            return 1.0; // Default: 1 unit per byte
+        }
+
+        let start = n.saturating_sub(window).max(1); // Skip genesis
+        let recent = &self.blocks[start..];
+
+        let mut total_fee = 0.0;
+        let mut total_size = 0.0;
+
+        for block in recent {
+            for tx in &block.txs {
+                // Skip SYSTEM transactions (e.g., rewards)
+                if tx.from == "SYSTEM" {
+                    continue;
+                }
+                total_fee += tx.fee as f64;
+                total_size += tx.size() as f64;
+            }
+        }
+
+        if total_size == 0.0 {
+            1.0 // Default fallback
+        } else {
+            total_fee / total_size
+        }
+    }
+
     /// Basic chain validation (linkage + merkle placeholder).
     pub fn validate(&self) -> anyhow::Result<()> {
         anyhow::ensure!(!self.blocks.is_empty(), "chain has no blocks");

@@ -228,6 +228,17 @@ enum Commands {
         #[arg(long)]
         peer: String,
     },
+
+    /// Request a fee estimate from a node
+    FeeEstimate {
+        /// Node address to query (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        node: String,
+
+        /// Transaction size in bytes to estimate for
+        #[arg(long, default_value_t = 250)]
+        size: u32,
+    },
 }
 
 fn chain_path(path: Option<String>) -> std::path::PathBuf {
@@ -655,6 +666,34 @@ async fn main() -> anyhow::Result<()> {
                 "Sent Unwhitelist command for {} to {}",
                 peer_to_unwhitelist, target
             );
+        }
+        Commands::FeeEstimate { node, size } => {
+            use rusty_chain::core::network::Message;
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+
+            let target: SocketAddr = node.parse().context("Invalid node address")?;
+            let mut stream = TcpStream::connect(target).await?;
+
+            Message::GetFeeEstimate {
+                tx_size: size as usize,
+            }
+            .send_async(&mut stream)
+            .await?;
+            let response = Message::decode_async(&mut stream).await?;
+
+            if let Message::FeeEstimate {
+                fee_per_byte,
+                estimated_total,
+            } = response
+            {
+                println!("Fee estimate from {}:", target);
+                println!("  tx_size: {} bytes", size);
+                println!("  fee_per_byte: {} units", fee_per_byte);
+                println!("  estimated_total: {} units", estimated_total);
+            } else {
+                println!("Unexpected response: {:?}", response);
+            }
         }
     }
 
