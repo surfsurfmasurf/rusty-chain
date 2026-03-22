@@ -297,6 +297,16 @@ Next:
 - Tests: Added `tests/fee_tests.rs` for verifying rolling average logic and edge cases.
 - Pushed 8 commits as part of the Day 44 maintenance and enhancement session.
 
+## Day 45
+- Core: Added checkpointing support to `Chain` for validation and future syncing.
+- Core: Implemented `add_checkpoint` and `validate_checkpoints` in `Chain`.
+- Core: Updated genesis to include initial checkpoint at height 0.
+- Core: Implemented automatic checkpointing in `append_block` every 10 blocks.
+- Tests: Added `tests/checkpoint_tests.rs` with coverage for manual and automatic checkpointing.
+- Tests: Added checkpoint failure coverage with block corruption.
+- Refactor: Enhanced `validate()` to check checkpoints automatically.
+- Pushed 8 commits as part of the Day 45 work session.
+
 Next:
 - Add UPnP support for better connectivity.
 - P2P sync checkpointing.
