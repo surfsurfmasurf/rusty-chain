@@ -43,7 +43,7 @@ fn test_automatic_checkpointing() {
     let mut chain = Chain::new_genesis();
     
     // append_block triggers auto-checkpoint every 10 blocks
-    for i in 1..=21 {
+    for _i in 1..=21 {
         let prev = chain.blocks.last().unwrap();
         let prev_hash = rusty_chain::core::chain::hash_block(prev);
         let header = rusty_chain::core::types::BlockHeader {
