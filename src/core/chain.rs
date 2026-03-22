@@ -16,6 +16,11 @@ pub struct Chain {
     pub pow_difficulty: usize,
 
     pub blocks: Vec<Block>,
+
+    /// Checkpoints for pruning and fast synchronization.
+    /// Maps block height to block hash.
+    #[serde(default)]
+    pub checkpoints: std::collections::HashMap<usize, String>,
 }
 
 fn default_pow_difficulty() -> usize {
@@ -34,9 +39,14 @@ impl Chain {
             header,
             txs: vec![],
         };
+        let genesis_hash = hash_block(&genesis);
+        let mut checkpoints = std::collections::HashMap::new();
+        checkpoints.insert(0, genesis_hash);
+
         Self {
             pow_difficulty: default_pow_difficulty(),
             blocks: vec![genesis],
+            checkpoints,
         }
     }
 
@@ -227,6 +237,30 @@ impl Chain {
         Ok(())
     }
 
+    /// Adds a checkpoint at the current height.
+    pub fn add_checkpoint(&mut self) {
+        let height = self.height();
+        let hash = self.tip_hash();
+        self.checkpoints.insert(height, hash);
+    }
+
+    /// Validates the chain against its checkpoints.
+    pub fn validate_checkpoints(&self) -> anyhow::Result<()> {
+        for (&height, expected_hash) in &self.checkpoints {
+            if height < self.blocks.len() {
+                let actual_hash = hash_block(&self.blocks[height]);
+                anyhow::ensure!(
+                    actual_hash == *expected_hash,
+                    "checkpoint mismatch at height {}: expected {}, got {}",
+                    height,
+                    expected_hash,
+                    actual_hash
+                );
+            }
+        }
+        Ok(())
+    }
+
     /// Calculates the average fee rate (fee/size) of recent blocks.
     pub fn estimate_fee_rate(&self, window: usize) -> f64 {
         let n = self.blocks.len();
@@ -271,6 +305,9 @@ impl Chain {
             genesis.header.merkle_root == merkle_root(&genesis.txs),
             "genesis merkle_root mismatch"
         );
+
+        // Checkpoints validation
+        self.validate_checkpoints()?;
 
         // Validate state transitions (balances, nonces)
         // This ensures every block in the chain is valid according to the state rules.
