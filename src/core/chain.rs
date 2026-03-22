@@ -234,6 +234,12 @@ impl Chain {
     pub fn append_block(&mut self, block: Block) -> anyhow::Result<()> {
         self.validate_block(&block)?;
         self.blocks.push(block);
+
+        // Auto-checkpoint every 10 blocks
+        if self.height() % 10 == 0 {
+            self.add_checkpoint();
+        }
+
         Ok(())
     }
 
