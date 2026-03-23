@@ -83,6 +83,10 @@ pub enum Message {
         fee_per_byte: u64,
         estimated_total: u64,
     },
+    /// Request checkpoints from a peer
+    GetCheckpoints,
+    /// List of checkpoints (height -> hash)
+    Checkpoints(std::collections::HashMap<usize, String>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -200,6 +204,8 @@ impl Message {
             Message::GetAllAddr => "GetAllAddr",
             Message::GetFeeEstimate { .. } => "GetFeeEstimate",
             Message::FeeEstimate { .. } => "FeeEstimate",
+            Message::GetCheckpoints => "GetCheckpoints",
+            Message::Checkpoints(_) => "Checkpoints",
         }
     }
 
@@ -385,5 +391,21 @@ mod tests {
         let encoded = msg.encode().unwrap();
         let decoded = Message::decode(Cursor::new(encoded)).unwrap();
         assert_eq!(msg, decoded);
+    }
+
+    #[test]
+    fn test_message_checkpoints_roundtrip() {
+        let mut checkpoints = std::collections::HashMap::new();
+        checkpoints.insert(0, "hash0".to_string());
+        checkpoints.insert(10, "hash10".to_string());
+        let msg = Message::Checkpoints(checkpoints);
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+
+        let msg2 = Message::GetCheckpoints;
+        let encoded2 = msg2.encode().unwrap();
+        let decoded2 = Message::decode(Cursor::new(encoded2)).unwrap();
+        assert_eq!(msg2, decoded2);
     }
 }
