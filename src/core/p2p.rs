@@ -813,7 +813,7 @@ impl P2PNodeHandle {
             Message::Checkpoints(checkpoints) => {
                 println!("Received {} checkpoints from {}", checkpoints.len(), from);
                 if !checkpoints.is_empty() {
-                    let mut state = self.state.lock().await;
+                    let state = self.state.lock().await;
                     let our_height = state.chain.height();
 
                     // Find the highest common checkpoint
@@ -822,7 +822,9 @@ impl P2PNodeHandle {
                         if height <= our_height {
                             if let Some(our_hash) = state.chain.get_checkpoint_at(height) {
                                 if our_hash == hash {
-                                    if highest_checkpoint.as_ref().map_or(true, |(h, _)| height > *h)
+                                    if highest_checkpoint
+                                        .as_ref()
+                                        .map_or(true, |(h, _)| height > *h)
                                     {
                                         highest_checkpoint = Some((height, hash));
                                     }
@@ -830,7 +832,10 @@ impl P2PNodeHandle {
                             }
                         } else {
                             // Peer is ahead, we can use their checkpoints for future validation
-                            if highest_checkpoint.as_ref().map_or(true, |(h, _)| height > *h) {
+                            if highest_checkpoint
+                                .as_ref()
+                                .map_or(true, |(h, _)| height > *h)
+                            {
                                 highest_checkpoint = Some((height, hash));
                             }
                         }

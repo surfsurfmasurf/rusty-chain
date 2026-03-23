@@ -259,7 +259,7 @@ impl Chain {
     pub fn get_last_checkpoint(&self) -> Option<(usize, String)> {
         self.checkpoints
             .iter()
-            .max_by_key(|(&h, _)| h)
+            .max_by_key(|&(&h, _)| h)
             .map(|(&h, hash)| (h, hash.clone()))
     }
 
