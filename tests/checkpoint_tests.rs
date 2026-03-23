@@ -78,3 +78,23 @@ fn test_automatic_checkpointing() {
     assert!(chain.checkpoints.contains_key(&20));
     assert!(chain.validate_checkpoints().is_ok());
 }
+
+#[test]
+fn test_get_checkpoint_helpers() {
+    let mut chain = Chain::new_genesis();
+    let genesis_hash = rusty_chain::core::chain::hash_block(&chain.blocks[0]);
+    
+    assert_eq!(chain.get_checkpoint_at(0), Some(genesis_hash.clone()));
+    assert_eq!(chain.get_last_checkpoint(), Some((0, genesis_hash)));
+    
+    // Add checkpoint
+    for _ in 0..5 {
+        chain.mine_empty_block(3).unwrap();
+    }
+    let height = chain.height();
+    let hash = chain.tip_hash();
+    chain.add_checkpoint();
+    
+    assert_eq!(chain.get_checkpoint_at(height), Some(hash.clone()));
+    assert_eq!(chain.get_last_checkpoint(), Some((height, hash)));
+}
