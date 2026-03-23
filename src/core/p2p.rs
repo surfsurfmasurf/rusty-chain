@@ -564,17 +564,10 @@ impl P2PNodeHandle {
 
                 if best_height > our_height {
                     println!(
-                        "Peer {} is ahead ({} > {}), requesting headers...",
+                        "Peer {} is ahead ({} > {}), requesting checkpoints...",
                         from, best_height, our_height
                     );
-                    self.send_to(
-                        from,
-                        Message::GetHeaders {
-                            start_height: our_height,
-                            limit: 100,
-                        },
-                    )
-                    .await?;
+                    self.send_to(from, Message::GetCheckpoints).await?;
                 }
 
                 // Request addresses during handshake
@@ -810,6 +803,59 @@ impl P2PNodeHandle {
                     from
                 );
                 self.merge_reputation(scores).await;
+            }
+            Message::GetCheckpoints => {
+                let checkpoints = {
+                    let state = self.state.lock().await;
+                    state.chain.checkpoints.clone()
+                };
+                self.send_to(from, Message::Checkpoints(checkpoints))
+                    .await?;
+            }
+            Message::Checkpoints(checkpoints) => {
+                println!("Received {} checkpoints from {}", checkpoints.len(), from);
+                if !checkpoints.is_empty() {
+                    let mut state = self.state.lock().await;
+                    let our_height = state.chain.height();
+
+                    // Find the highest common checkpoint
+                    let mut highest_checkpoint: Option<(usize, String)> = None;
+                    for (height, hash) in checkpoints {
+                        if height <= our_height {
+                            if let Some(our_hash) = state.chain.get_checkpoint_at(height) {
+                                if our_hash == hash {
+                                    if highest_checkpoint.as_ref().map_or(true, |(h, _)| height > *h)
+                                    {
+                                        highest_checkpoint = Some((height, hash));
+                                    }
+                                }
+                            }
+                        } else {
+                            // Peer is ahead, we can use their checkpoints for future validation
+                            if highest_checkpoint.as_ref().map_or(true, |(h, _)| height > *h) {
+                                highest_checkpoint = Some((height, hash));
+                            }
+                        }
+                    }
+
+                    if let Some((h, _)) = highest_checkpoint {
+                        if h as u64 > our_height as u64 {
+                            println!(
+                                "Peer {} has a newer checkpoint at {}, requesting headers...",
+                                from, h
+                            );
+                            let _ = self
+                                .send_to(
+                                    from,
+                                    Message::GetHeaders {
+                                        start_height: our_height as u64 + 1,
+                                        limit: 100,
+                                    },
+                                )
+                                .await;
+                        }
+                    }
+                }
             }
             _ => {
                 println!("Received unhandled message from {}: {:?}", from, msg);
