@@ -504,9 +504,7 @@ impl P2PNodeHandle {
                 return Ok(());
             }
             // 3. Clear mempool txs
-            for tx in &block.txs {
-                state.mempool.remove_tx(&tx.id());
-            }
+            state.mempool.remove_included(&block.txs);
             // 4. Update reputation
             drop(state);
             self.update_reputation(from, 10).await;
