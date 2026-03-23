@@ -250,6 +250,19 @@ impl Chain {
         self.checkpoints.insert(height, hash);
     }
 
+    /// Gets a checkpoint at a specific height if it exists.
+    pub fn get_checkpoint_at(&self, height: usize) -> Option<String> {
+        self.checkpoints.get(&height).cloned()
+    }
+
+    /// Returns the highest checkpoint currently known.
+    pub fn get_last_checkpoint(&self) -> Option<(usize, String)> {
+        self.checkpoints
+            .iter()
+            .max_by_key(|(&h, _)| h)
+            .map(|(&h, hash)| (h, hash.clone()))
+    }
+
     /// Validates the chain against its checkpoints.
     pub fn validate_checkpoints(&self) -> anyhow::Result<()> {
         for (&height, expected_hash) in &self.checkpoints {
