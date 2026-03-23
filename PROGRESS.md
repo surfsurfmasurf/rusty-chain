@@ -310,3 +310,13 @@ Next:
 Next:
 - Add UPnP support for better connectivity.
 - P2P sync checkpointing.
+
+## Day 46
+- Core: Added `get_checkpoint_at` and `get_last_checkpoint` to `Chain`.
+- P2P: Added `GetCheckpoints` and `Checkpoints` messages to the network protocol.
+- P2P: Implemented `GetCheckpoints` and `Checkpoints` message handlers.
+- Mempool: Added `remove_included` for batch removal of transactions.
+- Refactor: Optimized mempool clearing in P2P node using `remove_included`.
+- Tests: Added test coverage for new checkpoint helpers.
+- Polish: Improved handshake-triggered synchronization using checkpoints.
+- Pushed 8 commits as part of the Day 46 maintenance and enhancement session.
