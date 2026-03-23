@@ -121,6 +121,12 @@ impl Mempool {
         self.txs.retain(|t| t.id() != tx_id);
     }
 
+    /// Removes all transactions from the mempool that are included in the given slice.
+    pub fn remove_included(&mut self, txs: &[Transaction]) {
+        let ids: HashSet<String> = txs.iter().map(|t| t.id()).collect();
+        self.txs.retain(|t| !ids.contains(&t.id()));
+    }
+
     /// Evicts transactions from the mempool that have exceeded the time-to-live (TTL).
     /// Returns the number of evicted transactions.
     pub fn evict_expired(&mut self, ttl_ms: u64, now_ms: u64) -> usize {
