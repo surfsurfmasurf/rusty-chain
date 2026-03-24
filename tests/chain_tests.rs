@@ -45,11 +45,11 @@ fn mine_produces_pow_ok_hash() {
     let mut c = Chain::new_genesis();
     let difficulty = 2;
 
-    let mined = c.mine_empty_block(difficulty).unwrap();
+    let _mined = c.mine_empty_block(difficulty).unwrap();
     c.validate().unwrap();
 
-    let h = hash_block(&mined);
-    assert!(pow_ok(&h, difficulty), "expected pow_ok for hash={h}");
+    let tip = c.blocks.last().unwrap();
+    assert!(tip.header.verify_pow(difficulty as u32).is_ok(), "expected verify_pow ok");
 }
 
 #[test]
@@ -63,7 +63,7 @@ fn validate_rejects_block_failing_pow() {
     c.pow_difficulty = 6;
 
     let err = c.validate().unwrap_err().to_string();
-    assert!(err.contains("fails PoW"), "unexpected error: {err}");
+    assert!(err.contains("PoW fail"), "unexpected error: {err}");
 }
 
 #[test]
