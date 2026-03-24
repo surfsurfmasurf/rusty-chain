@@ -635,9 +635,15 @@ impl P2PNodeHandle {
                     )
                     .await?;
 
-                    // If we got a full batch, request the next batch
-                    if headers.len() as u32 == limit {
-                        let next_start = start_height + headers.len() as u64;
+                    // Batching: if we likely received a full batch, request more.
+                    // Default limit in GetHeaders is usually around 100-2000.
+                    // For now we use 100 as the trigger.
+                    if headers.len() >= 100 {
+                        let current_height = {
+                            let state = self.state.lock().await;
+                            state.chain.height() as u64
+                        };
+                        let next_start = current_height + 1;
                         println!(
                             "Requesting next batch of headers starting at {}",
                             next_start
@@ -646,7 +652,7 @@ impl P2PNodeHandle {
                             from,
                             Message::GetHeaders {
                                 start_height: next_start,
-                                limit,
+                                limit: 100,
                             },
                         )
                         .await?;
