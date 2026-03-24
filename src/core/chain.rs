@@ -196,14 +196,8 @@ impl Chain {
 
     /// Validates a block's structure, PoW, and state transitions.
     pub fn validate_block(&self, block: &Block) -> anyhow::Result<()> {
-        // 1. Baseline header/merkle/PoW
-        let prev_hash = self.tip_hash();
-        anyhow::ensure!(
-            block.header.prev_hash == prev_hash,
-            "prev_hash mismatch: expected {} got {}",
-            prev_hash,
-            block.header.prev_hash
-        );
+        let prev_header = &self.blocks.last().expect("genesis exists").header;
+        block.validate_with_prev(prev_header, self.pow_difficulty as u32)?;
 
         let merkle = merkle_root(&block.txs);
         anyhow::ensure!(
@@ -211,14 +205,6 @@ impl Chain {
             "merkle mismatch: expected {} got {}",
             merkle,
             block.header.merkle_root
-        );
-
-        let h = hash_block(block);
-        anyhow::ensure!(
-            pow_ok(&h, self.pow_difficulty),
-            "PoW fail: hash {} does not match difficulty {}",
-            h,
-            self.pow_difficulty
         );
 
         // 2. State transition
