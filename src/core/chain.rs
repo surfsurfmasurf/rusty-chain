@@ -36,10 +36,10 @@ impl Chain {
             merkle_root: merkle_root(&[]),
         };
         let genesis = Block {
-            header,
+            header: header.clone(),
             txs: vec![],
         };
-        let genesis_hash = hash_block(&genesis);
+        let genesis_hash = header.hash();
         let mut checkpoints = std::collections::HashMap::new();
         checkpoints.insert(0, genesis_hash);
 
