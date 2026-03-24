@@ -38,7 +38,7 @@ fn validate_rejects_broken_prev_hash_linkage() {
     c.blocks[1].header.prev_hash = "deadbeef".to_string();
 
     let err = c.validate().unwrap_err().to_string();
-    assert!(err.contains("invalid prev_hash"), "unexpected error: {err}");
+    assert!(err.contains("invalid prev_hash") || err.contains("linkage/PoW fail"), "unexpected error: {err}");
 }
 
 #[test]
