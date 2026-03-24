@@ -327,26 +327,14 @@ impl Chain {
                     .with_context(|| format!("invalid tx in block={i} index={j}"))?;
             }
 
-            let prev_hash = hash_block(prev);
-            anyhow::ensure!(
-                cur.header.prev_hash == prev_hash,
-                "block {i} prev_hash mismatch (expected={prev_hash} got={})",
-                cur.header.prev_hash
-            );
+            cur.validate_with_prev(&prev.header, self.pow_difficulty as u32)
+                .with_context(|| format!("block {} linkage/PoW fail", i))?;
 
             let expected_merkle = merkle_root(&cur.txs);
             anyhow::ensure!(
                 cur.header.merkle_root == expected_merkle,
                 "block {i} merkle_root mismatch (expected={expected_merkle} got={})",
                 cur.header.merkle_root
-            );
-
-            let h = hash_block(cur);
-            anyhow::ensure!(
-                pow_ok(&h, self.pow_difficulty),
-                "block {i} fails PoW (difficulty={} hash={})",
-                self.pow_difficulty,
-                h
             );
         }
 
