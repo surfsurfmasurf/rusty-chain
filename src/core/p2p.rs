@@ -636,20 +636,17 @@ impl P2PNodeHandle {
                     .await?;
 
                     // If we got a full batch, request the next batch
-                    if headers.len() == 100 {
-                        let last_height = {
-                            let state = self.state.lock().await;
-                            state.chain.blocks.len() as u64
-                        };
+                    if headers.len() as u32 == limit {
+                        let next_start = start_height + headers.len() as u64;
                         println!(
                             "Requesting next batch of headers starting at {}",
-                            last_height + 100
+                            next_start
                         );
                         self.send_to(
                             from,
                             Message::GetHeaders {
-                                start_height: last_height + 100,
-                                limit: 100,
+                                start_height: next_start,
+                                limit,
                             },
                         )
                         .await?;
