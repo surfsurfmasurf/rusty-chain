@@ -56,7 +56,7 @@ impl Chain {
 
     pub fn tip_hash(&self) -> String {
         let tip = self.blocks.last().expect("genesis exists");
-        hash_block(tip)
+        tip.header.hash()
     }
 
     pub fn tx_count(&self) -> usize {
@@ -144,7 +144,7 @@ impl Chain {
         let difficulty = self.pow_difficulty;
 
         let prev = self.blocks.last().expect("genesis exists");
-        let prev_hash = hash_block(prev);
+        let prev_hash = prev.header.hash();
 
         let merkle_root = merkle_root(&txs);
         let timestamp_ms = now_ms();
@@ -253,7 +253,7 @@ impl Chain {
     pub fn validate_checkpoints(&self) -> anyhow::Result<()> {
         for (&height, expected_hash) in &self.checkpoints {
             if height < self.blocks.len() {
-                let actual_hash = hash_block(&self.blocks[height]);
+                let actual_hash = self.blocks[height].header.hash();
                 anyhow::ensure!(
                     actual_hash == *expected_hash,
                     "checkpoint mismatch at height {}: expected {}, got {}",
