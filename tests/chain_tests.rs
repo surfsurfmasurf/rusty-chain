@@ -31,8 +31,9 @@ fn validate_accepts_genesis() {
 #[test]
 fn validate_rejects_broken_prev_hash_linkage() {
     let mut c = Chain::new_genesis();
-    c.blocks.push(c.blocks[0].clone());
-
+    c.pow_difficulty = 3;
+    let mined = c.mine_empty_block(3).unwrap();
+    
     // Tamper with linkage.
     c.blocks[1].header.prev_hash = "deadbeef".to_string();
 
@@ -43,7 +44,8 @@ fn validate_rejects_broken_prev_hash_linkage() {
 #[test]
 fn mine_produces_pow_ok_hash() {
     let mut c = Chain::new_genesis();
-    let difficulty = 2;
+    c.pow_difficulty = 2; // Match the difficulty used in mine_block
+    let difficulty = c.pow_difficulty;
 
     let _mined = c.mine_empty_block(difficulty).unwrap();
     c.validate().unwrap();
