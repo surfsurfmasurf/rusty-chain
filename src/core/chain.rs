@@ -114,6 +114,10 @@ impl Chain {
     ) -> anyhow::Result<Block> {
         let block_height = self.height() as u64 + 1;
 
+        // Persist difficulty so later `validate` has the right context.
+        self.pow_difficulty = new_difficulty;
+        let difficulty = self.pow_difficulty;
+
         // Prepend coinbase if miner specified
         if let Some(miner) = miner_address {
             let total_fees: u64 = txs.iter().map(|tx| tx.fee).sum();
@@ -139,10 +143,6 @@ impl Chain {
             .apply_block_txs(&txs, block_height as usize)
             .context("mempool transactions failed state application")?;
 
-        // Persist difficulty so later `validate` has the right context.
-        self.pow_difficulty = new_difficulty;
-        let difficulty = self.pow_difficulty;
-
         let prev = self.blocks.last().expect("genesis exists");
         let prev_hash = prev.header.hash();
 
@@ -157,12 +157,12 @@ impl Chain {
                 nonce,
                 merkle_root: merkle_root.clone(),
             };
-            let candidate = Block {
-                header,
-                txs: txs.clone(),
-            };
-            let h = hash_block(&candidate);
+            let h = header.hash();
             if pow_ok(&h, difficulty) {
+                let candidate = Block {
+                    header,
+                    txs: txs.clone(),
+                };
                 self.blocks.push(candidate.clone());
                 return Ok(candidate);
             }
@@ -196,8 +196,8 @@ impl Chain {
 
     /// Validates a block's structure, PoW, and state transitions.
     pub fn validate_block(&self, block: &Block) -> anyhow::Result<()> {
-        let prev_header = &self.blocks.last().expect("genesis exists").header;
-        block.validate_with_prev(prev_header, self.pow_difficulty as u32)?;
+        let prev_block = self.blocks.last().expect("genesis exists");
+        block.validate_with_prev(&prev_block.header, self.pow_difficulty as u32)?;
 
         let merkle = merkle_root(&block.txs);
         anyhow::ensure!(

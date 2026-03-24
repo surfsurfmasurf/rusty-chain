@@ -1,0 +1,8 @@
+ceaa0f8 Polish: Fixed clippy warnings and dereference issue
+4fee096 Docs: Updated PROGRESS.md for Day 46
+2a278ee P2P: Refactored mempool clearing to use remove_included
+c602e9e Mempool: Added remove_included for batch removal of transactions
+cbabf4b Tests: Added test_get_checkpoint_helpers coverage
+3996d80 P2P: Implemented GetCheckpoints and Checkpoints message handlers
+2e2812b P2P: Added GetCheckpoints and Checkpoints messages to the network protocol
+21f1742 Core: Added get_checkpoint_at and get_last_checkpoint to Chain

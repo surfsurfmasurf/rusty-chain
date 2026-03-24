@@ -320,3 +320,13 @@ Next:
 - Tests: Added test coverage for new checkpoint helpers.
 - Polish: Improved handshake-triggered synchronization using checkpoints.
 - Pushed 8 commits as part of the Day 46 maintenance and enhancement session.
+
+Day 47
+- Core: Added `verify_header` to `BlockHeader` for stateless PoW validation.
+- P2P: Added `GetHeaders` and `Headers` messages for efficient chain state polling.
+- P2P: Implemented `GetHeaders` and `Headers` handlers in `process_message`.
+- P2P: Improved sync speed by batching header requests (up to 2000 per request).
+- Refactor: Moved block validation logic to `Block::validate_with_prev`.
+- Tests: Added unit tests for stateless header verification.
+- Polish: Unified error types for block and header validation.
+- Pushed 8 commits as part of the Day 47 maintenance and enhancement session.
