@@ -13,6 +13,16 @@ impl BlockHeader {
     pub fn hash(&self) -> String {
         crate::core::hash::header_hash(self)
     }
+
+    /// Stateless header verification (PoW check).
+    pub fn verify_pow(&self, difficulty: u32) -> anyhow::Result<()> {
+        let hash = self.hash();
+        let target = "0".repeat(difficulty as usize);
+        if !hash.starts_with(&target) {
+            anyhow::bail!("invalid PoW: hash={} difficulty={}", hash, difficulty);
+        }
+        Ok(())
+    }
 }
 
 /// A minimal transaction (Week 2: add optional signatures).
@@ -232,5 +242,27 @@ impl Block {
     /// Calculate the size of the block in bytes when serialized.
     pub fn size(&self) -> usize {
         serde_json::to_vec(self).unwrap_or_default().len()
+    }
+
+    /// Basic block validation against a previous header.
+    pub fn validate_with_prev(
+        &self,
+        prev_header: &BlockHeader,
+        difficulty: u32,
+    ) -> anyhow::Result<()> {
+        anyhow::ensure!(
+            self.header.prev_hash == prev_header.hash(),
+            "invalid prev_hash: {} (expected {})",
+            self.header.prev_hash,
+            prev_header.hash()
+        );
+        anyhow::ensure!(
+            self.header.timestamp_ms >= prev_header.timestamp_ms,
+            "timestamp cannot go backward: {} (prev: {})",
+            self.header.timestamp_ms,
+            prev_header.timestamp_ms
+        );
+        self.header.verify_pow(difficulty)?;
+        Ok(())
     }
 }
