@@ -1,4 +1,4 @@
-use rusty_chain::core::chain::{Chain, hash_block, merkle_root, pow_ok};
+use rusty_chain::core::chain::{Chain, merkle_root};
 use rusty_chain::core::hash::tx_hash;
 use rusty_chain::core::types::Transaction;
 
@@ -32,7 +32,7 @@ fn validate_accepts_genesis() {
 fn validate_rejects_broken_prev_hash_linkage() {
     let mut c = Chain::new_genesis();
     c.pow_difficulty = 3;
-    let mined = c.mine_empty_block(3).unwrap();
+    let _mined = c.mine_empty_block(3).unwrap();
     
     // Tamper with linkage.
     c.blocks[1].header.prev_hash = "deadbeef".to_string();
