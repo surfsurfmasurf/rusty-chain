@@ -7,6 +7,10 @@ use std::path::{Path, PathBuf};
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Mempool {
     pub txs: Vec<Transaction>,
+
+    /// Transaction ID to index mapping for fast O(1) lookups.
+    #[serde(skip, default)]
+    pub tx_index: std::collections::HashMap<String, usize>,
 }
 
 impl Mempool {
@@ -20,7 +24,13 @@ impl Mempool {
 
     pub fn load(path: &Path) -> anyhow::Result<Self> {
         let s = fs::read_to_string(path)?;
-        let m: Self = serde_json::from_str(&s)?;
+        let mut m: Self = serde_json::from_str(&s)?;
+
+        // Rebuild tx index
+        for (i, tx) in m.txs.iter().enumerate() {
+            m.tx_index.insert(tx.id(), i);
+        }
+
         Ok(m)
     }
 
@@ -35,8 +45,7 @@ impl Mempool {
 
     fn ensure_unique_hash(&self, tx: &Transaction) -> anyhow::Result<()> {
         let h = tx.id();
-        let existing: HashSet<String> = self.txs.iter().map(|t| t.id()).collect();
-        anyhow::ensure!(!existing.contains(&h), "duplicate tx (hash={h})");
+        anyhow::ensure!(!self.tx_index.contains_key(&h), "duplicate tx (hash={h})");
         Ok(())
     }
 
@@ -97,7 +106,10 @@ impl Mempool {
 
         self.ensure_unique_hash(&tx)?;
 
+        let id = tx.id();
+        let pos = self.txs.len();
         self.txs.push(tx);
+        self.tx_index.insert(id, pos);
         Ok(())
     }
 
@@ -106,25 +118,34 @@ impl Mempool {
 
         self.ensure_unique_hash(&tx)?;
 
+        let id = tx.id();
+        let pos = self.txs.len();
         self.txs.push(tx);
+        self.tx_index.insert(id, pos);
         Ok(())
     }
 
     pub fn drain(&mut self) -> Vec<Transaction> {
         let mut out = Vec::new();
         std::mem::swap(&mut self.txs, &mut out);
+        self.tx_index.clear();
         out
     }
 
     /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
-        self.txs.retain(|t| t.id() != tx_id);
+        if let Some(pos) = self.tx_index.remove(tx_id) {
+            self.txs.remove(pos);
+            // Rebuild index after removal because positions shifted
+            self.rebuild_index();
+        }
     }
 
     /// Removes all transactions from the mempool that are included in the given slice.
     pub fn remove_included(&mut self, txs: &[Transaction]) {
         let ids: HashSet<String> = txs.iter().map(|t| t.id()).collect();
         self.txs.retain(|t| !ids.contains(&t.id()));
+        self.rebuild_index();
     }
 
     /// Evicts transactions from the mempool that have exceeded the time-to-live (TTL).
@@ -139,6 +160,17 @@ impl Mempool {
             }
             now_ms < t.timestamp_ms.saturating_add(ttl_ms)
         });
-        count_before - self.txs.len()
+        let evicted = count_before - self.txs.len();
+        if evicted > 0 {
+            self.rebuild_index();
+        }
+        evicted
+    }
+
+    fn rebuild_index(&mut self) {
+        self.tx_index.clear();
+        for (i, tx) in self.txs.iter().enumerate() {
+            self.tx_index.insert(tx.id(), i);
+        }
     }
 }
