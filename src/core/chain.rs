@@ -243,7 +243,7 @@ impl Chain {
         self.block_index.insert(hash, height);
 
         // Auto-checkpoint every 10 blocks
-        if self.height() > 0 && self.height() % 10 == 0 {
+        if self.height() > 0 && self.height().is_multiple_of(10) {
             self.add_checkpoint();
         }
 
