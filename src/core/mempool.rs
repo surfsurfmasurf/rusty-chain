@@ -91,7 +91,8 @@ impl Mempool {
             );
 
             // Replace the existing transaction
-            self.txs[pos] = tx;
+            self.txs[pos] = tx.clone();
+            self.tx_index.insert(tx.id(), pos);
             return Ok(());
         }
 
