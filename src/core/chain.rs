@@ -21,6 +21,11 @@ pub struct Chain {
     /// Maps block height to block hash.
     #[serde(default)]
     pub checkpoints: std::collections::HashMap<usize, String>,
+
+    /// Block hash to Block mapping for fast O(1) block retrieval by hash.
+    /// Used primarily in P2P sync (GetData handling).
+    #[serde(skip, default)]
+    pub block_index: std::collections::HashMap<String, usize>,
 }
 
 fn default_pow_difficulty() -> usize {
@@ -41,12 +46,16 @@ impl Chain {
         };
         let genesis_hash = header.hash();
         let mut checkpoints = std::collections::HashMap::new();
-        checkpoints.insert(0, genesis_hash);
+        checkpoints.insert(0, genesis_hash.clone());
+
+        let mut block_index = std::collections::HashMap::new();
+        block_index.insert(genesis_hash, 0);
 
         Self {
             pow_difficulty: default_pow_difficulty(),
             blocks: vec![genesis],
             checkpoints,
+            block_index,
         }
     }
 
@@ -86,7 +95,13 @@ impl Chain {
 
     pub fn load(path: &Path) -> anyhow::Result<Self> {
         let s = fs::read_to_string(path)?;
-        let c: Self = serde_json::from_str(&s)?;
+        let mut c: Self = serde_json::from_str(&s)?;
+
+        // Rebuild block index
+        for (i, block) in c.blocks.iter().enumerate() {
+            c.block_index.insert(block.header.hash(), i);
+        }
+
         Ok(c)
     }
 
