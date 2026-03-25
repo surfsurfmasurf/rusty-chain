@@ -468,8 +468,10 @@ impl P2PNodeHandle {
         let state = self.state.lock().await;
         let mut results = Vec::new();
         for hash in hashes {
-            if let Some(block) = state.chain.blocks.iter().find(|b| b.header.hash() == hash) {
-                results.push(block.clone());
+            if let Some(&height) = state.chain.block_index.get(&hash) {
+                if let Some(block) = state.chain.blocks.get(height) {
+                    results.push(block.clone());
+                }
             }
         }
         results
