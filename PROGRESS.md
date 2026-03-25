@@ -321,12 +321,11 @@ Next:
 - Polish: Improved handshake-triggered synchronization using checkpoints.
 - Pushed 8 commits as part of the Day 46 maintenance and enhancement session.
 
-Day 47
-- Core: Added `verify_header` to `BlockHeader` for stateless PoW validation.
-- P2P: Added `GetHeaders` and `Headers` messages for efficient chain state polling.
-- P2P: Implemented `GetHeaders` and `Headers` handlers in `process_message`.
-- P2P: Improved sync speed by batching header requests (up to 2000 per request).
-- Refactor: Moved block validation logic to `Block::validate_with_prev`.
-- Tests: Added unit tests for stateless header verification.
-- Polish: Unified error types for block and header validation.
-- Pushed 8 commits as part of the Day 47 maintenance and enhancement session.
+## Day 48
+- Core: Added `block_index` to `Chain` for O(1) block retrieval by hash.
+- Core: Added `tx_index` to `Mempool` for O(1) transaction duplicate checks and lookups.
+- P2P: Optimized `get_blocks_by_hash` to use the new `block_index`, speeding up `GetData` response times.
+- Mempool: Implemented index maintenance for RBF (Replace-By-Fee) and bulk transaction removal.
+- Tests: Added `test_mempool_index_consistency` to verify index integrity during removals and shifts.
+- Refactor: Replaced manual O(N) searches with O(1) hash map lookups in performance-critical paths.
+- Pushed 6 commits as part of the Day 48 maintenance and optimization session.
