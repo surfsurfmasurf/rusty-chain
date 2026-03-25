@@ -168,10 +168,28 @@ impl Mempool {
         evicted
     }
 
-    fn rebuild_index(&mut self) {
-        self.tx_index.clear();
-        for (i, tx) in self.txs.iter().enumerate() {
-            self.tx_index.insert(tx.id(), i);
-        }
+#[cfg(test)]
+mod mempool_index_tests {
+    use super::*;
+    use crate::core::types::Transaction;
+
+    #[test]
+    fn test_mempool_index_consistency() {
+        let mut mempool = Mempool::new();
+        let tx1 = Transaction::new("A", "B", 10, 0);
+        let tx2 = Transaction::new("A", "C", 20, 1);
+        let id1 = tx1.id();
+        let id2 = tx2.id();
+
+        mempool.add_tx(tx1).unwrap();
+        mempool.add_tx(tx2).unwrap();
+
+        assert_eq!(mempool.tx_index.len(), 2);
+        assert_eq!(mempool.tx_index.get(&id1), Some(&0));
+        assert_eq!(mempool.tx_index.get(&id2), Some(&1));
+
+        mempool.remove_tx(&id1);
+        assert_eq!(mempool.tx_index.len(), 1);
+        assert_eq!(mempool.tx_index.get(&id2), Some(&0)); // Shifted
     }
 }
