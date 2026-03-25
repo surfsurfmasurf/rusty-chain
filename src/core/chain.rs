@@ -178,7 +178,10 @@ impl Chain {
                     header,
                     txs: txs.clone(),
                 };
+                let hash = candidate.header.hash();
+                let height = self.blocks.len();
                 self.blocks.push(candidate.clone());
+                self.block_index.insert(hash, height);
                 return Ok(candidate);
             }
             nonce = nonce.wrapping_add(1);
@@ -234,7 +237,10 @@ impl Chain {
     /// Appends a validated block to the chain.
     pub fn append_block(&mut self, block: Block) -> anyhow::Result<()> {
         self.validate_block(&block)?;
+        let hash = block.header.hash();
+        let height = self.blocks.len();
         self.blocks.push(block);
+        self.block_index.insert(hash, height);
 
         // Auto-checkpoint every 10 blocks
         if self.height() > 0 && self.height() % 10 == 0 {
