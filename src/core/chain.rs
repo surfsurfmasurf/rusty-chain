@@ -236,14 +236,17 @@ impl Chain {
 
     /// Appends a validated block to the chain.
     pub fn append_block(&mut self, block: Block) -> anyhow::Result<()> {
-        self.validate_block(&block)?;
         let hash = block.header.hash();
         let height = self.blocks.len();
+
+        self.validate_block(&block)?;
+
         self.blocks.push(block);
         self.block_index.insert(hash, height);
 
         // Auto-checkpoint every 10 blocks
-        if self.height() > 0 && self.height().is_multiple_of(10) {
+        let current_height = self.height();
+        if current_height > 0 && current_height % 10 == 0 {
             self.add_checkpoint();
         }
 
