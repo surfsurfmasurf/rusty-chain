@@ -50,7 +50,7 @@ impl State {
         let total_fees: u64 = txs.iter().map(|tx| tx.fee).sum();
 
         // 1. Check if the block has a coinbase transaction at index 0
-        if let Some(first_tx) = txs.get(0) {
+        if let Some(first_tx) = txs.first() {
             if !first_tx.is_coinbase() && height > 0 {
                 println!("Warning: Block {} has no coinbase at index 0", height);
             }

@@ -487,7 +487,7 @@ impl P2PNodeHandle {
             println!("Gossip: New Block {} from {}", blk_id, from);
 
             // 1. Initial validation against local chain (lightweight clone)
-            let mut chain_copy = {
+            let chain_copy = {
                 let state = self.state.lock().await;
                 // Basic duplicate check against local chain
                 if state.chain.block_index.contains_key(&blk_id) {
@@ -507,12 +507,18 @@ impl P2PNodeHandle {
                 let mut state = self.state.lock().await;
                 // Re-verify linkage in case tip changed during validation
                 if block.header.prev_hash != state.chain.tip_hash() {
-                    println!("Gossip block {} from {} rejected: prev_hash mismatch during lock", blk_id, from);
+                    println!(
+                        "Gossip block {} from {} rejected: prev_hash mismatch during lock",
+                        blk_id, from
+                    );
                     return Ok(());
                 }
 
                 if let Err(e) = state.chain.append_block(block.clone()) {
-                    println!("Failed to append validated block {} to chain: {}", blk_id, e);
+                    println!(
+                        "Failed to append validated block {} to chain: {}",
+                        blk_id, e
+                    );
                     return Ok(());
                 }
                 // 3. Clear mempool txs
