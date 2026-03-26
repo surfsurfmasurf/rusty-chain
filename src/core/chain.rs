@@ -313,6 +313,14 @@ impl Chain {
         }
 
         if total_size == 0.0 {
+            // If no transactions in the window, try to find the last non-coinbase fee
+            for block in self.blocks.iter().rev() {
+                for tx in &block.txs {
+                    if tx.from != "SYSTEM" && tx.size() > 0 {
+                        return tx.fee as f64 / tx.size() as f64;
+                    }
+                }
+            }
             1.0 // Default fallback
         } else {
             total_fee / total_size
