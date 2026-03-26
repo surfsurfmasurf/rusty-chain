@@ -49,7 +49,16 @@ impl State {
         let block_reward = 50;
         let total_fees: u64 = txs.iter().map(|tx| tx.fee).sum();
 
-        // 1. Verify all transactions against current state (read-only check)
+        // 1. Check if the block has a coinbase transaction at index 0
+        if let Some(first_tx) = txs.get(0) {
+            if !first_tx.is_coinbase() && height > 0 {
+                println!("Warning: Block {} has no coinbase at index 0", height);
+            }
+        } else if height > 0 {
+            println!("Warning: Block {} has no transactions", height);
+        }
+
+        // 2. Verify all transactions against current state (read-only check)
         for (i, tx) in txs.iter().enumerate() {
             if i > 0 && tx.is_coinbase() {
                 anyhow::bail!("Coinbase tx at index {} invalid (only index 0 allowed)", i);
@@ -58,7 +67,7 @@ impl State {
                 .with_context(|| format!("tx index={}", i))?;
         }
 
-        // 2. Apply transactions (mutate)
+        // 3. Apply transactions (mutate)
         for tx in txs {
             self.apply_tx(tx);
         }
@@ -133,7 +142,7 @@ impl State {
             // Deduct from sender (amount + fee)
             let sender = self.accounts.entry(tx.from.clone()).or_default();
             sender.balance = sender.balance.saturating_sub(tx.amount + tx.fee);
-            sender.nonce += 1;
+            sender.nonce = sender.nonce.saturating_add(1);
         }
 
         // Add to receiver (amount only; fees are already collected by the miner via coinbase)
