@@ -328,4 +328,12 @@ Next:
 - Mempool: Implemented index maintenance for RBF (Replace-By-Fee) and bulk transaction removal.
 - Tests: Added `test_mempool_index_consistency` to verify index integrity during removals and shifts.
 - Refactor: Replaced manual O(N) searches with O(1) hash map lookups in performance-critical paths.
-- Pushed 6 commits as part of the Day 48 maintenance and optimization session.
+
+## Day 49
+- Core: Fixed a critical index bug in `Mempool::add_tx_checked` that caused the transaction index to become stale upon replacement.
+- Core: Fixed a move-after-borrow issue in `Chain::append_block` and optimized its checkpointing logic.
+- P2P: Optimized P2P block processing by moving structural validation outside the global node state lock, reducing contention.
+- P2P: Improved robustness of block gossip by adding re-verification of chain linkage under lock to prevent race conditions.
+- Core: Enhanced fee estimation in `Chain::estimate_fee_rate` with a fallback mechanism to the most recent transaction fee if the window is empty.
+- Core: Polished `State` transition logic with saturating math for nonce increments and improved coinbase transaction logging.
+- Pushed 8 commits as part of the Day 49 maintenance and optimization session.
