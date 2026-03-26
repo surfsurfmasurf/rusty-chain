@@ -91,8 +91,10 @@ impl Mempool {
             );
 
             // Replace the existing transaction
-            self.txs[pos] = tx.clone();
-            self.tx_index.insert(tx.id(), pos);
+            self.tx_index.remove(&existing.id());
+            let id = tx.id();
+            self.txs[pos] = tx;
+            self.tx_index.insert(id, pos);
             return Ok(());
         }
 
@@ -167,6 +169,14 @@ impl Mempool {
         }
         evicted
     }
+
+    fn rebuild_index(&mut self) {
+        self.tx_index.clear();
+        for (i, tx) in self.txs.iter().enumerate() {
+            self.tx_index.insert(tx.id(), i);
+        }
+    }
+}
 
 #[cfg(test)]
 mod mempool_index_tests {

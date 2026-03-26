@@ -33,12 +33,15 @@ fn validate_rejects_broken_prev_hash_linkage() {
     let mut c = Chain::new_genesis();
     c.pow_difficulty = 3;
     let _mined = c.mine_empty_block(3).unwrap();
-    
+
     // Tamper with linkage.
     c.blocks[1].header.prev_hash = "deadbeef".to_string();
 
     let err = c.validate().unwrap_err().to_string();
-    assert!(err.contains("invalid prev_hash") || err.contains("linkage/PoW fail"), "unexpected error: {err}");
+    assert!(
+        err.contains("invalid prev_hash") || err.contains("linkage/PoW fail"),
+        "unexpected error: {err}"
+    );
 }
 
 #[test]
@@ -51,7 +54,10 @@ fn mine_produces_pow_ok_hash() {
     c.validate().unwrap();
 
     let tip = c.blocks.last().unwrap();
-    assert!(tip.header.verify_pow(difficulty as u32).is_ok(), "expected verify_pow ok");
+    assert!(
+        tip.header.verify_pow(difficulty as u32).is_ok(),
+        "expected verify_pow ok"
+    );
 }
 
 #[test]
