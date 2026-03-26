@@ -98,9 +98,7 @@ impl Chain {
         let mut c: Self = serde_json::from_str(&s)?;
 
         // Rebuild block index
-        for (i, block) in c.blocks.iter().enumerate() {
-            c.block_index.insert(block.header.hash(), i);
-        }
+        c.rebuild_block_index();
 
         Ok(c)
     }
@@ -322,6 +320,7 @@ impl Chain {
     }
 
     /// Basic chain validation (linkage + merkle placeholder).
+    /// Basic chain validation (linkage + merkle placeholder).
     pub fn validate(&self) -> anyhow::Result<()> {
         anyhow::ensure!(!self.blocks.is_empty(), "chain has no blocks");
 
@@ -363,6 +362,14 @@ impl Chain {
         }
 
         Ok(())
+    }
+
+    /// Rebuilds the block index from scratch.
+    pub fn rebuild_block_index(&mut self) {
+        self.block_index.clear();
+        for (i, block) in self.blocks.iter().enumerate() {
+            self.block_index.insert(block.header.hash(), i);
+        }
     }
 }
 

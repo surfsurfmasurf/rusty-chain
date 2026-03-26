@@ -484,31 +484,42 @@ impl P2PNodeHandle {
     ) -> anyhow::Result<()> {
         let blk_id = block.header.hash();
         if self.mark_seen(blk_id.clone()).await {
-            let state = self.state.lock().await;
-
-            // Basic duplicate check against local chain
-            if state.chain.blocks.iter().any(|b| b.header.hash() == blk_id) {
-                return Ok(());
-            }
-
             println!("Gossip: New Block {} from {}", blk_id, from);
-            // 1. Validate block
-            let mut state = self.state.lock().await;
-            if let Err(e) = state.chain.validate_block(&block) {
+
+            // 1. Initial validation against local chain (lightweight clone)
+            let mut chain_copy = {
+                let state = self.state.lock().await;
+                // Basic duplicate check against local chain
+                if state.chain.block_index.contains_key(&blk_id) {
+                    return Ok(());
+                }
+                state.chain.clone()
+            };
+
+            if let Err(e) = chain_copy.validate_block(&block) {
                 println!("Invalid block {} from {}: {}", blk_id, from, e);
-                drop(state);
                 self.update_reputation(from, -50).await;
                 return Ok(());
             }
-            // 2. Append to chain
-            if let Err(e) = state.chain.append_block(block.clone()) {
-                println!("Failed to append block {} to chain: {}", blk_id, e);
-                return Ok(());
+
+            // 2. Final append under lock
+            {
+                let mut state = self.state.lock().await;
+                // Re-verify linkage in case tip changed during validation
+                if block.header.prev_hash != state.chain.tip_hash() {
+                    println!("Gossip block {} from {} rejected: prev_hash mismatch during lock", blk_id, from);
+                    return Ok(());
+                }
+
+                if let Err(e) = state.chain.append_block(block.clone()) {
+                    println!("Failed to append validated block {} to chain: {}", blk_id, e);
+                    return Ok(());
+                }
+                // 3. Clear mempool txs
+                state.mempool.remove_included(&block.txs);
             }
-            // 3. Clear mempool txs
-            state.mempool.remove_included(&block.txs);
+
             // 4. Update reputation
-            drop(state);
             self.update_reputation(from, 10).await;
             // 5. Re-gossip
             self.broadcast_except(Message::NewBlock(block), from)
