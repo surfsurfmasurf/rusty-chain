@@ -573,6 +573,9 @@ impl P2PNodeHandle {
                     return Ok(());
                 }
 
+                // Request mempool transactions upon connection
+                self.send_to(from, Message::GetMempoolTxs).await?;
+
                 // Sync logic: if they are ahead, request headers
                 let our_height = {
                     let state = self.state.lock().await;
@@ -880,6 +883,21 @@ impl P2PNodeHandle {
                                 .await;
                         }
                     }
+                }
+            }
+            Message::GetMempoolTxs => {
+                let txs = {
+                    let state = self.state.lock().await;
+                    state.mempool.txs.clone()
+                };
+                self.send_to(from, Message::MempoolTxs(txs)).await?;
+            }
+            Message::MempoolTxs(txs) => {
+                println!("Received {} transactions from {} mempool", txs.len(), from);
+                for tx in txs {
+                    // Re-use NewTransaction logic for processing individual txs
+                    self.process_message(Message::NewTransaction(tx), from)
+                        .await?;
                 }
             }
             _ => {
