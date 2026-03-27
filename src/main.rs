@@ -218,6 +218,13 @@ enum Commands {
         node: String,
     },
 
+    /// List all transactions currently in a node's mempool
+    Mempool {
+        /// Node address to query (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        node: String,
+    },
+
     /// Remove a peer from the whitelist
     Unwhitelist {
         /// Node address to send command to (e.g. 127.0.0.1:9000)
@@ -645,6 +652,34 @@ async fn main() -> anyhow::Result<()> {
                 }
                 if addrs.is_empty() {
                     println!("  (none)");
+                }
+            } else {
+                println!("Unexpected response: {:?}", response);
+            }
+        }
+        Commands::Mempool { node } => {
+            use rusty_chain::core::network::Message;
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+
+            let target: SocketAddr = node.parse().context("Invalid node address")?;
+            let mut stream = TcpStream::connect(target).await?;
+
+            Message::GetMempoolTxs.send_async(&mut stream).await?;
+            let response = Message::decode_async(&mut stream).await?;
+
+            if let Message::MempoolTxs(txs) = response {
+                println!("Transactions in mempool of {}:", target);
+                for (i, tx) in txs.iter().enumerate() {
+                    let h = tx.id();
+                    let short = h.get(..8).unwrap_or(&h);
+                    println!(
+                        "  {i}: {short} {} -> {} amount={} fee={} nonce={} sequence={}",
+                        tx.from, tx.to, tx.amount, tx.fee, tx.nonce, tx.sequence
+                    );
+                }
+                if txs.is_empty() {
+                    println!("  (empty)");
                 }
             } else {
                 println!("Unexpected response: {:?}", response);
