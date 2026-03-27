@@ -900,6 +900,10 @@ impl P2PNodeHandle {
                         .await?;
                 }
             }
+            Message::BroadcastTransaction(tx) => {
+                println!("Received request to broadcast transaction {} from {}", tx.id(), from);
+                self.process_message(Message::NewTransaction(tx), from).await?;
+            }
             _ => {
                 println!("Received unhandled message from {}: {:?}", from, msg);
             }

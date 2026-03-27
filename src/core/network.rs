@@ -91,6 +91,8 @@ pub enum Message {
     GetMempoolTxs,
     /// Mempool content response
     MempoolTxs(Vec<Transaction>),
+    /// Request to broadcast a transaction to the network
+    BroadcastTransaction(Transaction),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -212,6 +214,7 @@ impl Message {
             Message::Checkpoints(_) => "Checkpoints",
             Message::GetMempoolTxs => "GetMempoolTxs",
             Message::MempoolTxs(_) => "MempoolTxs",
+            Message::BroadcastTransaction(_) => "BroadcastTransaction",
         }
     }
 
