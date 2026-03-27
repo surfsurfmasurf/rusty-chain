@@ -449,11 +449,7 @@ impl P2PNodeHandle {
         Ok(())
     }
 
-    pub async fn get_headers(
-        &self,
-        start_height: u64,
-        limit: u32,
-    ) -> Vec<BlockHeader> {
+    pub async fn get_headers(&self, start_height: u64, limit: u32) -> Vec<BlockHeader> {
         let state = self.state.lock().await;
         state
             .chain
@@ -478,11 +474,7 @@ impl P2PNodeHandle {
         results
     }
 
-    async fn process_new_block(
-        &self,
-        block: Block,
-        from: SocketAddr,
-    ) -> anyhow::Result<()> {
+    async fn process_new_block(&self, block: Block, from: SocketAddr) -> anyhow::Result<()> {
         let blk_id = block.header.hash();
         if self.mark_seen(blk_id.clone()).await {
             println!("Gossip: New Block {} from {}", blk_id, from);
@@ -909,7 +901,11 @@ impl P2PNodeHandle {
                 }
             }
             Message::BroadcastTransaction(tx) => {
-                println!("Received request to broadcast transaction {} from {}", tx.id(), from);
+                println!(
+                    "Received request to broadcast transaction {} from {}",
+                    tx.id(),
+                    from
+                );
                 self.process_new_transaction(tx, from).await?;
             }
             _ => {

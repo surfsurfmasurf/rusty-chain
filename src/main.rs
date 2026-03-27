@@ -413,6 +413,7 @@ async fn main() -> anyhow::Result<()> {
             mempool,
             memo,
             timestamp,
+            broadcast_to,
         } => {
             let chain_path = chain_path(chain);
             let chain = load_or_genesis(&chain_path)?;
@@ -459,7 +460,7 @@ async fn main() -> anyhow::Result<()> {
             }
 
             let h = tx.id();
-            mp.add_tx_checked(tx, base_nonce)?;
+            mp.add_tx_checked(tx.clone(), base_nonce)?;
             mp.save(&mp_path)?;
             println!("Added tx to mempool: {}", mp_path.display());
             println!("tx_hash={}", h);
@@ -473,10 +474,13 @@ async fn main() -> anyhow::Result<()> {
                 use std::net::SocketAddr;
                 use tokio::net::TcpStream;
 
-                let target: SocketAddr = target_addr.parse().context("Invalid broadcast address")?;
+                let target: SocketAddr =
+                    target_addr.parse().context("Invalid broadcast address")?;
                 println!("Broadcasting transaction to {}...", target);
                 let mut stream = TcpStream::connect(target).await?;
-                Message::BroadcastTransaction(tx).send_async(&mut stream).await?;
+                Message::BroadcastTransaction(tx)
+                    .send_async(&mut stream)
+                    .await?;
                 println!("Broadcast successful.");
             }
         }
