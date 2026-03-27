@@ -87,6 +87,10 @@ pub enum Message {
     GetCheckpoints,
     /// List of checkpoints (height -> hash)
     Checkpoints(std::collections::HashMap<usize, String>),
+    /// Request the mempool content from a peer
+    GetMempoolTxs,
+    /// Mempool content response
+    MempoolTxs(Vec<Transaction>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -206,6 +210,8 @@ impl Message {
             Message::FeeEstimate { .. } => "FeeEstimate",
             Message::GetCheckpoints => "GetCheckpoints",
             Message::Checkpoints(_) => "Checkpoints",
+            Message::GetMempoolTxs => "GetMempoolTxs",
+            Message::MempoolTxs(_) => "MempoolTxs",
         }
     }
 
