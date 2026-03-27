@@ -384,6 +384,29 @@ mod tests {
         assert_eq!(msg, decoded);
     }
 
+    #[tokio::test]
+    async fn test_message_mempool_txs_roundtrip() {
+        let tx = Transaction::new("a", "b", 10, 0);
+        let msg = Message::MempoolTxs(vec![tx]);
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+
+        let msg2 = Message::GetMempoolTxs;
+        let encoded2 = msg2.encode().unwrap();
+        let decoded2 = Message::decode(Cursor::new(encoded2)).unwrap();
+        assert_eq!(msg2, decoded2);
+    }
+
+    #[test]
+    fn test_message_broadcast_tx_roundtrip() {
+        let tx = Transaction::new("a", "b", 10, 0);
+        let msg = Message::BroadcastTransaction(tx);
+        let encoded = msg.encode().unwrap();
+        let decoded = Message::decode(Cursor::new(encoded)).unwrap();
+        assert_eq!(msg, decoded);
+    }
+
     #[test]
     fn test_memo_limit_128() {
         let mut tx = Transaction::new("A", "B", 100, 0);

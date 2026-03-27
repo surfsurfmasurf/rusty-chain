@@ -1,6 +1,7 @@
 use crate::core::chain::Chain;
 use crate::core::mempool::Mempool;
 use crate::core::network::{Message, PeerInfo};
+use crate::core::types::{Block, BlockHeader, Transaction};
 use anyhow::Context;
 use std::collections::{HashMap, HashSet};
 use std::net::SocketAddr;
@@ -452,7 +453,7 @@ impl P2PNodeHandle {
         &self,
         start_height: u64,
         limit: u32,
-    ) -> Vec<crate::core::types::BlockHeader> {
+    ) -> Vec<BlockHeader> {
         let state = self.state.lock().await;
         state
             .chain
@@ -464,7 +465,7 @@ impl P2PNodeHandle {
             .collect()
     }
 
-    pub async fn get_blocks_by_hash(&self, hashes: Vec<String>) -> Vec<crate::core::types::Block> {
+    pub async fn get_blocks_by_hash(&self, hashes: Vec<String>) -> Vec<Block> {
         let state = self.state.lock().await;
         let mut results = Vec::new();
         for hash in hashes {
@@ -479,7 +480,7 @@ impl P2PNodeHandle {
 
     async fn process_new_block(
         &self,
-        block: crate::core::types::Block,
+        block: Block,
         from: SocketAddr,
     ) -> anyhow::Result<()> {
         let blk_id = block.header.hash();
@@ -529,6 +530,53 @@ impl P2PNodeHandle {
             self.update_reputation(from, 10).await;
             // 5. Re-gossip
             self.broadcast_except(Message::NewBlock(block), from)
+                .await?;
+        }
+        Ok(())
+    }
+
+    async fn process_new_transaction(
+        &self,
+        tx: Transaction,
+        from: SocketAddr,
+    ) -> anyhow::Result<()> {
+        let tx_id = tx.id();
+        let gossip_id = format!("{}_{}", tx_id, tx.fee);
+        if self.mark_seen(gossip_id).await {
+            println!(
+                "Gossip: New Transaction {} (fee={}) from {}",
+                tx_id, tx.fee, from
+            );
+            // 1. Validate tx
+            let mut state = self.state.lock().await;
+            if let Err(e) = state.chain.validate_transaction(&tx) {
+                println!("Invalid transaction {} from {}: {}", tx_id, from, e);
+                drop(state);
+                self.update_reputation(from, -10).await;
+                return Ok(());
+            }
+            // 2. Add to mempool
+            let base_nonce = state.chain.next_nonce_for(&tx.from);
+            if let Err(e) = state.mempool.add_tx_checked(tx.clone(), base_nonce) {
+                println!("Failed to add tx {} from {} to mempool: {}", tx_id, from, e);
+                // Send rejection message for invalid RBF attempt or nonce gap
+                let _ = self
+                    .send_to(
+                        from,
+                        Message::Reject {
+                            code: 1,
+                            reason: e.to_string(),
+                            message_type: "NewTransaction".to_string(),
+                        },
+                    )
+                    .await;
+                return Ok(());
+            }
+            drop(state);
+            self.update_reputation(from, 1).await;
+
+            // 3. Re-gossip
+            self.broadcast_except(Message::NewTransaction(tx), from)
                 .await?;
         }
         Ok(())
@@ -594,45 +642,7 @@ impl P2PNodeHandle {
                 self.send_to(from, Message::GetAddr).await?;
             }
             Message::NewTransaction(tx) => {
-                let tx_id = tx.id();
-                let gossip_id = format!("{}_{}", tx_id, tx.fee);
-                if self.mark_seen(gossip_id).await {
-                    println!(
-                        "Gossip: New Transaction {} (fee={}) from {}",
-                        tx_id, tx.fee, from
-                    );
-                    // 1. Validate tx
-                    let mut state = self.state.lock().await;
-                    if let Err(e) = state.chain.validate_transaction(&tx) {
-                        println!("Invalid transaction {} from {}: {}", tx_id, from, e);
-                        drop(state);
-                        self.update_reputation(from, -10).await;
-                        return Ok(());
-                    }
-                    // 2. Add to mempool
-                    let base_nonce = state.chain.next_nonce_for(&tx.from);
-                    if let Err(e) = state.mempool.add_tx_checked(tx.clone(), base_nonce) {
-                        println!("Failed to add tx {} from {} to mempool: {}", tx_id, from, e);
-                        // Send rejection message for invalid RBF attempt or nonce gap
-                        let _ = self
-                            .send_to(
-                                from,
-                                Message::Reject {
-                                    code: 1,
-                                    reason: e.to_string(),
-                                    message_type: "NewTransaction".to_string(),
-                                },
-                            )
-                            .await;
-                        return Ok(());
-                    }
-                    drop(state);
-                    self.update_reputation(from, 1).await;
-
-                    // 3. Re-gossip
-                    self.broadcast_except(Message::NewTransaction(tx), from)
-                        .await?;
-                }
+                self.process_new_transaction(tx, from).await?;
             }
             Message::NewBlock(block) => {
                 self.process_new_block(block, from).await?;
@@ -895,14 +905,12 @@ impl P2PNodeHandle {
             Message::MempoolTxs(txs) => {
                 println!("Received {} transactions from {} mempool", txs.len(), from);
                 for tx in txs {
-                    // Re-use NewTransaction logic for processing individual txs
-                    self.process_message(Message::NewTransaction(tx), from)
-                        .await?;
+                    self.process_new_transaction(tx, from).await?;
                 }
             }
             Message::BroadcastTransaction(tx) => {
                 println!("Received request to broadcast transaction {} from {}", tx.id(), from);
-                self.process_message(Message::NewTransaction(tx), from).await?;
+                self.process_new_transaction(tx, from).await?;
             }
             _ => {
                 println!("Received unhandled message from {}: {:?}", from, msg);
