@@ -321,6 +321,16 @@ Next:
 - Polish: Improved handshake-triggered synchronization using checkpoints.
 - Pushed 8 commits as part of the Day 46 maintenance and enhancement session.
 
+## Day 50
+- P2P: Added `GetMempoolTxs`, `MempoolTxs`, and `BroadcastTransaction` to the network protocol.
+- P2P: Implemented mempool synchronization upon connection.
+- CLI: Added `mempool` command to query transactions from remote nodes.
+- CLI: Added `--broadcast-to` flag to `tx-add` for immediate transaction dissemination.
+- Refactor: Moved transaction and block processing into dedicated methods to resolve async recursion.
+- Core: Standardized imports and fixed type resolution in P2P module.
+- Tests: Added unit tests for new P2P messages and transaction broadcasting.
+- Pushed 8 commits for Day 50 (30-day challenge continue).
+
 ## Day 48
 - Core: Added `block_index` to `Chain` for O(1) block retrieval by hash.
 - Core: Added `tx_index` to `Mempool` for O(1) transaction duplicate checks and lookups.
