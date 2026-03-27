@@ -121,6 +121,10 @@ enum Commands {
         /// Optional timestamp (ms). If omitted, current time is used.
         #[arg(long)]
         timestamp: Option<u64>,
+
+        /// Optional node address to broadcast the transaction to (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        broadcast_to: Option<String>,
     },
 
     /// List mempool transactions
@@ -463,6 +467,18 @@ async fn main() -> anyhow::Result<()> {
             println!("nonce={}", filled_nonce);
             println!("base_nonce(chain)={}", base_nonce);
             println!("mempool size={}", mp.txs.len());
+
+            if let Some(target_addr) = broadcast_to {
+                use rusty_chain::core::network::Message;
+                use std::net::SocketAddr;
+                use tokio::net::TcpStream;
+
+                let target: SocketAddr = target_addr.parse().context("Invalid broadcast address")?;
+                println!("Broadcasting transaction to {}...", target);
+                let mut stream = TcpStream::connect(target).await?;
+                Message::BroadcastTransaction(tx).send_async(&mut stream).await?;
+                println!("Broadcast successful.");
+            }
         }
         Commands::TxList { mempool } => {
             let mp_path = mempool_path(mempool);
