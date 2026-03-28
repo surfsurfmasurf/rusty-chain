@@ -135,6 +135,16 @@ impl Mempool {
         out
     }
 
+    /// Returns a transaction by its ID if it exists in the mempool.
+    pub fn get_tx_by_id(&self, tx_id: &str) -> Option<&Transaction> {
+        self.tx_index.get(tx_id).and_then(|&idx| self.txs.get(idx))
+    }
+
+    /// Returns true if the mempool contains a transaction with the given ID.
+    pub fn contains_tx(&self, tx_id: &str) -> bool {
+        self.tx_index.contains_key(tx_id)
+    }
+
     /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
         if let Some(pos) = self.tx_index.remove(tx_id) {
