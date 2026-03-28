@@ -400,6 +400,15 @@ impl P2PNodeHandle {
         state.banned_peers.clone()
     }
 
+    pub async fn get_mempool_info(&self) -> (usize, usize, u64, u64) {
+        let state = self.state.lock().await;
+        let count = state.mempool.txs.len();
+        let total_size = state.mempool.txs.iter().map(|tx| tx.size()).sum();
+        let min_fee = state.mempool.txs.iter().map(|tx| tx.fee).min().unwrap_or(0);
+        let max_fee = state.mempool.txs.iter().map(|tx| tx.fee).max().unwrap_or(0);
+        (count, total_size, min_fee, max_fee)
+    }
+
     pub async fn merge_reputation(&self, incoming: Vec<(SocketAddr, i32)>) {
         let mut state = self.state.lock().await;
         for (addr, incoming_score) in incoming {
