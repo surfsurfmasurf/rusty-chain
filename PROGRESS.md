@@ -347,3 +347,13 @@ Next:
 - Core: Enhanced fee estimation in `Chain::estimate_fee_rate` with a fallback mechanism to the most recent transaction fee if the window is empty.
 - Core: Polished `State` transition logic with saturating math for nonce increments and improved coinbase transaction logging.
 - Pushed 8 commits as part of the Day 49 maintenance and optimization session.
+
+## Day 50 (Today)
+- Mempool: Implemented `get_tx_by_id` and `contains_tx` for O(1) transaction lookups via index.
+- P2P: Optimized `process_message` to skip duplicate transactions and blocks early using O(1) index checks.
+- P2P: Added `P2PNode::get_mempool_info` to return high-level mempool statistics (count, total size, min/max fee).
+- CLI: Added `mempool-info` command to query node mempool statistics remotely.
+- Core: Added `Block::is_valid_pow` helper for independent Proof-of-Work verification.
+- Refactor: Moved P2P message serialization checks to a dedicated `network_tests` module.
+- Tests: Added `tests/mempool_tests.rs` for verifying index-based lookups and stats.
+- Pushed 8 commits as part of the Day 50 work session.
