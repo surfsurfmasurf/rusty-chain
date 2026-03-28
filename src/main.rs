@@ -250,6 +250,13 @@ enum Commands {
         #[arg(long, default_value_t = 250)]
         size: u32,
     },
+
+    /// Request mempool statistics from a node
+    MempoolInfo {
+        /// Node address to query (e.g. 127.0.0.1:9000)
+        #[arg(long)]
+        node: String,
+    },
 }
 
 fn chain_path(path: Option<String>) -> std::path::PathBuf {
@@ -746,6 +753,33 @@ async fn main() -> anyhow::Result<()> {
                 println!("  tx_size: {} bytes", size);
                 println!("  fee_per_byte: {} units", fee_per_byte);
                 println!("  estimated_total: {} units", estimated_total);
+            } else {
+                println!("Unexpected response: {:?}", response);
+            }
+        }
+        Commands::MempoolInfo { node } => {
+            use rusty_chain::core::network::Message;
+            use std::net::SocketAddr;
+            use tokio::net::TcpStream;
+
+            let target: SocketAddr = node.parse().context("Invalid node address")?;
+            let mut stream = TcpStream::connect(target).await?;
+
+            Message::GetMempoolInfo.send_async(&mut stream).await?;
+            let response = Message::decode_async(&mut stream).await?;
+
+            if let Message::MempoolInfo {
+                count,
+                total_size,
+                min_fee,
+                max_fee,
+            } = response
+            {
+                println!("Mempool info from {}:", target);
+                println!("  tx_count: {}", count);
+                println!("  total_size: {} bytes", total_size);
+                println!("  min_fee: {}", min_fee);
+                println!("  max_fee: {}", max_fee);
             } else {
                 println!("Unexpected response: {:?}", response);
             }
