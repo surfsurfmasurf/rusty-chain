@@ -244,6 +244,11 @@ impl Block {
         serde_json::to_vec(self).unwrap_or_default().len()
     }
 
+    /// Returns true if the block's header satisfies the given PoW difficulty.
+    pub fn is_valid_pow(&self, difficulty: u32) -> bool {
+        self.header.verify_pow(difficulty).is_ok()
+    }
+
     /// Basic block validation against a previous header.
     pub fn validate_with_prev(
         &self,
