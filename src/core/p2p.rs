@@ -917,6 +917,30 @@ impl P2PNodeHandle {
                 );
                 self.process_new_transaction(tx, from).await?;
             }
+            Message::GetMempoolInfo => {
+                let (count, total_size, min_fee, max_fee) = self.get_mempool_info().await;
+                self.send_to(
+                    from,
+                    Message::MempoolInfo {
+                        count,
+                        total_size,
+                        min_fee,
+                        max_fee,
+                    },
+                )
+                .await?;
+            }
+            Message::MempoolInfo {
+                count,
+                total_size,
+                min_fee,
+                max_fee,
+            } => {
+                println!(
+                    "Received mempool info from {}: count={}, size={} bytes, fees={}-{}",
+                    from, count, total_size, min_fee, max_fee
+                );
+            }
             _ => {
                 println!("Received unhandled message from {}: {:?}", from, msg);
             }

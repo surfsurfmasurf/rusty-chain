@@ -93,6 +93,15 @@ pub enum Message {
     MempoolTxs(Vec<Transaction>),
     /// Request to broadcast a transaction to the network
     BroadcastTransaction(Transaction),
+    /// Request high-level mempool statistics
+    GetMempoolInfo,
+    /// Mempool statistics response
+    MempoolInfo {
+        count: usize,
+        total_size: usize,
+        min_fee: u64,
+        max_fee: u64,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -215,6 +224,8 @@ impl Message {
             Message::GetMempoolTxs => "GetMempoolTxs",
             Message::MempoolTxs(_) => "MempoolTxs",
             Message::BroadcastTransaction(_) => "BroadcastTransaction",
+            Message::GetMempoolInfo => "GetMempoolInfo",
+            Message::MempoolInfo { .. } => "MempoolInfo",
         }
     }
 
