@@ -409,6 +409,11 @@ impl P2PNodeHandle {
         (count, total_size, min_fee, max_fee)
     }
 
+    pub async fn get_reputation_snapshot(&self) -> HashMap<SocketAddr, i32> {
+        let state = self.state.lock().await;
+        state.peer_reputation.clone()
+    }
+
     pub async fn merge_reputation(&self, incoming: Vec<(SocketAddr, i32)>) {
         let mut state = self.state.lock().await;
         for (addr, incoming_score) in incoming {
@@ -474,10 +479,9 @@ impl P2PNodeHandle {
         let state = self.state.lock().await;
         let mut results = Vec::new();
         for hash in hashes {
-            if let Some(&height) = state.chain.block_index.get(&hash) {
-                if let Some(block) = state.chain.blocks.get(height) {
-                    results.push(block.clone());
-                }
+            if let Some(&height) = state.chain.block_index.get(&hash)
+                && let Some(block) = state.chain.blocks.get(height) {
+                results.push(block.clone());
             }
         }
         results
@@ -820,14 +824,7 @@ impl P2PNodeHandle {
                 }
             }
             Message::GetReputation => {
-                let scores = {
-                    let state = self.state.lock().await;
-                    state
-                        .peer_reputation
-                        .iter()
-                        .map(|(&addr, &score)| (addr, score))
-                        .collect()
-                };
+                let scores = self.get_reputation_snapshot().await.into_iter().collect();
                 self.send_to(from, Message::Reputation(scores)).await?;
             }
             Message::Reputation(scores) => {
@@ -852,33 +849,24 @@ impl P2PNodeHandle {
                     let state = self.state.lock().await;
                     let our_height = state.chain.height();
 
-                    // Find the highest common checkpoint
-                    let mut highest_checkpoint: Option<(usize, String)> = None;
-                    for (height, hash) in checkpoints {
-                        if height <= our_height {
-                            if let Some(our_hash) = state.chain.get_checkpoint_at(height) {
-                                if our_hash == hash {
-                                    if highest_checkpoint
-                                        .as_ref()
-                                        .map_or(true, |(h, _)| height > *h)
-                                    {
-                                        highest_checkpoint = Some((height, hash));
-                                    }
-                                }
-                            }
-                        } else {
-                            // Peer is ahead, we can use their checkpoints for future validation
-                            if highest_checkpoint
-                                .as_ref()
-                                .map_or(true, |(h, _)| height > *h)
-                            {
+                // Find the highest common checkpoint
+                let mut highest_checkpoint: Option<(usize, String)> = None;
+                for (height, hash) in checkpoints {
+                    if height <= our_height {
+                        if let Some(our_hash) = state.chain.get_checkpoint_at(height)
+                            && our_hash == hash && highest_checkpoint.as_ref().is_none_or(|(h, _)| height > *h) {
                                 highest_checkpoint = Some((height, hash));
-                            }
+                        }
+                    } else {
+                        // Peer is ahead, we can use their checkpoints for future validation
+                        if highest_checkpoint.as_ref().is_none_or(|(h, _)| height > *h) {
+                            highest_checkpoint = Some((height, hash));
                         }
                     }
+                }
 
-                    if let Some((h, _)) = highest_checkpoint {
-                        if h as u64 > our_height as u64 {
+                if let Some((h, _)) = highest_checkpoint {
+                    if h as u64 > our_height as u64 {
                             println!(
                                 "Peer {} has a newer checkpoint at {}, requesting headers...",
                                 from, h
