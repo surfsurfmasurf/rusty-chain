@@ -190,6 +190,7 @@ impl Transaction {
         serde_json::to_vec(self).unwrap_or_default().len()
     }
 
+    /// Check if the transaction is a coinbase (reward) transaction.
     pub fn is_coinbase(&self) -> bool {
         self.from == "SYSTEM"
     }
