@@ -357,3 +357,13 @@ Next:
 - Refactor: Moved P2P message serialization checks to a dedicated `network_tests` module.
 - Tests: Added `tests/mempool_tests.rs` for verifying index-based lookups and stats.
 - Pushed 8 commits as part of the Day 50 work session.
+
+## Day 51 (Today)
+- Core: Added `locktime` support to `Transaction` and `TxSignPayload`.
+- State: Implemented locktime enforcement during block and transaction validation.
+- CLI: Added `--locktime` flag to `tx-add` and displayed locktime in `tx-list`.
+- Tests: Added comprehensive integration test for transaction locktime (`tests/locktime_tests.rs`).
+- Core: Added `Transaction::new_with_locktime` helper.
+- Core: Updated coinbase transaction construction to include the `locktime` field.
+- Refactor: Improved documentation for `is_coinbase` in `types.rs`.
+- Pushed 8 commits as part of the Day 51 work session.
