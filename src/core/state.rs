@@ -134,6 +134,17 @@ impl State {
             );
         }
 
+        // Locktime check
+        if let Some(lock) = tx.locktime {
+            if (height as u64) < lock {
+                anyhow::bail!(
+                    "Transaction locked until height {}: current height {}",
+                    lock,
+                    height
+                );
+            }
+        }
+
         Ok(())
     }
 

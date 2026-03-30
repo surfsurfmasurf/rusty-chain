@@ -145,6 +145,7 @@ impl Chain {
                 memo: Some(format!("Block {block_height} Reward")),
                 sequence: 0,
                 timestamp_ms: now_ms(),
+                locktime: None,
             };
             txs.insert(0, coinbase);
         }
