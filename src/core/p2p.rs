@@ -480,7 +480,8 @@ impl P2PNodeHandle {
         let mut results = Vec::new();
         for hash in hashes {
             if let Some(&height) = state.chain.block_index.get(&hash)
-                && let Some(block) = state.chain.blocks.get(height) {
+                && let Some(block) = state.chain.blocks.get(height)
+            {
                 results.push(block.clone());
             }
         }
@@ -849,24 +850,26 @@ impl P2PNodeHandle {
                     let state = self.state.lock().await;
                     let our_height = state.chain.height();
 
-                // Find the highest common checkpoint
-                let mut highest_checkpoint: Option<(usize, String)> = None;
-                for (height, hash) in checkpoints {
-                    if height <= our_height {
-                        if let Some(our_hash) = state.chain.get_checkpoint_at(height)
-                            && our_hash == hash && highest_checkpoint.as_ref().is_none_or(|(h, _)| height > *h) {
+                    // Find the highest common checkpoint
+                    let mut highest_checkpoint: Option<(usize, String)> = None;
+                    for (height, hash) in checkpoints {
+                        if height <= our_height {
+                            if let Some(our_hash) = state.chain.get_checkpoint_at(height)
+                                && our_hash == hash
+                                && highest_checkpoint.as_ref().is_none_or(|(h, _)| height > *h)
+                            {
                                 highest_checkpoint = Some((height, hash));
-                        }
-                    } else {
-                        // Peer is ahead, we can use their checkpoints for future validation
-                        if highest_checkpoint.as_ref().is_none_or(|(h, _)| height > *h) {
-                            highest_checkpoint = Some((height, hash));
+                            }
+                        } else {
+                            // Peer is ahead, we can use their checkpoints for future validation
+                            if highest_checkpoint.as_ref().is_none_or(|(h, _)| height > *h) {
+                                highest_checkpoint = Some((height, hash));
+                            }
                         }
                     }
-                }
 
-                if let Some((h, _)) = highest_checkpoint {
-                    if h as u64 > our_height as u64 {
+                    if let Some((h, _)) = highest_checkpoint {
+                        if h as u64 > our_height as u64 {
                             println!(
                                 "Peer {} has a newer checkpoint at {}, requesting headers...",
                                 from, h
