@@ -122,6 +122,10 @@ enum Commands {
         #[arg(long)]
         timestamp: Option<u64>,
 
+        /// Optional locktime (block height). If set, tx is invalid until chain reaches this height.
+        #[arg(long)]
+        locktime: Option<u64>,
+
         /// Optional node address to broadcast the transaction to (e.g. 127.0.0.1:9000)
         #[arg(long)]
         broadcast_to: Option<String>,
@@ -420,6 +424,7 @@ async fn main() -> anyhow::Result<()> {
             mempool,
             memo,
             timestamp,
+            locktime,
             broadcast_to,
         } => {
             let chain_path = chain_path(chain);
@@ -455,6 +460,7 @@ async fn main() -> anyhow::Result<()> {
             tx.fee = fee;
             tx.sequence = sequence;
             tx.memo = memo;
+            tx.locktime = locktime;
             if let Some(ts) = timestamp {
                 tx.timestamp_ms = ts;
             }
@@ -508,8 +514,9 @@ async fn main() -> anyhow::Result<()> {
                 } else {
                     "unsigned"
                 };
+                let lock = tx.locktime.map_or("".to_string(), |l| format!(" lock={l}"));
                 println!(
-                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed})",
+                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed}){lock}",
                     tx.from, tx.to, tx.amount, tx.fee, tx.nonce, tx.sequence, tx.timestamp_ms
                 );
             }
