@@ -54,6 +54,10 @@ pub struct Transaction {
     /// Optional timestamp for when the transaction was created (Unix epoch ms)
     #[serde(default)]
     pub timestamp_ms: u64,
+
+    /// Optional locktime (block height). If set, the transaction is invalid until the chain reaches this height.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub locktime: Option<u64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -69,6 +73,8 @@ pub struct TxSignPayload {
     pub sequence: u32,
     #[serde(default)]
     pub timestamp_ms: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub locktime: Option<u64>,
 }
 
 impl Transaction {
@@ -84,6 +90,7 @@ impl Transaction {
             memo: None,
             sequence: 0,
             timestamp_ms: crate::core::time::now_ms(),
+            locktime: None,
         }
     }
 
@@ -105,6 +112,29 @@ impl Transaction {
             memo: None,
             sequence,
             timestamp_ms: crate::core::time::now_ms(),
+            locktime: None,
+        }
+    }
+
+    pub fn new_with_locktime(
+        from: impl Into<String>,
+        to: impl Into<String>,
+        amount: u64,
+        nonce: u64,
+        locktime: u64,
+    ) -> Self {
+        Self {
+            from: from.into(),
+            to: to.into(),
+            amount,
+            fee: 0,
+            nonce,
+            pubkey_hex: None,
+            signature_b64: None,
+            memo: None,
+            sequence: 0,
+            timestamp_ms: crate::core::time::now_ms(),
+            locktime: Some(locktime),
         }
     }
 
@@ -127,6 +157,7 @@ impl Transaction {
             memo: None,
             sequence,
             timestamp_ms: crate::core::time::now_ms(),
+            locktime: None,
         }
     }
 
@@ -140,6 +171,7 @@ impl Transaction {
             memo: self.memo.clone(),
             sequence: self.sequence,
             timestamp_ms: self.timestamp_ms,
+            locktime: self.locktime,
         }
     }
 
