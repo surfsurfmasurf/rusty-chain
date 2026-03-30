@@ -24,6 +24,7 @@ fn chain_next_nonce_for_is_max_plus_one() {
         memo: None,
         sequence: 0,
         timestamp_ms: 0,
+        locktime: None,
     };
     c.mine_block(vec![cb], 0, None).unwrap();
 
