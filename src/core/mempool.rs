@@ -154,6 +154,12 @@ impl Mempool {
         }
     }
 
+    /// Sorts transactions in the mempool by fee (descending).
+    pub fn sort_by_fee(&mut self) {
+        self.txs.sort_by(|a, b| b.fee.cmp(&a.fee));
+        self.rebuild_index();
+    }
+
     /// Removes all transactions from the mempool that are included in the given slice.
     pub fn remove_included(&mut self, txs: &[Transaction]) {
         let ids: HashSet<String> = txs.iter().map(|t| t.id()).collect();
