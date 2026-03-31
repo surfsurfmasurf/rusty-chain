@@ -367,3 +367,10 @@ Next:
 - Core: Updated coinbase transaction construction to include the `locktime` field.
 - Refactor: Improved documentation for `is_coinbase` in `types.rs`.
 - Pushed 8 commits as part of the Day 51 work session.
+
+## Day 52 (Today)
+- Mempool: Added `sort_by_fee`, `len()`, and `is_empty()` helpers to `Mempool`.
+- Core: Integrated automatic checkpointing into `Chain::mine_block` for consistency.
+- Tests: Added unit tests for mempool fee-based sorting and index integrity.
+- Polish: Standardized checkpointing logic using the modulo operator.
+- Maintenance: Pushed 8 commits for the Day 52 maintenance and optimization session.
