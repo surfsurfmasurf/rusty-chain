@@ -150,6 +150,11 @@ impl Mempool {
         self.txs.len()
     }
 
+    /// Returns true if the mempool is empty.
+    pub fn is_empty(&self) -> bool {
+        self.txs.is_empty()
+    }
+
     /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
         if let Some(pos) = self.tx_index.remove(tx_id) {
