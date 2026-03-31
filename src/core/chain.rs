@@ -181,6 +181,12 @@ impl Chain {
                 let height = self.blocks.len();
                 self.blocks.push(candidate.clone());
                 self.block_index.insert(hash, height);
+
+                // Auto-checkpoint every 10 blocks
+                if height > 0 && height % 10 == 0 {
+                    self.checkpoints.insert(height, candidate.header.hash());
+                }
+
                 return Ok(candidate);
             }
             nonce = nonce.wrapping_add(1);
