@@ -228,4 +228,25 @@ mod mempool_index_tests {
         assert_eq!(mempool.tx_index.len(), 1);
         assert_eq!(mempool.tx_index.get(&id2), Some(&0)); // Shifted
     }
+
+    #[test]
+    fn test_mempool_sort_by_fee() {
+        let mut mempool = Mempool::new();
+        let mut tx_low = Transaction::new("A", "B", 10, 0);
+        tx_low.fee = 1;
+        let mut tx_high = Transaction::new("A", "C", 20, 1);
+        tx_high.fee = 10;
+
+        let id_high = tx_high.id();
+
+        mempool.add_tx(tx_low).unwrap();
+        mempool.add_tx(tx_high).unwrap();
+
+        assert_eq!(mempool.txs[0].fee, 1);
+
+        mempool.sort_by_fee();
+
+        assert_eq!(mempool.txs[0].fee, 10);
+        assert_eq!(mempool.tx_index.get(&id_high), Some(&0));
+    }
 }
