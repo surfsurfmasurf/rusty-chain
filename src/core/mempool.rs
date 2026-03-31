@@ -145,6 +145,11 @@ impl Mempool {
         self.tx_index.contains_key(tx_id)
     }
 
+    /// Returns the number of transactions in the mempool.
+    pub fn len(&self) -> usize {
+        self.txs.len()
+    }
+
     /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
         if let Some(pos) = self.tx_index.remove(tx_id) {
