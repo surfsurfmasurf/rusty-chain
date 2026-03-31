@@ -155,6 +155,15 @@ impl Mempool {
         self.txs.is_empty()
     }
 
+    /// Truncates the mempool to a maximum size, removing lowest fee transactions.
+    pub fn truncate(&mut self, max_size: usize) {
+        if self.txs.len() > max_size {
+            self.sort_by_fee();
+            self.txs.truncate(max_size);
+            self.rebuild_index();
+        }
+    }
+
     /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
         if let Some(pos) = self.tx_index.remove(tx_id) {
