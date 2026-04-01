@@ -146,6 +146,7 @@ impl Chain {
                 sequence: 0,
                 timestamp_ms: now_ms(),
                 locktime: None,
+                version: 1,
             };
             txs.insert(0, coinbase);
         }
