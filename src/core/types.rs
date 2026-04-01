@@ -226,6 +226,8 @@ impl Transaction {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
         }
 
+        anyhow::ensure!(self.version > 0, "tx.version must be > 0");
+
         Ok(())
     }
 
