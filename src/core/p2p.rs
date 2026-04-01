@@ -868,22 +868,22 @@ impl P2PNodeHandle {
                         }
                     }
 
-                    if let Some((h, _)) = highest_checkpoint {
-                        if h as u64 > our_height as u64 {
-                            println!(
-                                "Peer {} has a newer checkpoint at {}, requesting headers...",
-                                from, h
-                            );
-                            let _ = self
-                                .send_to(
-                                    from,
-                                    Message::GetHeaders {
-                                        start_height: our_height as u64 + 1,
-                                        limit: 100,
-                                    },
-                                )
-                                .await;
-                        }
+                    if let Some((h, _)) = highest_checkpoint
+                        && h as u64 > our_height as u64
+                    {
+                        println!(
+                            "Peer {} has a newer checkpoint at {}, requesting headers...",
+                            from, h
+                        );
+                        let _ = self
+                            .send_to(
+                                from,
+                                Message::GetHeaders {
+                                    start_height: our_height as u64 + 1,
+                                    limit: 100,
+                                },
+                            )
+                            .await;
                     }
                 }
             }

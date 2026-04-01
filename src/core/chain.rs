@@ -184,7 +184,7 @@ impl Chain {
                 self.block_index.insert(hash, height);
 
                 // Auto-checkpoint every 10 blocks
-                if height > 0 && height % 10 == 0 {
+                if height > 0 && height.is_multiple_of(10) {
                     self.checkpoints.insert(height, candidate.header.hash());
                 }
 
@@ -256,7 +256,7 @@ impl Chain {
 
         // Auto-checkpoint every 10 blocks
         let current_height = self.height();
-        if current_height > 0 && current_height % 10 == 0 {
+        if current_height > 0 && current_height.is_multiple_of(10) {
             self.add_checkpoint();
         }
 
