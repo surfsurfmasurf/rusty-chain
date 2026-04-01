@@ -58,6 +58,14 @@ pub struct Transaction {
     /// Optional locktime (block height). If set, the transaction is invalid until the chain reaches this height.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub locktime: Option<u64>,
+
+    /// Version number for the transaction format.
+    #[serde(default = "default_tx_version")]
+    pub version: u32,
+}
+
+fn default_tx_version() -> u32 {
+    1
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -75,6 +83,8 @@ pub struct TxSignPayload {
     pub timestamp_ms: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub locktime: Option<u64>,
+    #[serde(default)]
+    pub version: u32,
 }
 
 impl Transaction {
@@ -91,6 +101,7 @@ impl Transaction {
             sequence: 0,
             timestamp_ms: crate::core::time::now_ms(),
             locktime: None,
+            version: 1,
         }
     }
 
@@ -113,6 +124,7 @@ impl Transaction {
             sequence,
             timestamp_ms: crate::core::time::now_ms(),
             locktime: None,
+            version: 1,
         }
     }
 
@@ -135,6 +147,7 @@ impl Transaction {
             sequence: 0,
             timestamp_ms: crate::core::time::now_ms(),
             locktime: Some(locktime),
+            version: 1,
         }
     }
 
@@ -158,6 +171,7 @@ impl Transaction {
             sequence,
             timestamp_ms: crate::core::time::now_ms(),
             locktime: None,
+            version: 1,
         }
     }
 
@@ -172,6 +186,7 @@ impl Transaction {
             sequence: self.sequence,
             timestamp_ms: self.timestamp_ms,
             locktime: self.locktime,
+            version: self.version,
         }
     }
 
