@@ -258,4 +258,24 @@ mod mempool_index_tests {
         assert_eq!(mempool.txs[0].fee, 10);
         assert_eq!(mempool.tx_index.get(&id_high), Some(&0));
     }
+
+    #[test]
+    fn test_mempool_evict_expired() {
+        let mut mempool = Mempool::new();
+        let mut tx1 = Transaction::new("A", "B", 10, 0);
+        tx1.timestamp_ms = 1000;
+        let mut tx2 = Transaction::new("A", "C", 20, 1);
+        tx2.timestamp_ms = 2000;
+
+        mempool.add_tx(tx1).unwrap();
+        mempool.add_tx(tx2).unwrap();
+
+        assert_eq!(mempool.len(), 2);
+
+        // TTL of 500ms, current time 2000ms. tx1 (1000) expired, tx2 (2000) not.
+        let evicted = mempool.evict_expired(500, 2000);
+        assert_eq!(evicted, 1);
+        assert_eq!(mempool.len(), 1);
+        assert_eq!(mempool.txs[0].amount, 20);
+    }
 }
