@@ -213,6 +213,10 @@ impl Chain {
     pub fn validate_transaction(&self, tx: &Transaction) -> anyhow::Result<()> {
         tx.validate_accept()
             .context("TX baseline validation failed")?;
+
+        // Versioning check (future-proofing)
+        anyhow::ensure!(tx.version == 1, "only transaction version 1 is supported");
+
         let state = self.compute_state()?;
         state.validate_transaction(tx, self.height() + 1)?;
         Ok(())
