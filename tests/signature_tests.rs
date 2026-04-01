@@ -40,6 +40,7 @@ fn signed_tx_rejects_tampering() {
 fn tx_signature_requires_both_fields() {
     let tx = Transaction {
         pubkey_hex: Some("00".repeat(32)),
+        version: 1,
         ..Transaction::new("alice", "bob", 1, 0)
     };
 
