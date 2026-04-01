@@ -278,4 +278,21 @@ mod mempool_index_tests {
         assert_eq!(mempool.len(), 1);
         assert_eq!(mempool.txs[0].amount, 20);
     }
+
+    #[test]
+    fn test_mempool_evict_preserves_index() {
+        let mut mempool = Mempool::new();
+        let mut tx1 = Transaction::new("A", "B", 10, 0);
+        tx1.timestamp_ms = 1000;
+        let mut tx2 = Transaction::new("A", "C", 20, 1);
+        tx2.timestamp_ms = 2000;
+        let id2 = tx2.id();
+
+        mempool.add_tx(tx1).unwrap();
+        mempool.add_tx(tx2).unwrap();
+
+        mempool.evict_expired(500, 2000);
+
+        assert_eq!(mempool.tx_index.get(&id2), Some(&0));
+    }
 }
