@@ -155,13 +155,16 @@ impl Mempool {
         self.txs.is_empty()
     }
 
-    /// Truncates the mempool to a maximum size, removing lowest fee transactions.
-    pub fn truncate(&mut self, max_size: usize) {
-        if self.txs.len() > max_size {
-            self.sort_by_fee();
-            self.txs.truncate(max_size);
-            self.rebuild_index();
+    /// Truncates the mempool to a maximum count, removing lowest fee transactions.
+    pub fn truncate(&mut self, max_count: usize) -> usize {
+        if self.txs.len() <= max_count {
+            return 0;
         }
+        self.sort_by_fee();
+        let evicted = self.txs.len() - max_count;
+        self.txs.truncate(max_count);
+        self.rebuild_index();
+        evicted
     }
 
     /// Removes a transaction from the mempool by its ID.
