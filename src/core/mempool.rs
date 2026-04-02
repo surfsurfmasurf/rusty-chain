@@ -144,6 +144,12 @@ impl Mempool {
         out
     }
 
+    /// Optimized drain that clears mempool and returns transactions sorted by fee.
+    pub fn drain_sorted(&mut self) -> Vec<Transaction> {
+        self.sort_by_fee();
+        self.drain()
+    }
+
     /// Returns a transaction by its ID if it exists in the mempool.
     pub fn get_tx_by_id(&self, tx_id: &str) -> Option<&Transaction> {
         self.tx_index.get(tx_id).and_then(|&idx| self.txs.get(idx))
@@ -220,6 +226,12 @@ impl Mempool {
         let ids: HashSet<String> = txs.iter().map(|t| t.id()).collect();
         self.txs.retain(|t| !ids.contains(&t.id()));
         self.rebuild_index();
+    }
+
+    /// Clear all transactions from the mempool.
+    pub fn clear(&mut self) {
+        self.txs.clear();
+        self.tx_index.clear();
     }
 
     /// Evicts transactions from the mempool that have exceeded the time-to-live (TTL).
