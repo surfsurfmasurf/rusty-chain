@@ -343,4 +343,25 @@ mod mempool_index_tests {
 
         assert_eq!(mempool.tx_index.get(&id2), Some(&0));
     }
+
+    #[test]
+    fn test_mempool_limit_size() {
+        let mut mempool = Mempool::new();
+        let mut tx1 = Transaction::new("A", "B", 10, 0);
+        tx1.fee = 100; // High fee, small size
+        let mut tx2 = Transaction::new("A", "C", 20, 1);
+        tx2.fee = 10; // Low fee, small size
+
+        let size1 = tx1.size();
+        let _size2 = tx2.size();
+
+        mempool.add_tx(tx1).unwrap();
+        mempool.add_tx(tx2).unwrap();
+
+        // Limit size to exactly tx1's size. tx2 should be evicted because it has lower fee.
+        let evicted = mempool.limit_size(size1);
+        assert_eq!(evicted, 1);
+        assert_eq!(mempool.len(), 1);
+        assert_eq!(mempool.txs[0].fee, 100);
+    }
 }
