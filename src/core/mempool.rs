@@ -179,6 +179,30 @@ impl Mempool {
         self.rebuild_index();
     }
 
+    /// Limits the mempool to a maximum size (in bytes), removing lowest fee transactions.
+    pub fn limit_size(&mut self, max_bytes: usize) -> usize {
+        let current_size: usize = self.txs.iter().map(|t| t.size()).sum();
+        if current_size <= max_bytes {
+            return 0;
+        }
+
+        self.sort_by_fee();
+        let mut new_size = current_size;
+        let mut evicted = 0;
+
+        while new_size > max_bytes && !self.txs.is_empty() {
+            if let Some(tx) = self.txs.pop() {
+                new_size -= tx.size();
+                evicted += 1;
+            }
+        }
+
+        if evicted > 0 {
+            self.rebuild_index();
+        }
+        evicted
+    }
+
     /// Removes all transactions from the mempool that are included in the given slice.
     pub fn remove_included(&mut self, txs: &[Transaction]) {
         let ids: HashSet<String> = txs.iter().map(|t| t.id()).collect();
