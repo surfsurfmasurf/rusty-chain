@@ -64,6 +64,15 @@ impl Mempool {
     pub fn add_tx_checked(&mut self, tx: Transaction, base_nonce: u64) -> anyhow::Result<()> {
         tx.validate_accept()?;
 
+        // Mempool size limit check: refuse new transactions if mempool is at absolute capacity
+        // and the new transaction has a very low fee.
+        // (Hardcoded 10MB limit for demo purposes)
+        const MAX_MEMPOOL_BYTES: usize = 10 * 1024 * 1024;
+        if self.txs.iter().map(|t| t.size()).sum::<usize>() > MAX_MEMPOOL_BYTES {
+            let min_fee = self.txs.iter().map(|t| t.fee).min().unwrap_or(0);
+            anyhow::ensure!(tx.fee > min_fee, "mempool is full; transaction fee too low to displace others");
+        }
+
         // If a transaction with the same sender and nonce exists, we check if the new tx
         // is an RBF (Replace-By-Fee) candidate.
         // Rule: same sender, same nonce, higher fee OR higher sequence.
