@@ -68,9 +68,15 @@ impl Mempool {
         // and the new transaction has a very low fee.
         // (Hardcoded 10MB limit for demo purposes)
         const MAX_MEMPOOL_BYTES: usize = 10 * 1024 * 1024;
-        if self.txs.iter().map(|t| t.size()).sum::<usize>() > MAX_MEMPOOL_BYTES {
+        let current_size: usize = self.txs.iter().map(|t| t.size()).sum();
+        if current_size > MAX_MEMPOOL_BYTES {
             let min_fee = self.txs.iter().map(|t| t.fee).min().unwrap_or(0);
-            anyhow::ensure!(tx.fee > min_fee, "mempool is full; transaction fee too low to displace others");
+            anyhow::ensure!(
+                tx.fee > min_fee,
+                "mempool is full; transaction fee (={}) too low to displace others (min_fee={})",
+                tx.fee,
+                min_fee
+            );
         }
 
         // If a transaction with the same sender and nonce exists, we check if the new tx
