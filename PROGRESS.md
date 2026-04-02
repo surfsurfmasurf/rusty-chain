@@ -382,3 +382,13 @@ Next:
 - Mempool: Added unit tests for transaction TTL eviction to ensure mempool freshness.
 - Types: Enforced strictly positive transaction versions in `validate_basic`.
 - Pushed 8 commits as part of the Day 53 work session.
+
+## Day 54 (Today)
+- Mempool: Implemented `limit_size` to enforce byte-based capacity limits by evicting low-fee transactions.
+- Mempool: Added `drain_sorted` for efficient fee-prioritized transaction processing.
+- Mempool: Added `clear` helper for explicit mempool reset.
+- Mempool: Updated `truncate` to return the number of evicted transactions for better telemetry.
+- Core: Integrated size-based rejection in `add_tx_checked` to prevent memory exhaustion.
+- Tests: Added comprehensive unit test for `limit_size` and fee-based eviction.
+- Polish: Cleaned up mempool index maintenance during bulk operations.
+- Pushed 8 commits as part of the Day 54 work session.
