@@ -114,7 +114,7 @@ enum Commands {
         #[arg(long)]
         mempool: Option<String>,
 
-        /// Optional memo (max 64 chars)
+        /// Optional memo (max 128 chars)
         #[arg(long)]
         memo: Option<String>,
 
@@ -125,6 +125,10 @@ enum Commands {
         /// Optional locktime (block height). If set, tx is invalid until chain reaches this height.
         #[arg(long)]
         locktime: Option<u64>,
+
+        /// Optional expiry (block height). If set, tx is invalid after chain reaches this height.
+        #[arg(long)]
+        expiry: Option<u64>,
 
         /// Optional node address to broadcast the transaction to (e.g. 127.0.0.1:9000)
         #[arg(long)]
@@ -425,6 +429,7 @@ async fn main() -> anyhow::Result<()> {
             memo,
             timestamp,
             locktime,
+            expiry,
             broadcast_to,
         } => {
             let chain_path = chain_path(chain);
@@ -461,6 +466,7 @@ async fn main() -> anyhow::Result<()> {
             tx.sequence = sequence;
             tx.memo = memo;
             tx.locktime = locktime;
+            tx.expiry = expiry;
             if let Some(ts) = timestamp {
                 tx.timestamp_ms = ts;
             }
@@ -515,8 +521,9 @@ async fn main() -> anyhow::Result<()> {
                     "unsigned"
                 };
                 let lock = tx.locktime.map_or("".to_string(), |l| format!(" lock={l}"));
+                let exp = tx.expiry.map_or("".to_string(), |e| format!(" expiry={e}"));
                 println!(
-                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed}){lock}",
+                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed}){lock}{exp}",
                     tx.from, tx.to, tx.amount, tx.fee, tx.nonce, tx.sequence, tx.timestamp_ms
                 );
             }

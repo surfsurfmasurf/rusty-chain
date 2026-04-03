@@ -383,12 +383,13 @@ Next:
 - Types: Enforced strictly positive transaction versions in `validate_basic`.
 - Pushed 8 commits as part of the Day 53 work session.
 
-## Day 54 (Today)
-- Mempool: Implemented `limit_size` to enforce byte-based capacity limits by evicting low-fee transactions.
-- Mempool: Added `drain_sorted` for efficient fee-prioritized transaction processing.
-- Mempool: Added `clear` helper for explicit mempool reset.
-- Mempool: Updated `truncate` to return the number of evicted transactions for better telemetry.
-- Core: Integrated size-based rejection in `add_tx_checked` to prevent memory exhaustion.
-- Tests: Added comprehensive unit test for `limit_size` and fee-based eviction.
-- Polish: Cleaned up mempool index maintenance during bulk operations.
-- Pushed 8 commits as part of the Day 54 work session.
+## Day 55 (Today)
+- Core: Added `expiry` field to `Transaction` and `TxSignPayload` for block-height based expiration.
+- State: Implemented transaction expiration enforcement during block and mempool validation.
+- CLI: Added `--expiry` flag to `tx-add` and displayed expiry height in `tx-list`.
+- CLI: Updated memo character limit documentation to match core rules (128 chars).
+- Tests: Added `tests/expiry_tests.rs` verifying both state enforcement and mempool TTL eviction.
+- Polish: Unified all `Transaction` constructors and coinbase construction with the new `expiry` field.
+- Maintenance: Fixed manual `Transaction` initializers in existing tests to include the `expiry` field.
+- Pushed 8 commits as part of the Day 55 work session.
+

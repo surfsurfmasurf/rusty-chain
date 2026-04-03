@@ -145,6 +145,17 @@ impl State {
             );
         }
 
+        // Expiry check
+        if let Some(exp) = tx.expiry
+            && (height as u64) > exp
+        {
+            anyhow::bail!(
+                "Transaction expired at height {}: current height {}",
+                exp,
+                height
+            );
+        }
+
         Ok(())
     }
 
