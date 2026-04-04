@@ -393,3 +393,14 @@ Next:
 - Maintenance: Fixed manual `Transaction` initializers in existing tests to include the `expiry` field.
 - Pushed 8 commits as part of the Day 55 work session.
 
+## Day 56 (Today)
+- Core: Added `priority` field to `Transaction` and `TxSignPayload` (0-255).
+- Mempool: Implemented `sort_by_fee_and_priority` for better transaction ordering.
+- Mempool: Updated `drain_sorted`, `truncate`, and `limit_size` to be priority-aware.
+- Core: Set coinbase transaction priority to maximum (255) for guaranteed inclusion.
+- CLI: Added `--priority` flag to `tx-add` for manual priority control.
+- CLI: `tx-list` now displays the priority for each transaction.
+- Tests: Added comprehensive priority tests (`tests/priority_tests.rs`) and updated mempool unit tests.
+- Refactor: Polished `types.rs` constructors and unified signing payload handling.
+- Pushed 8 commits as part of the Day 56 work session.
+
