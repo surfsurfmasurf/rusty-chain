@@ -130,6 +130,10 @@ enum Commands {
         #[arg(long)]
         expiry: Option<u64>,
 
+        /// Optional priority (0-255). Used for mempool ordering.
+        #[arg(long, default_value_t = 0)]
+        priority: u8,
+
         /// Optional node address to broadcast the transaction to (e.g. 127.0.0.1:9000)
         #[arg(long)]
         broadcast_to: Option<String>,
@@ -430,6 +434,7 @@ async fn main() -> anyhow::Result<()> {
             timestamp,
             locktime,
             expiry,
+            priority,
             broadcast_to,
         } => {
             let chain_path = chain_path(chain);
@@ -467,6 +472,7 @@ async fn main() -> anyhow::Result<()> {
             tx.memo = memo;
             tx.locktime = locktime;
             tx.expiry = expiry;
+            tx.priority = priority;
             if let Some(ts) = timestamp {
                 tx.timestamp_ms = ts;
             }
@@ -522,8 +528,13 @@ async fn main() -> anyhow::Result<()> {
                 };
                 let lock = tx.locktime.map_or("".to_string(), |l| format!(" lock={l}"));
                 let exp = tx.expiry.map_or("".to_string(), |e| format!(" expiry={e}"));
+                let prio = if tx.priority > 0 {
+                    format!(" priority={}", tx.priority)
+                } else {
+                    "".to_string()
+                };
                 println!(
-                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed}){lock}{exp}",
+                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed}){lock}{exp}{prio}",
                     tx.from, tx.to, tx.amount, tx.fee, tx.nonce, tx.sequence, tx.timestamp_ms
                 );
             }
