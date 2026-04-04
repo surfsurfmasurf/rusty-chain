@@ -63,6 +63,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expiry: Option<u64>,
 
+    /// Optional priority level (0-255). Used for mempool ordering and processing.
+    #[serde(default)]
+    pub priority: u8,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -90,6 +94,8 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expiry: Option<u64>,
     #[serde(default)]
+    pub priority: u8,
+    #[serde(default)]
     pub version: u32,
 }
 
@@ -108,6 +114,7 @@ impl Transaction {
             timestamp_ms: crate::core::time::now_ms(),
             locktime: None,
             expiry: None,
+            priority: 0,
             version: 1,
         }
     }
@@ -132,6 +139,7 @@ impl Transaction {
             timestamp_ms: crate::core::time::now_ms(),
             locktime: None,
             expiry: None,
+            priority: 0,
             version: 1,
         }
     }
@@ -156,6 +164,7 @@ impl Transaction {
             timestamp_ms: crate::core::time::now_ms(),
             locktime: Some(locktime),
             expiry: None,
+            priority: 0,
             version: 1,
         }
     }
@@ -181,6 +190,7 @@ impl Transaction {
             timestamp_ms: crate::core::time::now_ms(),
             locktime: None,
             expiry: None,
+            priority: 0,
             version: 1,
         }
     }
@@ -197,6 +207,7 @@ impl Transaction {
             timestamp_ms: self.timestamp_ms,
             locktime: self.locktime,
             expiry: self.expiry,
+            priority: self.priority,
             version: self.version,
         }
     }
