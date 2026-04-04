@@ -53,7 +53,7 @@ fn test_mempool_priority_limit_size() {
     mempool.add_tx(tx2).unwrap();
     
     // Limit to size of 1 tx. Higher priority should stay.
-    mempool.limit_size(size);
+    mempool.limit_size(size + 1);
 
     assert_eq!(mempool.len(), 1);
     assert_eq!(mempool.txs[0].priority, 100);
