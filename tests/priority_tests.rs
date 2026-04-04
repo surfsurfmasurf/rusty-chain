@@ -48,11 +48,11 @@ fn test_mempool_priority_limit_size() {
     tx2.fee = 10;
     tx2.priority = 100;
 
+    let size = tx1.size();
     mempool.add_tx(tx1).unwrap();
     mempool.add_tx(tx2).unwrap();
-
+    
     // Limit to size of 1 tx. Higher priority should stay.
-    let size = tx1.size();
     mempool.limit_size(size);
 
     assert_eq!(mempool.len(), 1);
