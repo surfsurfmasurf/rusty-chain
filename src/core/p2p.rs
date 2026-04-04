@@ -12,7 +12,7 @@ use tokio::sync::{Mutex, mpsc};
 /// Commands that can be sent to the peer handler
 #[derive(Debug, Clone)]
 pub enum PeerCmd {
-    SendMessage(Message),
+    SendMessage(Box<Message>),
     Disconnect,
 }
 
@@ -190,7 +190,7 @@ impl P2PNode {
                     state.peer_senders.len()
                 );
                 for tx in state.peer_senders.values() {
-                    let _ = tx.send(PeerCmd::SendMessage(Message::GetReputation));
+                    let _ = tx.send(PeerCmd::SendMessage(Box::new(Message::GetReputation)));
                 }
             }
         });
@@ -293,7 +293,7 @@ impl P2PNodeHandle {
         let state = self.state.lock().await;
         for (&addr, tx) in &state.peer_senders {
             if addr != except {
-                let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
+                let _ = tx.send(PeerCmd::SendMessage(Box::new(msg.clone())));
             }
         }
         Ok(())
@@ -340,11 +340,11 @@ impl P2PNodeHandle {
             );
             state.banned_peers.insert(peer);
             if let Some(tx) = state.peer_senders.get(&peer) {
-                let _ = tx.send(PeerCmd::SendMessage(Message::Reject {
+                let _ = tx.send(PeerCmd::SendMessage(Box::new(Message::Reject {
                     code: 403,
                     reason: "Banned due to low reputation".to_string(),
                     message_type: "Handshake".to_string(),
-                }));
+                })));
                 let _ = tx.send(PeerCmd::Disconnect);
             }
         }
@@ -429,11 +429,11 @@ impl P2PNodeHandle {
                 state.banned_peers.insert(addr);
                 // If we are currently connected to this peer, disconnect them
                 if let Some(tx) = state.peer_senders.get(&addr) {
-                    let _ = tx.send(PeerCmd::SendMessage(Message::Reject {
+                    let _ = tx.send(PeerCmd::SendMessage(Box::new(Message::Reject {
                         code: 403,
                         reason: "Banned due to low merged reputation".to_string(),
                         message_type: "Reputation".to_string(),
-                    }));
+                    })));
                     let _ = tx.send(PeerCmd::Disconnect);
                 }
             }
@@ -444,7 +444,7 @@ impl P2PNodeHandle {
     pub async fn send_to(&self, target: SocketAddr, msg: Message) -> anyhow::Result<()> {
         let state = self.state.lock().await;
         if let Some(tx) = state.peer_senders.get(&target) {
-            let _ = tx.send(PeerCmd::SendMessage(msg));
+            let _ = tx.send(PeerCmd::SendMessage(Box::new(msg)));
         } else {
             eprintln!(
                 "Failed to send {}: Peer {} not found",
@@ -458,7 +458,7 @@ impl P2PNodeHandle {
     pub async fn broadcast(&self, msg: Message) -> anyhow::Result<()> {
         let state = self.state.lock().await;
         for tx in state.peer_senders.values() {
-            let _ = tx.send(PeerCmd::SendMessage(msg.clone()));
+            let _ = tx.send(PeerCmd::SendMessage(Box::new(msg.clone())));
         }
         Ok(())
     }

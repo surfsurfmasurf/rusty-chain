@@ -26,6 +26,7 @@ fn coinbase_tx_increases_balance() {
         timestamp_ms: 0,
         locktime: None,
         expiry: None,
+        priority: 0,
         version: 1,
     };
 
@@ -53,6 +54,7 @@ fn transfer_tx_updates_balances() {
         timestamp_ms: 0,
         locktime: None,
         expiry: None,
+        priority: 0,
         version: 1,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
@@ -101,6 +103,7 @@ fn invalid_nonce_makes_chain_invalid() {
         timestamp_ms: 0,
         locktime: None,
         expiry: None,
+        priority: 0,
         version: 1,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
@@ -134,6 +137,7 @@ fn fees_are_collected_by_miner() {
         timestamp_ms: 0,
         locktime: None,
         expiry: None,
+        priority: 0,
         version: 1,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
@@ -170,6 +174,7 @@ fn insufficient_balance_for_fee_fails() {
         timestamp_ms: 0,
         locktime: None,
         expiry: None,
+        priority: 0,
         version: 1,
     };
     c.mine_block(vec![cb], 1, None).unwrap();

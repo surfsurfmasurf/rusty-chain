@@ -5,11 +5,11 @@ use rusty_chain::core::types::Transaction;
 #[test]
 fn test_transaction_expiry_enforcement() {
     let mut chain = Chain::new_genesis();
-    
+
     // Give ALICE some coins so balance check passes
     let alice_addr = "ALICE";
     chain.mine_block(vec![], 3, Some(alice_addr)).unwrap();
-    
+
     let state = chain.compute_state().unwrap();
     assert!(state.get_balance(alice_addr) >= 10);
 
@@ -24,11 +24,15 @@ fn test_transaction_expiry_enforcement() {
     assert!(err_msg.contains("expired"));
 
     // Should pass validation for height 1
-    state.validate_transaction(&tx, 1).expect("valid at height 1");
+    state
+        .validate_transaction(&tx, 1)
+        .expect("valid at height 1");
 
     // Create a transaction that expires at height 5
     tx.expiry = Some(5);
-    state.validate_transaction(&tx, 5).expect("valid at height 5");
+    state
+        .validate_transaction(&tx, 5)
+        .expect("valid at height 5");
     let res2 = state.validate_transaction(&tx, 6);
     assert!(res2.is_err());
 }
@@ -38,7 +42,7 @@ fn test_mempool_evict_expired_transactions() {
     let mut mempool = Mempool::new();
     let mut tx1 = Transaction::new("A", "B", 10, 0);
     tx1.timestamp_ms = 1000;
-    
+
     let mut tx2 = Transaction::new("C", "D", 20, 0);
     tx2.timestamp_ms = 2000;
 
