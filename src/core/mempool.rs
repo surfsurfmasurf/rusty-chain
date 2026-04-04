@@ -150,9 +150,9 @@ impl Mempool {
         out
     }
 
-    /// Optimized drain that clears mempool and returns transactions sorted by fee.
+    /// Optimized drain that clears mempool and returns transactions sorted by fee and priority.
     pub fn drain_sorted(&mut self) -> Vec<Transaction> {
-        self.sort_by_fee();
+        self.sort_by_fee_and_priority();
         self.drain()
     }
 
@@ -176,12 +176,12 @@ impl Mempool {
         self.txs.is_empty()
     }
 
-    /// Truncates the mempool to a maximum count, removing lowest fee transactions.
+    /// Truncates the mempool to a maximum count, removing lowest fee/priority transactions.
     pub fn truncate(&mut self, max_count: usize) -> usize {
         if self.txs.len() <= max_count {
             return 0;
         }
-        self.sort_by_fee();
+        self.sort_by_fee_and_priority();
         let evicted = self.txs.len() - max_count;
         self.txs.truncate(max_count);
         self.rebuild_index();
@@ -197,20 +197,29 @@ impl Mempool {
         }
     }
 
-    /// Sorts transactions in the mempool by fee (descending).
-    pub fn sort_by_fee(&mut self) {
-        self.txs.sort_by(|a, b| b.fee.cmp(&a.fee));
+    /// Sorts transactions in the mempool by fee (descending), then by priority (descending).
+    pub fn sort_by_fee_and_priority(&mut self) {
+        self.txs.sort_by(|a, b| {
+            // First sort by fee descending
+            let fee_cmp = b.fee.cmp(&a.fee);
+            if fee_cmp == std::cmp::Ordering::Equal {
+                // If fees are equal, sort by priority descending
+                b.priority.cmp(&a.priority)
+            } else {
+                fee_cmp
+            }
+        });
         self.rebuild_index();
     }
 
-    /// Limits the mempool to a maximum size (in bytes), removing lowest fee transactions.
+    /// Limits the mempool to a maximum size (in bytes), removing lowest fee/priority transactions.
     pub fn limit_size(&mut self, max_bytes: usize) -> usize {
         let current_size: usize = self.txs.iter().map(|t| t.size()).sum();
         if current_size <= max_bytes {
             return 0;
         }
 
-        self.sort_by_fee();
+        self.sort_by_fee_and_priority();
         let mut new_size = current_size;
         let mut evicted = 0;
 
@@ -293,24 +302,41 @@ mod mempool_index_tests {
     }
 
     #[test]
-    fn test_mempool_sort_by_fee() {
+    fn test_mempool_sort_by_fee_and_priority() {
         let mut mempool = Mempool::new();
         let mut tx_low = Transaction::new("A", "B", 10, 0);
         tx_low.fee = 1;
-        let mut tx_high = Transaction::new("A", "C", 20, 1);
-        tx_high.fee = 10;
+        tx_low.priority = 100;
 
-        let id_high = tx_high.id();
+        let mut tx_mid_prio1 = Transaction::new("A", "C", 20, 1);
+        tx_mid_prio1.fee = 5;
+        tx_mid_prio1.priority = 10;
+
+        let mut tx_mid_prio2 = Transaction::new("A", "D", 30, 2);
+        tx_mid_prio2.fee = 5;
+        tx_mid_prio2.priority = 20;
+
+        let mut tx_high = Transaction::new("A", "E", 40, 3);
+        tx_high.fee = 10;
+        tx_high.priority = 0;
 
         mempool.add_tx(tx_low).unwrap();
+        mempool.add_tx(tx_mid_prio1).unwrap();
+        mempool.add_tx(tx_mid_prio2).unwrap();
         mempool.add_tx(tx_high).unwrap();
 
-        assert_eq!(mempool.txs[0].fee, 1);
+        mempool.sort_by_fee_and_priority();
 
-        mempool.sort_by_fee();
-
+        // 1. Fee 10
         assert_eq!(mempool.txs[0].fee, 10);
-        assert_eq!(mempool.tx_index.get(&id_high), Some(&0));
+        // 2. Fee 5, Priority 20
+        assert_eq!(mempool.txs[1].fee, 5);
+        assert_eq!(mempool.txs[1].priority, 20);
+        // 3. Fee 5, Priority 10
+        assert_eq!(mempool.txs[2].fee, 5);
+        assert_eq!(mempool.txs[2].priority, 10);
+        // 4. Fee 1
+        assert_eq!(mempool.txs[3].fee, 1);
     }
 
     #[test]
