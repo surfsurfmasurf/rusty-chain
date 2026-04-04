@@ -147,6 +147,7 @@ impl Chain {
                 timestamp_ms: now_ms(),
                 locktime: None,
                 expiry: None,
+                priority: 255, // Max priority for coinbase
                 version: 1,
             };
             txs.insert(0, coinbase);
