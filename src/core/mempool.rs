@@ -389,6 +389,21 @@ mod mempool_index_tests {
     }
 
     #[test]
+    fn test_mempool_nonce_id_uniqueness() {
+        let mut mempool = Mempool::new();
+        let mut tx1 = Transaction::new("A", "B", 10, 0);
+        tx1.nonce_id = Some("unique-1".to_string());
+        
+        let mut tx2 = Transaction::new("C", "D", 20, 0);
+        tx2.nonce_id = Some("unique-1".to_string());
+
+        mempool.add_tx_checked(tx1, 0).unwrap();
+        let res = mempool.add_tx_checked(tx2, 0);
+        assert!(res.is_err());
+        assert!(res.unwrap_err().to_string().contains("duplicate nonce_id"));
+    }
+
+    #[test]
     fn test_mempool_limit_size() {
         let mut mempool = Mempool::new();
         let mut tx1 = Transaction::new("A", "B", 10, 0);
