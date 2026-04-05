@@ -148,6 +148,7 @@ impl Chain {
                 locktime: None,
                 expiry: None,
                 priority: 255, // Max priority for coinbase
+                nonce_id: Some(format!("coinbase-{}", block_height)),
                 version: 1,
             };
             txs.insert(0, coinbase);
