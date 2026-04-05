@@ -404,6 +404,17 @@ mod mempool_index_tests {
     }
 
     #[test]
+    fn test_mempool_nonce_id_persistence() {
+        let mut mempool = Mempool::new();
+        let mut tx1 = Transaction::new("A", "B", 10, 0);
+        tx1.nonce_id = Some("persisted-1".to_string());
+        mempool.add_tx(tx1).unwrap();
+        
+        let tx_back = mempool.get_tx_by_id(&mempool.txs[0].id()).unwrap();
+        assert_eq!(tx_back.nonce_id, Some("persisted-1".to_string()));
+    }
+
+    #[test]
     fn test_mempool_limit_size() {
         let mut mempool = Mempool::new();
         let mut tx1 = Transaction::new("A", "B", 10, 0);
