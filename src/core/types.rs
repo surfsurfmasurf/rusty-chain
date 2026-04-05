@@ -67,6 +67,10 @@ pub struct Transaction {
     #[serde(default)]
     pub priority: u8,
 
+    /// Unique identifier for the transaction (UUID v4), used for tracking through P2P and mempool.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub nonce_id: Option<String>,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -95,6 +99,8 @@ pub struct TxSignPayload {
     pub expiry: Option<u64>,
     #[serde(default)]
     pub priority: u8,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub nonce_id: Option<String>,
     #[serde(default)]
     pub version: u32,
 }
@@ -115,6 +121,7 @@ impl Transaction {
             locktime: None,
             expiry: None,
             priority: 0,
+            nonce_id: None,
             version: 1,
         }
     }
@@ -140,6 +147,7 @@ impl Transaction {
             locktime: None,
             expiry: None,
             priority: 0,
+            nonce_id: None,
             version: 1,
         }
     }
@@ -165,6 +173,7 @@ impl Transaction {
             locktime: Some(locktime),
             expiry: None,
             priority: 0,
+            nonce_id: None,
             version: 1,
         }
     }
@@ -191,6 +200,7 @@ impl Transaction {
             locktime: None,
             expiry: None,
             priority: 0,
+            nonce_id: None,
             version: 1,
         }
     }
@@ -208,9 +218,11 @@ impl Transaction {
             locktime: self.locktime,
             expiry: self.expiry,
             priority: self.priority,
+            nonce_id: self.nonce_id.clone(),
             version: self.version,
         }
     }
+
 
     pub fn signing_bytes(&self) -> Vec<u8> {
         // JSON keeps this demo-friendly; if we need canonical encoding later, we can swap it.
