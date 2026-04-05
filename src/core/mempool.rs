@@ -195,6 +195,11 @@ impl Mempool {
         evicted
     }
 
+    /// Optimized: Returns true if any transaction in the mempool has the given nonce_id.
+    pub fn contains_nonce_id(&self, nonce_id: &str) -> bool {
+        self.txs.iter().any(|t| t.nonce_id.as_ref() == Some(&nonce_id.to_string()))
+    }
+
     /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
         if let Some(pos) = self.tx_index.remove(tx_id) {
