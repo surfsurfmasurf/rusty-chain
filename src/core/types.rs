@@ -67,7 +67,7 @@ pub struct Transaction {
     #[serde(default)]
     pub priority: u8,
 
-    /// Unique identifier for the transaction (UUID v4), used for tracking through P2P and mempool.
+    /// UNIQUE: Unique identifier for the transaction (UUID v4), used for tracking through P2P and mempool.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nonce_id: Option<String>,
 
