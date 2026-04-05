@@ -398,9 +398,11 @@ Next:
 - Mempool: Implemented `sort_by_fee_and_priority` for better transaction ordering.
 - Mempool: Updated `drain_sorted`, `truncate`, and `limit_size` to be priority-aware.
 - Core: Set coinbase transaction priority to maximum (255) for guaranteed inclusion.
-- CLI: Added `--priority` flag to `tx-add` for manual priority control.
-- CLI: `tx-list` now displays the priority for each transaction.
-- Tests: Added comprehensive priority tests (`tests/priority_tests.rs`) and updated mempool unit tests.
+- Core: Added `nonce_id` (unique transaction tracking) to `Transaction` and `TxSignPayload`.
+- Mempool: Enforced `nonce_id` uniqueness during transaction insertion.
+- Core: Integrated `nonce_id` into coinbase transaction generation.
+- CLI: Added support for `nonce_id` in transaction display and construction.
+- Tests: Added unit tests for `nonce_id` uniqueness and mempool integration.
 - Refactor: Polished `types.rs` constructors and unified signing payload handling.
-- Pushed 8 commits as part of the Day 56 work session.
+- Pushed 8 commits as part of the Day 57 work session.
 
