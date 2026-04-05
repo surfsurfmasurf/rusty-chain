@@ -64,6 +64,13 @@ impl Mempool {
     pub fn add_tx_checked(&mut self, tx: Transaction, base_nonce: u64) -> anyhow::Result<()> {
         tx.validate_accept()?;
 
+        // If nonce_id is present, ensure it is unique within the mempool.
+        if let Some(nonce_id) = &tx.nonce_id {
+            if self.txs.iter().any(|t| t.nonce_id.as_ref() == Some(nonce_id)) {
+                anyhow::bail!("duplicate nonce_id detected in mempool: {}", nonce_id);
+            }
+        }
+
         // Mempool size limit check: refuse new transactions if mempool is at absolute capacity
         // and the new transaction has a very low fee.
         // (Hardcoded 10MB limit for demo purposes)
