@@ -66,11 +66,7 @@ impl Mempool {
 
         // If nonce_id is present, ensure it is unique within the mempool.
         if let Some(nonce_id) = &tx.nonce_id {
-            if self
-                .txs
-                .iter()
-                .any(|t| t.nonce_id.as_ref() == Some(nonce_id))
-            {
+            if self.contains_nonce_id(nonce_id) {
                 anyhow::bail!("duplicate nonce_id detected in mempool: {}", nonce_id);
             }
         }
@@ -444,7 +440,7 @@ mod mempool_index_tests {
 
         let group1 = mempool.get_txs_by_nonce_id("group-1");
         assert_eq!(group1.len(), 2);
-        
+
         let group2 = mempool.get_txs_by_nonce_id("group-2");
         assert_eq!(group2.len(), 1);
         assert_eq!(group2[0].amount, 30);
