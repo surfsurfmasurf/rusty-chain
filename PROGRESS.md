@@ -393,16 +393,10 @@ Next:
 - Maintenance: Fixed manual `Transaction` initializers in existing tests to include the `expiry` field.
 - Pushed 8 commits as part of the Day 55 work session.
 
-## Day 56 (Today)
-- Core: Added `priority` field to `Transaction` and `TxSignPayload` (0-255).
-- Mempool: Implemented `sort_by_fee_and_priority` for better transaction ordering.
-- Mempool: Updated `drain_sorted`, `truncate`, and `limit_size` to be priority-aware.
-- Core: Set coinbase transaction priority to maximum (255) for guaranteed inclusion.
-- Core: Added `nonce_id` (unique transaction tracking) to `Transaction` and `TxSignPayload`.
-- Mempool: Enforced `nonce_id` uniqueness during transaction insertion.
-- Core: Integrated `nonce_id` into coinbase transaction generation.
-- CLI: Added support for `nonce_id` in transaction display and construction.
-- Tests: Added unit tests for `nonce_id` uniqueness and mempool integration.
-- Refactor: Polished `types.rs` constructors and unified signing payload handling.
+## Day 57 (Today)
+- Mempool: Implemented `get_txs_by_nonce_id` helper for transaction grouping.
+- Refactor: Standardized manual transaction initializers across test suite (fixed formatting and missing fields).
+- Maintenance: Applied `cargo fmt` to core modules and test files.
+- Tests: Added unit tests for `get_txs_by_nonce_id` in `mempool_index_tests`.
 - Pushed 8 commits as part of the Day 57 work session.
 
