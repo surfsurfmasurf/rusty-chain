@@ -429,23 +429,24 @@ mod mempool_index_tests {
     }
 
     #[test]
-    fn test_mempool_limit_size() {
+    fn test_mempool_get_txs_by_nonce_id() {
         let mut mempool = Mempool::new();
         let mut tx1 = Transaction::new("A", "B", 10, 0);
-        tx1.fee = 100; // High fee, small size
+        tx1.nonce_id = Some("group-1".to_string());
         let mut tx2 = Transaction::new("A", "C", 20, 1);
-        tx2.fee = 10; // Low fee, small size
-
-        let size1 = tx1.size();
-        let _size2 = tx2.size();
+        tx2.nonce_id = Some("group-1".to_string());
+        let mut tx3 = Transaction::new("B", "C", 30, 0);
+        tx3.nonce_id = Some("group-2".to_string());
 
         mempool.add_tx(tx1).unwrap();
         mempool.add_tx(tx2).unwrap();
+        mempool.add_tx(tx3).unwrap();
 
-        // Limit size to exactly tx1's size. tx2 should be evicted because it has lower fee.
-        let evicted = mempool.limit_size(size1);
-        assert_eq!(evicted, 1);
-        assert_eq!(mempool.len(), 1);
-        assert_eq!(mempool.txs[0].fee, 100);
+        let group1 = mempool.get_txs_by_nonce_id("group-1");
+        assert_eq!(group1.len(), 2);
+        
+        let group2 = mempool.get_txs_by_nonce_id("group-2");
+        assert_eq!(group2.len(), 1);
+        assert_eq!(group2[0].amount, 30);
     }
 }
