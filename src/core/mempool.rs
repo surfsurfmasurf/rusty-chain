@@ -66,7 +66,11 @@ impl Mempool {
 
         // If nonce_id is present, ensure it is unique within the mempool.
         if let Some(nonce_id) = &tx.nonce_id {
-            if self.txs.iter().any(|t| t.nonce_id.as_ref() == Some(nonce_id)) {
+            if self
+                .txs
+                .iter()
+                .any(|t| t.nonce_id.as_ref() == Some(nonce_id))
+            {
                 anyhow::bail!("duplicate nonce_id detected in mempool: {}", nonce_id);
             }
         }
@@ -197,7 +201,9 @@ impl Mempool {
 
     /// Optimized: Returns true if any transaction in the mempool has the given nonce_id.
     pub fn contains_nonce_id(&self, nonce_id: &str) -> bool {
-        self.txs.iter().any(|t| t.nonce_id.as_ref() == Some(&nonce_id.to_string()))
+        self.txs
+            .iter()
+            .any(|t| t.nonce_id.as_ref() == Some(&nonce_id.to_string()))
     }
 
     /// Removes a transaction from the mempool by its ID.
@@ -393,7 +399,7 @@ mod mempool_index_tests {
         let mut mempool = Mempool::new();
         let mut tx1 = Transaction::new("A", "B", 10, 0);
         tx1.nonce_id = Some("unique-1".to_string());
-        
+
         let mut tx2 = Transaction::new("C", "D", 20, 0);
         tx2.nonce_id = Some("unique-1".to_string());
 
@@ -409,7 +415,7 @@ mod mempool_index_tests {
         let mut tx1 = Transaction::new("A", "B", 10, 0);
         tx1.nonce_id = Some("persisted-1".to_string());
         mempool.add_tx(tx1).unwrap();
-        
+
         let tx_back = mempool.get_tx_by_id(&mempool.txs[0].id()).unwrap();
         assert_eq!(tx_back.nonce_id, Some("persisted-1".to_string()));
     }

@@ -223,7 +223,6 @@ impl Transaction {
         }
     }
 
-
     pub fn signing_bytes(&self) -> Vec<u8> {
         // JSON keeps this demo-friendly; if we need canonical encoding later, we can swap it.
         serde_json::to_vec(&self.signing_payload()).expect("serialize signing payload")
