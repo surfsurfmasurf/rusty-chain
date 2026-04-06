@@ -206,6 +206,14 @@ impl Mempool {
             .any(|t| t.nonce_id.as_ref() == Some(&nonce_id.to_string()))
     }
 
+    /// Optimized: Returns a list of transactions in the mempool that have a specific nonce_id.
+    pub fn get_txs_by_nonce_id(&self, nonce_id: &str) -> Vec<&Transaction> {
+        self.txs
+            .iter()
+            .filter(|t| t.nonce_id.as_ref() == Some(&nonce_id.to_string()))
+            .collect()
+    }
+
     /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
         if let Some(pos) = self.tx_index.remove(tx_id) {
