@@ -65,10 +65,10 @@ impl Mempool {
         tx.validate_accept()?;
 
         // If nonce_id is present, ensure it is unique within the mempool.
-        if let Some(nonce_id) = &tx.nonce_id {
-            if self.contains_nonce_id(nonce_id) {
-                anyhow::bail!("duplicate nonce_id detected in mempool: {}", nonce_id);
-            }
+        if let Some(nonce_id) = &tx.nonce_id
+            && self.contains_nonce_id(nonce_id)
+        {
+            anyhow::bail!("duplicate nonce_id detected in mempool: {}", nonce_id);
         }
 
         // Mempool size limit check: refuse new transactions if mempool is at absolute capacity
