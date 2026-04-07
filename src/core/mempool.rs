@@ -157,9 +157,9 @@ impl Mempool {
         out
     }
 
-    /// Optimized drain that clears mempool and returns transactions sorted by fee and priority.
+    /// Optimized drain that clears mempool and returns transactions sorted by fee, priority, and timestamp.
     pub fn drain_sorted(&mut self) -> Vec<Transaction> {
-        self.sort_by_fee_and_priority();
+        self.sort_by_fee_priority_and_timestamp();
         self.drain()
     }
 
@@ -188,7 +188,7 @@ impl Mempool {
         if self.txs.len() <= max_count {
             return 0;
         }
-        self.sort_by_fee_and_priority();
+        self.sort_by_fee_priority_and_timestamp();
         let evicted = self.txs.len() - max_count;
         self.txs.truncate(max_count);
         self.rebuild_index();
@@ -220,16 +220,20 @@ impl Mempool {
     }
 
     /// Sorts transactions in the mempool by fee (descending), then by priority (descending).
-    pub fn sort_by_fee_and_priority(&mut self) {
+    pub fn sort_by_fee_priority_and_timestamp(&mut self) {
         self.txs.sort_by(|a, b| {
-            // First sort by fee descending
+            // 1. Fee descending
             let fee_cmp = b.fee.cmp(&a.fee);
-            if fee_cmp == std::cmp::Ordering::Equal {
-                // If fees are equal, sort by priority descending
-                b.priority.cmp(&a.priority)
-            } else {
-                fee_cmp
+            if fee_cmp != std::cmp::Ordering::Equal {
+                return fee_cmp;
             }
+            // 2. Priority descending
+            let prio_cmp = b.priority.cmp(&a.priority);
+            if prio_cmp != std::cmp::Ordering::Equal {
+                return prio_cmp;
+            }
+            // 3. Timestamp ascending (first in first out for equal fee/prio)
+            a.timestamp_ms.cmp(&b.timestamp_ms)
         });
         self.rebuild_index();
     }
@@ -241,7 +245,7 @@ impl Mempool {
             return 0;
         }
 
-        self.sort_by_fee_and_priority();
+        self.sort_by_fee_priority_and_timestamp();
         let mut new_size = current_size;
         let mut evicted = 0;
 
@@ -273,15 +277,19 @@ impl Mempool {
 
     /// Evicts transactions from the mempool that have exceeded the time-to-live (TTL).
     /// Returns the number of evicted transactions.
-    pub fn evict_expired(&mut self, ttl_ms: u64, now_ms: u64) -> usize {
+    pub fn evict_expired(&mut self, now_ms: u64) -> usize {
         let count_before = self.txs.len();
         self.txs.retain(|t| {
             if t.timestamp_ms == 0 {
-                // If timestamp is not set (legacy or internal), keep it for now
-                // or we could treat it as expired.
                 return true;
             }
-            now_ms < t.timestamp_ms.saturating_add(ttl_ms)
+            // Use transaction-specific TTL if set, otherwise default to a high value (e.g., 2 weeks)
+            let ttl = if t.ttl_ms > 0 {
+                t.ttl_ms
+            } else {
+                14 * 24 * 60 * 60 * 1000 // 14 days default
+            };
+            now_ms < t.timestamp_ms.saturating_add(ttl)
         });
         let evicted = count_before - self.txs.len();
         if evicted > 0 {
@@ -324,7 +332,7 @@ mod mempool_index_tests {
     }
 
     #[test]
-    fn test_mempool_sort_by_fee_and_priority() {
+    fn test_mempool_sort_by_fee_priority_and_timestamp() {
         let mut mempool = Mempool::new();
         let mut tx_low = Transaction::new("A", "B", 10, 0);
         tx_low.fee = 1;
@@ -333,10 +341,12 @@ mod mempool_index_tests {
         let mut tx_mid_prio1 = Transaction::new("A", "C", 20, 1);
         tx_mid_prio1.fee = 5;
         tx_mid_prio1.priority = 10;
+        tx_mid_prio1.timestamp_ms = 2000;
 
         let mut tx_mid_prio2 = Transaction::new("A", "D", 30, 2);
         tx_mid_prio2.fee = 5;
-        tx_mid_prio2.priority = 20;
+        tx_mid_prio2.priority = 10;
+        tx_mid_prio2.timestamp_ms = 1000; // Older should come first if fee/prio same
 
         let mut tx_high = Transaction::new("A", "E", 40, 3);
         tx_high.fee = 10;
@@ -347,16 +357,16 @@ mod mempool_index_tests {
         mempool.add_tx(tx_mid_prio2).unwrap();
         mempool.add_tx(tx_high).unwrap();
 
-        mempool.sort_by_fee_and_priority();
+        mempool.sort_by_fee_priority_and_timestamp();
 
         // 1. Fee 10
         assert_eq!(mempool.txs[0].fee, 10);
-        // 2. Fee 5, Priority 20
+        // 2. Fee 5, Priority 10, Older timestamp (1000)
         assert_eq!(mempool.txs[1].fee, 5);
-        assert_eq!(mempool.txs[1].priority, 20);
-        // 3. Fee 5, Priority 10
+        assert_eq!(mempool.txs[1].timestamp_ms, 1000);
+        // 3. Fee 5, Priority 10, Newer timestamp (2000)
         assert_eq!(mempool.txs[2].fee, 5);
-        assert_eq!(mempool.txs[2].priority, 10);
+        assert_eq!(mempool.txs[2].timestamp_ms, 2000);
         // 4. Fee 1
         assert_eq!(mempool.txs[3].fee, 1);
     }
@@ -368,14 +378,38 @@ mod mempool_index_tests {
         tx1.timestamp_ms = 1000;
         let mut tx2 = Transaction::new("A", "C", 20, 1);
         tx2.timestamp_ms = 2000;
+        tx1.ttl_ms = 500;
+        tx2.ttl_ms = 500;
 
         mempool.add_tx(tx1).unwrap();
         mempool.add_tx(tx2).unwrap();
 
         assert_eq!(mempool.len(), 2);
 
-        // TTL of 500ms, current time 2000ms. tx1 (1000) expired, tx2 (2000) not.
-        let evicted = mempool.evict_expired(500, 2000);
+        // At 2000ms:
+        // tx1: 1000 + 500 = 1500 (expired)
+        // tx2: 2000 + 500 = 2500 (not expired)
+        let evicted = mempool.evict_expired(2000);
+        assert_eq!(evicted, 1);
+        assert_eq!(mempool.len(), 1);
+        assert_eq!(mempool.txs[0].amount, 20);
+    }
+
+    #[test]
+    fn test_mempool_evict_expired_with_custom_ttl() {
+        let mut mempool = Mempool::new();
+        let mut tx1 = Transaction::new("A", "B", 10, 0);
+        tx1.timestamp_ms = 1000;
+        tx1.ttl_ms = 100; // Expire at 1100
+        let mut tx2 = Transaction::new("A", "C", 20, 1);
+        tx2.timestamp_ms = 1000;
+        tx2.ttl_ms = 2000; // Expire at 3000
+
+        mempool.add_tx(tx1).unwrap();
+        mempool.add_tx(tx2).unwrap();
+
+        // At 1500, tx1 is expired (1100), tx2 is not (3000)
+        let evicted = mempool.evict_expired(1500);
         assert_eq!(evicted, 1);
         assert_eq!(mempool.len(), 1);
         assert_eq!(mempool.txs[0].amount, 20);
@@ -386,14 +420,16 @@ mod mempool_index_tests {
         let mut mempool = Mempool::new();
         let mut tx1 = Transaction::new("A", "B", 10, 0);
         tx1.timestamp_ms = 1000;
+        tx1.ttl_ms = 500;
         let mut tx2 = Transaction::new("A", "C", 20, 1);
         tx2.timestamp_ms = 2000;
+        tx2.ttl_ms = 500;
         let id2 = tx2.id();
 
         mempool.add_tx(tx1).unwrap();
         mempool.add_tx(tx2).unwrap();
 
-        mempool.evict_expired(500, 2000);
+        mempool.evict_expired(2000);
 
         assert_eq!(mempool.tx_index.get(&id2), Some(&0));
     }

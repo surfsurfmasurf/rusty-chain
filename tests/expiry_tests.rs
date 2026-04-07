@@ -52,7 +52,10 @@ fn test_mempool_evict_expired_transactions() {
     // Evict with 500ms TTL at time 2000
     // tx1 (1000) + 500 = 1500 < 2000 -> Expired
     // tx2 (2000) + 500 = 2500 > 2000 -> OK
-    let evicted = mempool.evict_expired(500, 2000);
+    for tx in mempool.txs.iter_mut() {
+        tx.ttl_ms = 500;
+    }
+    let evicted = mempool.evict_expired(2000);
     assert_eq!(evicted, 1);
     assert_eq!(mempool.len(), 1);
     assert_eq!(mempool.txs[0].amount, 20);

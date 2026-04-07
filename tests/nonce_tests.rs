@@ -27,7 +27,9 @@ fn chain_next_nonce_for_is_max_plus_one() {
         locktime: None,
         expiry: None,
         priority: 0,
+        ttl_ms: 0,
         nonce_id: None,
+        message_id: None,
         version: 1,
     };
     c.mine_block(vec![cb], 0, None).unwrap();

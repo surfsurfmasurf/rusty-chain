@@ -169,8 +169,8 @@ impl P2PNode {
                     .unwrap_or_default()
                     .as_millis() as u64;
 
-                // TTL: 24 hours (86,400,000 ms)
-                let evicted = state.mempool.evict_expired(86_400_000, now);
+                // TTL is now transaction-specific or defaults in Mempool
+                let evicted = state.mempool.evict_expired(now);
                 if evicted > 0 {
                     println!(
                         "Background evictor: removed {} expired transactions",

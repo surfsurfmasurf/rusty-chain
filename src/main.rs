@@ -539,7 +539,7 @@ async fn main() -> anyhow::Result<()> {
                 );
             }
         }
-        Commands::TxEvict { mempool, ttl } => {
+        Commands::TxEvict { mempool, ttl: _ttl } => {
             let mp_path = mempool_path(mempool);
             if !mp_path.exists() {
                 println!("mempool: {} (not found)", mp_path.display());
@@ -547,7 +547,9 @@ async fn main() -> anyhow::Result<()> {
             }
             let mut mp = Mempool::load(&mp_path)?;
             let now = rusty_chain::core::time::now_ms();
-            let evicted = mp.evict_expired(ttl, now);
+            // TTL is now transaction-specific or defaults.
+            // We ignore the command-line TTL for now, or could apply it to all if we wanted.
+            let evicted = mp.evict_expired(now);
             mp.save(&mp_path)?;
             println!("Evicted {} expired transactions from mempool.", evicted);
             println!("Current mempool size: {}", mp.txs.len());

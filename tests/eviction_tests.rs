@@ -25,7 +25,13 @@ fn test_mempool_eviction() {
     // tx1: 1000 + 1500 = 2500 < 3000 (expired)
     // tx2: 2000 + 1500 = 3500 > 3000 (ok)
     // tx3: 3000 + 1500 = 4500 > 3000 (ok)
-    let evicted = mp.evict_expired(1500, 3000);
+
+    // Update txs to have explicit TTL for this test
+    for tx in mp.txs.iter_mut() {
+        tx.ttl_ms = 1500;
+    }
+
+    let evicted = mp.evict_expired(3000);
 
     assert_eq!(evicted, 1);
     assert_eq!(mp.txs.len(), 2);
