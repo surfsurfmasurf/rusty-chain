@@ -393,10 +393,12 @@ Next:
 - Maintenance: Fixed manual `Transaction` initializers in existing tests to include the `expiry` field.
 - Pushed 8 commits as part of the Day 55 work session.
 
-## Day 57 (Today)
-- Mempool: Implemented `get_txs_by_nonce_id` helper for transaction grouping.
-- Refactor: Standardized manual transaction initializers across test suite (fixed formatting and missing fields).
-- Maintenance: Applied `cargo fmt` to core modules and test files.
-- Tests: Added unit tests for `get_txs_by_nonce_id` in `mempool_index_tests`.
-- Pushed 8 commits as part of the Day 57 work session.
+## Day 58 (Today)
+- Core: Added `ttl_ms` and `message_id` fields to `Transaction` and `TxSignPayload`.
+- Mempool: Implemented transaction-specific TTL in `evict_expired`, allowing per-TX expiration control.
+- Mempool: Refined `sort_by_fee_priority_and_timestamp` to include timestamp ascending as a tie-breaker for equal fee/priority (FIFO).
+- Refactor: Updated coinbase construction and P2P background evictor to comply with new TTL logic.
+- Tests: Updated all manual transaction initializers in the test suite and added coverage for custom TTL and refined sorting.
+- Polish: Applied clippy suggestions (collapsible if) and unified documentation.
+- Pushed 8+ commits for Day 58 (maintaining the streak).
 
