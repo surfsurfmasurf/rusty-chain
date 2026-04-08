@@ -275,11 +275,16 @@ impl Mempool {
         self.tx_index.clear();
     }
 
-    /// Evicts transactions from the mempool that have exceeded the time-to-live (TTL).
+    /// Evicts transactions from the mempool that have exceeded the time-to-live (TTL) or expiration_ms.
     /// Returns the number of evicted transactions.
     pub fn evict_expired(&mut self, now_ms: u64) -> usize {
         let count_before = self.txs.len();
         self.txs.retain(|t| {
+            // Check explicit expiration_ms
+            if t.expiration_ms > 0 && now_ms >= t.expiration_ms {
+                return false;
+            }
+
             if t.timestamp_ms == 0 {
                 return true;
             }
