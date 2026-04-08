@@ -89,6 +89,31 @@ pub struct Transaction {
     pub version: u32,
 }
 
+impl Default for Transaction {
+    fn default() -> Self {
+        Self {
+            from: "".to_string(),
+            to: "".to_string(),
+            amount: 0,
+            fee: 0,
+            nonce: 0,
+            pubkey_hex: None,
+            signature_b64: None,
+            memo: None,
+            sequence: 0,
+            timestamp_ms: crate::core::time::now_ms(),
+            locktime: None,
+            expiry: None,
+            priority: 0,
+            ttl_ms: 0,
+            nonce_id: None,
+            expiration_ms: 0,
+            message_id: None,
+            version: 1,
+        }
+    }
+}
+
 fn default_tx_version() -> u32 {
     1
 }
@@ -286,7 +311,7 @@ impl Transaction {
         anyhow::ensure!(self.from != self.to, "tx.from and tx.to must differ");
         // Minimum amount of 1 unit (prevents dust/negative amounts)
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
-        
+
         // Expiration check
         if self.expiration_ms > 0 {
             let now = crate::core::time::now_ms();
