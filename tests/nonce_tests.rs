@@ -29,6 +29,7 @@ fn chain_next_nonce_for_is_max_plus_one() {
         priority: 0,
         ttl_ms: 0,
         nonce_id: None,
+        expiration_ms: 0,
         message_id: None,
         version: 1,
     };

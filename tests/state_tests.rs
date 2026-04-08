@@ -29,6 +29,7 @@ fn coinbase_tx_increases_balance() {
         priority: 0,
         ttl_ms: 0,
         nonce_id: None,
+        expiration_ms: 0,
         message_id: None,
         version: 1,
     };
@@ -60,6 +61,7 @@ fn transfer_tx_updates_balances() {
         priority: 0,
         ttl_ms: 0,
         nonce_id: None,
+        expiration_ms: 0,
         message_id: None,
         version: 1,
     };
@@ -112,6 +114,7 @@ fn invalid_nonce_makes_chain_invalid() {
         priority: 0,
         ttl_ms: 0,
         nonce_id: None,
+        expiration_ms: 0,
         message_id: None,
         version: 1,
     };
@@ -149,6 +152,7 @@ fn fees_are_collected_by_miner() {
         priority: 0,
         ttl_ms: 0,
         nonce_id: None,
+        expiration_ms: 0,
         message_id: None,
         version: 1,
     };
@@ -189,6 +193,7 @@ fn insufficient_balance_for_fee_fails() {
         priority: 0,
         ttl_ms: 0,
         nonce_id: None,
+        expiration_ms: 0,
         message_id: None,
         version: 1,
     };
