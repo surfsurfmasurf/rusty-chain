@@ -75,6 +75,11 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nonce_id: Option<String>,
 
+    /// Transaction expiration timestamp (Unix epoch ms).
+    /// If non-zero, the transaction is invalid if `now_ms > expiration_ms`.
+    #[serde(default)]
+    pub expiration_ms: u64,
+
     /// Optional P2P message ID to handle P2P-level deduplication.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
@@ -111,6 +116,8 @@ pub struct TxSignPayload {
     pub ttl_ms: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nonce_id: Option<String>,
+    #[serde(default)]
+    pub expiration_ms: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
     #[serde(default)]
@@ -135,6 +142,7 @@ impl Transaction {
             priority: 0,
             ttl_ms: 0,
             nonce_id: None,
+            expiration_ms: 0,
             message_id: None,
             version: 1,
         }
@@ -163,6 +171,7 @@ impl Transaction {
             priority: 0,
             ttl_ms: 0,
             nonce_id: None,
+            expiration_ms: 0,
             message_id: None,
             version: 1,
         }
@@ -191,6 +200,7 @@ impl Transaction {
             priority: 0,
             ttl_ms: 0,
             nonce_id: None,
+            expiration_ms: 0,
             message_id: None,
             version: 1,
         }
@@ -220,6 +230,7 @@ impl Transaction {
             priority: 0,
             ttl_ms: 0,
             nonce_id: None,
+            expiration_ms: 0,
             message_id: None,
             version: 1,
         }
@@ -240,6 +251,7 @@ impl Transaction {
             priority: self.priority,
             ttl_ms: self.ttl_ms,
             nonce_id: self.nonce_id.clone(),
+            expiration_ms: self.expiration_ms,
             message_id: self.message_id.clone(),
             version: self.version,
         }
@@ -274,8 +286,17 @@ impl Transaction {
         anyhow::ensure!(self.from != self.to, "tx.from and tx.to must differ");
         // Minimum amount of 1 unit (prevents dust/negative amounts)
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
-        // Sequence should be non-negative (u32 handles this, but let's ensure it's not wrapped or used incorrectly)
-        // Add more sequence validation if rules emerge.
+        
+        // Expiration check
+        if self.expiration_ms > 0 {
+            let now = crate::core::time::now_ms();
+            anyhow::ensure!(
+                now < self.expiration_ms,
+                "transaction has expired (now={} expiration={})",
+                now,
+                self.expiration_ms
+            );
+        }
 
         if let Some(memo) = &self.memo {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
