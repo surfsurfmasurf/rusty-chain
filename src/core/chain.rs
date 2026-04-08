@@ -150,6 +150,7 @@ impl Chain {
                 priority: 255, // Max priority for coinbase
                 ttl_ms: 0,
                 nonce_id: Some(format!("coinbase-{}", block_height)),
+                expiration_ms: 0,
                 message_id: None,
                 version: 1,
             };
