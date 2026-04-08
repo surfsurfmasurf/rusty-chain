@@ -394,11 +394,11 @@ Next:
 - Pushed 8 commits as part of the Day 55 work session.
 
 ## Day 58 (Today)
-- Core: Added `ttl_ms` and `message_id` fields to `Transaction` and `TxSignPayload`.
-- Mempool: Implemented transaction-specific TTL in `evict_expired`, allowing per-TX expiration control.
-- Mempool: Refined `sort_by_fee_priority_and_timestamp` to include timestamp ascending as a tie-breaker for equal fee/priority (FIFO).
-- Refactor: Updated coinbase construction and P2P background evictor to comply with new TTL logic.
-- Tests: Updated all manual transaction initializers in the test suite and added coverage for custom TTL and refined sorting.
-- Polish: Applied clippy suggestions (collapsible if) and unified documentation.
-- Pushed 8+ commits for Day 58 (maintaining the streak).
+- Core: Added `expiration_ms` field to `Transaction` and `TxSignPayload` for explicit time-based expiration.
+- State: Implemented transaction expiration enforcement in `validate_basic`.
+- Mempool: Updated `evict_expired` to respect `expiration_ms`.
+- CLI: Added `--expiration` flag to `tx-add` and display in `tx-list`.
+- Tests: Added `tests/expiration_ms_tests.rs` and updated existing test suites for compatibility.
+- Core: Implemented `Default` for `Transaction` for easier future testing and construction.
+- Maintenance: Pushed 8 commits as part of the Day 58 maintenance and enhancement session.
 
