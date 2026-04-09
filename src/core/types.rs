@@ -84,6 +84,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
 
+    /// Optional transaction tag for categorizing or filtering transactions.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -109,6 +113,7 @@ impl Default for Transaction {
             nonce_id: None,
             expiration_ms: 0,
             message_id: None,
+            tag: None,
             version: 1,
         }
     }
@@ -145,6 +150,8 @@ pub struct TxSignPayload {
     pub expiration_ms: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
     #[serde(default)]
     pub version: u32,
 }
@@ -169,6 +176,7 @@ impl Transaction {
             nonce_id: None,
             expiration_ms: 0,
             message_id: None,
+            tag: None,
             version: 1,
         }
     }
@@ -198,6 +206,7 @@ impl Transaction {
             nonce_id: None,
             expiration_ms: 0,
             message_id: None,
+            tag: None,
             version: 1,
         }
     }
@@ -227,6 +236,7 @@ impl Transaction {
             nonce_id: None,
             expiration_ms: 0,
             message_id: None,
+            tag: None,
             version: 1,
         }
     }
@@ -278,6 +288,7 @@ impl Transaction {
             nonce_id: self.nonce_id.clone(),
             expiration_ms: self.expiration_ms,
             message_id: self.message_id.clone(),
+            tag: self.tag.clone(),
             version: self.version,
         }
     }
