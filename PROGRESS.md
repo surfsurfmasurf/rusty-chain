@@ -402,3 +402,13 @@ Next:
 - Core: Implemented `Default` for `Transaction` for easier future testing and construction.
 - Maintenance: Pushed 8 commits as part of the Day 58 maintenance and enhancement session.
 
+## Day 59 (Today)
+- Core: Added `tag` field to `Transaction` and `TxSignPayload` for categorization.
+- CLI: Added `--tag` flag to `tx-add` for manual transaction tagging.
+- CLI: Updated `tx-list` to display transaction tags when present.
+- Tests: Added `tests/tag_tests.rs` for verifying tag persistence and optionality.
+- Tests: Fixed `expiration_ms_tests.rs` formatting and unused imports.
+- Maintenance: Updated all manual `Transaction` initializers in test suites to include the new `tag` field.
+- Refactor: Polished `TxAdd` command and transaction display logic.
+- Pushed 8 commits as part of the Day 59 maintenance and enhancement session.
+
