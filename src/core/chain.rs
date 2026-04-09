@@ -152,6 +152,7 @@ impl Chain {
                 nonce_id: Some(format!("coinbase-{}", block_height)),
                 expiration_ms: 0,
                 message_id: None,
+                tag: None,
                 version: 1,
             };
             txs.insert(0, coinbase);

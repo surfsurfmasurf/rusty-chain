@@ -267,6 +267,7 @@ impl Transaction {
             nonce_id: None,
             expiration_ms: 0,
             message_id: None,
+            tag: None,
             version: 1,
         }
     }

@@ -31,6 +31,7 @@ fn coinbase_tx_increases_balance() {
         nonce_id: None,
         expiration_ms: 0,
         message_id: None,
+        tag: None,
         version: 1,
     };
 
@@ -63,6 +64,7 @@ fn transfer_tx_updates_balances() {
         nonce_id: None,
         expiration_ms: 0,
         message_id: None,
+        tag: None,
         version: 1,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
@@ -116,6 +118,7 @@ fn invalid_nonce_makes_chain_invalid() {
         nonce_id: None,
         expiration_ms: 0,
         message_id: None,
+        tag: None,
         version: 1,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
@@ -154,6 +157,7 @@ fn fees_are_collected_by_miner() {
         nonce_id: None,
         expiration_ms: 0,
         message_id: None,
+        tag: None,
         version: 1,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
@@ -195,6 +199,7 @@ fn insufficient_balance_for_fee_fails() {
         nonce_id: None,
         expiration_ms: 0,
         message_id: None,
+        tag: None,
         version: 1,
     };
     c.mine_block(vec![cb], 1, None).unwrap();

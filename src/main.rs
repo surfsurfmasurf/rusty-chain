@@ -550,7 +550,10 @@ async fn main() -> anyhow::Result<()> {
                 } else {
                     "".to_string()
                 };
-                let tag = tx.tag.as_ref().map_or("".to_string(), |t| format!(" tag={t}"));
+                let tag = tx
+                    .tag
+                    .as_ref()
+                    .map_or("".to_string(), |t| format!(" tag={t}"));
                 println!(
                     "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed}){lock}{exp}{expiration}{prio}{tag}",
                     tx.from, tx.to, tx.amount, tx.fee, tx.nonce, tx.sequence, tx.timestamp_ms
