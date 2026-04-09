@@ -141,6 +141,10 @@ enum Commands {
         /// Optional explicit expiration timestamp (ms).
         #[arg(long)]
         expiration: Option<u64>,
+
+        /// Optional tag for the transaction.
+        #[arg(long)]
+        tag: Option<String>,
     },
 
     /// List mempool transactions
@@ -441,6 +445,7 @@ async fn main() -> anyhow::Result<()> {
             priority,
             broadcast_to,
             expiration,
+            tag,
         } => {
             let chain_path = chain_path(chain);
             let chain = load_or_genesis(&chain_path)?;
@@ -479,6 +484,7 @@ async fn main() -> anyhow::Result<()> {
             tx.expiry = expiry;
             tx.priority = priority;
             tx.expiration_ms = expiration.unwrap_or(0);
+            tx.tag = tag;
             if let Some(ts) = timestamp {
                 tx.timestamp_ms = ts;
             }
@@ -544,8 +550,9 @@ async fn main() -> anyhow::Result<()> {
                 } else {
                     "".to_string()
                 };
+                let tag = tx.tag.as_ref().map_or("".to_string(), |t| format!(" tag={t}"));
                 println!(
-                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed}){lock}{exp}{expiration}{prio}",
+                    "{i}: {short} {} -> {} amount={} fee={} nonce={} sequence={} ts={} ({signed}){lock}{exp}{expiration}{prio}{tag}",
                     tx.from, tx.to, tx.amount, tx.fee, tx.nonce, tx.sequence, tx.timestamp_ms
                 );
             }
