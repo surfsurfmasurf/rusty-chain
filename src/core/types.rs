@@ -80,6 +80,10 @@ pub struct Transaction {
     #[serde(default)]
     pub expiration_ms: u64,
 
+    /// Unique transaction nonce hash (UUID/Nonce) for double-spend protection at P2P level.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unique_id: Option<String>,
+
     /// Optional P2P message ID to handle P2P-level deduplication.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
@@ -118,6 +122,7 @@ impl Default for Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            unique_id: None,
             weight: 0,
             version: 1,
         }
@@ -154,6 +159,8 @@ pub struct TxSignPayload {
     #[serde(default)]
     pub expiration_ms: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unique_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
@@ -184,6 +191,7 @@ impl Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            unique_id: None,
             weight: 0,
             version: 1,
         }
@@ -215,6 +223,7 @@ impl Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            unique_id: None,
             weight: 0,
             version: 1,
         }
@@ -278,6 +287,7 @@ impl Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            unique_id: None,
             weight: 0,
             version: 1,
         }
@@ -301,6 +311,8 @@ impl Transaction {
             expiration_ms: self.expiration_ms,
             message_id: self.message_id.clone(),
             tag: self.tag.clone(),
+            unique_id: self.unique_id.clone(),
+            weight: self.weight,
             version: self.version,
         }
     }
