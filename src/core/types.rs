@@ -364,6 +364,10 @@ impl Transaction {
 
         anyhow::ensure!(self.version > 0, "tx.version must be > 0");
 
+        if let Some(uid) = &self.unique_id {
+            anyhow::ensure!(!uid.trim().is_empty(), "tx.unique_id must not be empty if present");
+        }
+
         Ok(())
     }
 
