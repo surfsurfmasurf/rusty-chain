@@ -32,7 +32,7 @@ fn coinbase_tx_increases_balance() {
         expiration_ms: 0,
         message_id: None,
         tag: None,
-        version: 1,
+        version: 1, unique_id: None, weight: 0, is_private: false,
     };
 
     c.mine_block(vec![coinbase], 1, None).unwrap();
@@ -65,7 +65,7 @@ fn transfer_tx_updates_balances() {
         expiration_ms: 0,
         message_id: None,
         tag: None,
-        version: 1,
+        version: 1, unique_id: None, weight: 0, is_private: false,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
@@ -119,7 +119,7 @@ fn invalid_nonce_makes_chain_invalid() {
         expiration_ms: 0,
         message_id: None,
         tag: None,
-        version: 1,
+        version: 1, unique_id: None, weight: 0, is_private: false,
     };
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
@@ -158,7 +158,7 @@ fn fees_are_collected_by_miner() {
         expiration_ms: 0,
         message_id: None,
         tag: None,
-        version: 1,
+        version: 1, unique_id: None, weight: 0, is_private: false,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
 
@@ -200,7 +200,7 @@ fn insufficient_balance_for_fee_fails() {
         expiration_ms: 0,
         message_id: None,
         tag: None,
-        version: 1,
+        version: 1, unique_id: None, weight: 0, is_private: false,
     };
     c.mine_block(vec![cb], 1, None).unwrap();
 

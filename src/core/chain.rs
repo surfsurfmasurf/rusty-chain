@@ -153,6 +153,9 @@ impl Chain {
                 expiration_ms: 0,
                 message_id: None,
                 tag: None,
+                unique_id: None,
+                weight: 0,
+                is_private: false,
                 version: 1,
             };
             txs.insert(0, coinbase);

@@ -32,7 +32,7 @@ fn chain_next_nonce_for_is_max_plus_one() {
         expiration_ms: 0,
         message_id: None,
         tag: None,
-        version: 1,
+        version: 1, unique_id: None, weight: 0, is_private: false,
     };
     c.mine_block(vec![cb], 0, None).unwrap();
 

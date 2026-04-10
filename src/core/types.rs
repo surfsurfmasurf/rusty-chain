@@ -128,6 +128,7 @@ impl Default for Transaction {
             tag: None,
             unique_id: None,
             weight: 0,
+            is_private: false,
             version: 1,
         }
     }
@@ -199,6 +200,7 @@ impl Transaction {
             tag: None,
             unique_id: None,
             weight: 0,
+            is_private: false,
             version: 1,
         }
     }
@@ -231,6 +233,7 @@ impl Transaction {
             tag: None,
             unique_id: None,
             weight: 0,
+            is_private: false,
             version: 1,
         }
     }
@@ -261,7 +264,9 @@ impl Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            unique_id: None,
             weight: 0,
+            is_private: false,
             version: 1,
         }
     }
@@ -295,6 +300,7 @@ impl Transaction {
             tag: None,
             unique_id: None,
             weight: 0,
+            is_private: false,
             version: 1,
         }
     }
@@ -372,7 +378,10 @@ impl Transaction {
         anyhow::ensure!(self.version > 0, "tx.version must be > 0");
 
         if let Some(uid) = &self.unique_id {
-            anyhow::ensure!(!uid.trim().is_empty(), "tx.unique_id must not be empty if present");
+            anyhow::ensure!(
+                !uid.trim().is_empty(),
+                "tx.unique_id must not be empty if present"
+            );
         }
 
         Ok(())
