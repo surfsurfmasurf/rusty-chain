@@ -67,6 +67,10 @@ pub struct Transaction {
     #[serde(default)]
     pub priority: u8,
 
+    /// Is the transaction private? (Future proofing for zero-knowledge or encrypted txs)
+    #[serde(default)]
+    pub is_private: bool,
+
     /// Optional time-to-live (milliseconds) for mempool duration.
     #[serde(default)]
     pub ttl_ms: u64,
@@ -152,6 +156,8 @@ pub struct TxSignPayload {
     pub expiry: Option<u64>,
     #[serde(default)]
     pub priority: u8,
+    #[serde(default)]
+    pub is_private: bool,
     #[serde(default)]
     pub ttl_ms: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -306,6 +312,7 @@ impl Transaction {
             locktime: self.locktime,
             expiry: self.expiry,
             priority: self.priority,
+            is_private: self.is_private,
             ttl_ms: self.ttl_ms,
             nonce_id: self.nonce_id.clone(),
             expiration_ms: self.expiration_ms,
