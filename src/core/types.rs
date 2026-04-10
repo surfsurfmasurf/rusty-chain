@@ -88,6 +88,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
 
+    /// Transaction weight for congestion control.
+    #[serde(default)]
+    pub weight: u32,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -114,6 +118,7 @@ impl Default for Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            weight: 0,
             version: 1,
         }
     }
@@ -153,6 +158,8 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
     #[serde(default)]
+    pub weight: u32,
+    #[serde(default)]
     pub version: u32,
 }
 
@@ -177,6 +184,7 @@ impl Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            weight: 0,
             version: 1,
         }
     }
@@ -207,6 +215,7 @@ impl Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            weight: 0,
             version: 1,
         }
     }
@@ -237,6 +246,7 @@ impl Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            weight: 0,
             version: 1,
         }
     }
@@ -268,6 +278,7 @@ impl Transaction {
             expiration_ms: 0,
             message_id: None,
             tag: None,
+            weight: 0,
             version: 1,
         }
     }
