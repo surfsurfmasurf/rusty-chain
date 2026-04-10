@@ -307,9 +307,18 @@ Next:
 - Refactor: Enhanced `validate()` to check checkpoints automatically.
 - Pushed 8 commits as part of the Day 45 work session.
 
+## Day 60 (Today)
+- Core: Added `weight` field to `Transaction` for congestion control and fee-per-weight calculations.
+- Core: Added `unique_id` to `Transaction` for robust P2P double-spend prevention.
+- Core: Added `is_private` flag to `Transaction` for future privacy enhancement support.
+- Core: Updated `TxSignPayload` to include `weight`, `unique_id`, and `is_private` for signature integrity.
+- Validation: Implemented mandatory `unique_id` non-empty check in `validate_basic`.
+- Refactor: Unified all `Transaction` constructors with the new transaction fields.
+- Maintenance: Pushed 8 commits as part of the Day 60 work session.
+
 Next:
-- Add UPnP support for better connectivity.
-- P2P sync checkpointing.
+- Implement UPnP support for P2P connectivity.
+- Add weighted fee estimation based on transaction weight.
 
 ## Day 46
 - Core: Added `get_checkpoint_at` and `get_last_checkpoint` to `Chain`.
