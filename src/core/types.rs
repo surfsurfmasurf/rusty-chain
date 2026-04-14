@@ -124,6 +124,10 @@ pub struct Transaction {
     #[serde(default)]
     pub salt: u64,
 
+    /// Optional transaction size in bytes (calculated or fixed).
+    #[serde(default)]
+    pub size_bytes: u32,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -223,6 +227,8 @@ pub struct TxSignPayload {
     #[serde(default)]
     pub salt: u64,
     #[serde(default)]
+    pub size_bytes: u32,
+    #[serde(default)]
     pub weight: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -258,6 +264,7 @@ impl Transaction {
             schema_id: None,
             local_difficulty: 0,
             salt: 0,
+            size_bytes: 0,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -299,6 +306,7 @@ impl Transaction {
             schema_id: None,
             local_difficulty: 0,
             salt: 0,
+            size_bytes: 0,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -340,6 +348,7 @@ impl Transaction {
             schema_id: None,
             local_difficulty: 0,
             salt: 0,
+            size_bytes: 0,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -382,6 +391,7 @@ impl Transaction {
             schema_id: None,
             local_difficulty: 0,
             salt: 0,
+            size_bytes: 0,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -416,6 +426,7 @@ impl Transaction {
             schema_id: self.schema_id.clone(),
             local_difficulty: self.local_difficulty,
             salt: self.salt,
+            size_bytes: self.size_bytes,
             weight: self.weight,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),

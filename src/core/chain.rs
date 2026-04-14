@@ -160,6 +160,7 @@ impl Chain {
                 schema_id: None,
                 local_difficulty: 0,
                 salt: 0,
+                size_bytes: 0,
                 weight: 0,
                 is_private: false,
                 session_id: None,
