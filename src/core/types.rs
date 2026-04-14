@@ -112,6 +112,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
 
+    /// Transaction metadata schema identifier.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schema_id: Option<String>,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -204,6 +208,8 @@ pub struct TxSignPayload {
     pub is_batched: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schema_id: Option<String>,
     #[serde(default)]
     pub weight: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -237,6 +243,7 @@ impl Transaction {
             checkpoint_index: 0,
             is_batched: false,
             parent_id: None,
+            schema_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -275,6 +282,7 @@ impl Transaction {
             checkpoint_index: 0,
             is_batched: false,
             parent_id: None,
+            schema_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -313,6 +321,7 @@ impl Transaction {
             checkpoint_index: 0,
             is_batched: false,
             parent_id: None,
+            schema_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -352,6 +361,7 @@ impl Transaction {
             checkpoint_index: 0,
             is_batched: false,
             parent_id: None,
+            schema_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -383,6 +393,7 @@ impl Transaction {
             checkpoint_index: self.checkpoint_index,
             is_batched: self.is_batched,
             parent_id: self.parent_id.clone(),
+            schema_id: self.schema_id.clone(),
             weight: self.weight,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),

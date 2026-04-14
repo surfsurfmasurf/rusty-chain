@@ -157,6 +157,7 @@ impl Chain {
                 checkpoint_index: 0,
                 is_batched: false,
                 parent_id: None,
+                schema_id: None,
                 weight: 0,
                 is_private: false,
                 session_id: None,
