@@ -108,6 +108,10 @@ pub struct Transaction {
     #[serde(default)]
     pub is_batched: bool,
 
+    /// Reference to a parent transaction (for nested transactions or batch linkage).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -145,6 +149,7 @@ impl Default for Transaction {
             unique_id: None,
             checkpoint_index: 0,
             is_batched: false,
+            parent_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -197,6 +202,8 @@ pub struct TxSignPayload {
     pub checkpoint_index: u32,
     #[serde(default)]
     pub is_batched: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
     #[serde(default)]
     pub weight: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -229,6 +236,7 @@ impl Transaction {
             unique_id: None,
             checkpoint_index: 0,
             is_batched: false,
+            parent_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -266,6 +274,7 @@ impl Transaction {
             unique_id: None,
             checkpoint_index: 0,
             is_batched: false,
+            parent_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -303,6 +312,7 @@ impl Transaction {
             unique_id: None,
             checkpoint_index: 0,
             is_batched: false,
+            parent_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -341,6 +351,7 @@ impl Transaction {
             unique_id: None,
             checkpoint_index: 0,
             is_batched: false,
+            parent_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -371,6 +382,7 @@ impl Transaction {
             unique_id: self.unique_id.clone(),
             checkpoint_index: self.checkpoint_index,
             is_batched: self.is_batched,
+            parent_id: self.parent_id.clone(),
             weight: self.weight,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
