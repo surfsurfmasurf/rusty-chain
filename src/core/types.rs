@@ -100,6 +100,10 @@ pub struct Transaction {
     #[serde(default)]
     pub weight: u32,
 
+    /// Unique P2P session identifier to prevent cross-session replay.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session_id: Option<String>,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -129,6 +133,7 @@ impl Default for Transaction {
             unique_id: None,
             weight: 0,
             is_private: false,
+            session_id: None,
             version: 1,
         }
     }
@@ -173,6 +178,8 @@ pub struct TxSignPayload {
     pub tag: Option<String>,
     #[serde(default)]
     pub weight: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session_id: Option<String>,
     #[serde(default)]
     pub version: u32,
 }
@@ -201,6 +208,7 @@ impl Transaction {
             unique_id: None,
             weight: 0,
             is_private: false,
+            session_id: None,
             version: 1,
         }
     }
@@ -234,6 +242,7 @@ impl Transaction {
             unique_id: None,
             weight: 0,
             is_private: false,
+            session_id: None,
             version: 1,
         }
     }
@@ -267,6 +276,7 @@ impl Transaction {
             unique_id: None,
             weight: 0,
             is_private: false,
+            session_id: None,
             version: 1,
         }
     }
@@ -301,6 +311,7 @@ impl Transaction {
             unique_id: None,
             weight: 0,
             is_private: false,
+            session_id: None,
             version: 1,
         }
     }
@@ -326,6 +337,7 @@ impl Transaction {
             tag: self.tag.clone(),
             unique_id: self.unique_id.clone(),
             weight: self.weight,
+            session_id: self.session_id.clone(),
             version: self.version,
         }
     }
@@ -381,6 +393,13 @@ impl Transaction {
             anyhow::ensure!(
                 !uid.trim().is_empty(),
                 "tx.unique_id must not be empty if present"
+            );
+        }
+
+        if let Some(sid) = &self.session_id {
+            anyhow::ensure!(
+                !sid.trim().is_empty(),
+                "tx.session_id must not be empty if present"
             );
         }
 
