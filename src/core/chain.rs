@@ -155,6 +155,7 @@ impl Chain {
                 tag: None,
                 unique_id: None,
                 checkpoint_index: 0,
+                is_batched: false,
                 weight: 0,
                 is_private: false,
                 session_id: None,

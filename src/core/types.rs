@@ -104,6 +104,10 @@ pub struct Transaction {
     #[serde(default)]
     pub checkpoint_index: u32,
 
+    /// Is the transaction a part of a batch?
+    #[serde(default)]
+    pub is_batched: bool,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -140,6 +144,7 @@ impl Default for Transaction {
             tag: None,
             unique_id: None,
             checkpoint_index: 0,
+            is_batched: false,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -191,6 +196,8 @@ pub struct TxSignPayload {
     #[serde(default)]
     pub checkpoint_index: u32,
     #[serde(default)]
+    pub is_batched: bool,
+    #[serde(default)]
     pub weight: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -221,6 +228,7 @@ impl Transaction {
             tag: None,
             unique_id: None,
             checkpoint_index: 0,
+            is_batched: false,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -257,6 +265,7 @@ impl Transaction {
             tag: None,
             unique_id: None,
             checkpoint_index: 0,
+            is_batched: false,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -293,6 +302,7 @@ impl Transaction {
             tag: None,
             unique_id: None,
             checkpoint_index: 0,
+            is_batched: false,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -330,6 +340,7 @@ impl Transaction {
             tag: None,
             unique_id: None,
             checkpoint_index: 0,
+            is_batched: false,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -359,6 +370,7 @@ impl Transaction {
             tag: self.tag.clone(),
             unique_id: self.unique_id.clone(),
             checkpoint_index: self.checkpoint_index,
+            is_batched: self.is_batched,
             weight: self.weight,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
