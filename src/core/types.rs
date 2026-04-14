@@ -116,6 +116,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub schema_id: Option<String>,
 
+    /// Optional transaction difficulty for local or specific verification.
+    #[serde(default)]
+    pub local_difficulty: u32,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -211,6 +215,8 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub schema_id: Option<String>,
     #[serde(default)]
+    pub local_difficulty: u32,
+    #[serde(default)]
     pub weight: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -244,6 +250,7 @@ impl Transaction {
             is_batched: false,
             parent_id: None,
             schema_id: None,
+            local_difficulty: 0,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -283,6 +290,7 @@ impl Transaction {
             is_batched: false,
             parent_id: None,
             schema_id: None,
+            local_difficulty: 0,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -322,6 +330,7 @@ impl Transaction {
             is_batched: false,
             parent_id: None,
             schema_id: None,
+            local_difficulty: 0,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -362,6 +371,7 @@ impl Transaction {
             is_batched: false,
             parent_id: None,
             schema_id: None,
+            local_difficulty: 0,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -394,6 +404,7 @@ impl Transaction {
             is_batched: self.is_batched,
             parent_id: self.parent_id.clone(),
             schema_id: self.schema_id.clone(),
+            local_difficulty: self.local_difficulty,
             weight: self.weight,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),

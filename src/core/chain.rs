@@ -158,6 +158,7 @@ impl Chain {
                 is_batched: false,
                 parent_id: None,
                 schema_id: None,
+                local_difficulty: 0,
                 weight: 0,
                 is_private: false,
                 session_id: None,
