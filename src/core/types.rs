@@ -88,6 +88,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
 
+    /// Checksum of the transaction payload for quick integrity verification.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub payload_checksum: Option<String>,
+
     /// Optional P2P message ID to handle P2P-level deduplication.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
@@ -134,6 +138,7 @@ impl Default for Transaction {
             weight: 0,
             is_private: false,
             session_id: None,
+            payload_checksum: None,
             version: 1,
         }
     }
@@ -173,6 +178,8 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub payload_checksum: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
@@ -209,6 +216,7 @@ impl Transaction {
             weight: 0,
             is_private: false,
             session_id: None,
+            payload_checksum: None,
             version: 1,
         }
     }
@@ -243,6 +251,7 @@ impl Transaction {
             weight: 0,
             is_private: false,
             session_id: None,
+            payload_checksum: None,
             version: 1,
         }
     }
@@ -277,6 +286,7 @@ impl Transaction {
             weight: 0,
             is_private: false,
             session_id: None,
+            payload_checksum: None,
             version: 1,
         }
     }
@@ -312,6 +322,7 @@ impl Transaction {
             weight: 0,
             is_private: false,
             session_id: None,
+            payload_checksum: None,
             version: 1,
         }
     }
@@ -338,6 +349,7 @@ impl Transaction {
             unique_id: self.unique_id.clone(),
             weight: self.weight,
             session_id: self.session_id.clone(),
+            payload_checksum: self.payload_checksum.clone(),
             version: self.version,
         }
     }
@@ -400,6 +412,13 @@ impl Transaction {
             anyhow::ensure!(
                 !sid.trim().is_empty(),
                 "tx.session_id must not be empty if present"
+            );
+        }
+
+        if let Some(pc) = &self.payload_checksum {
+            anyhow::ensure!(
+                !pc.trim().is_empty(),
+                "tx.payload_checksum must not be empty if present"
             );
         }
 

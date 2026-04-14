@@ -157,6 +157,7 @@ impl Chain {
                 weight: 0,
                 is_private: false,
                 session_id: None,
+                payload_checksum: None,
                 version: 1,
             };
             txs.insert(0, coinbase);
