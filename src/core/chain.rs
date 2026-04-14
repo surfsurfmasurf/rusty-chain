@@ -154,6 +154,7 @@ impl Chain {
                 message_id: None,
                 tag: None,
                 unique_id: None,
+                checkpoint_index: 0,
                 weight: 0,
                 is_private: false,
                 session_id: None,
