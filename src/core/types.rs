@@ -132,6 +132,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
 
+    /// Transaction origin (e.g. "wallet", "faucet", "node").
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<String>,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -234,6 +238,8 @@ pub struct TxSignPayload {
     pub size_bytes: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<String>,
     #[serde(default)]
     pub weight: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -272,6 +278,7 @@ impl Transaction {
             salt: 0,
             size_bytes: 0,
             request_id: None,
+            origin: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -315,6 +322,7 @@ impl Transaction {
             salt: 0,
             size_bytes: 0,
             request_id: None,
+            origin: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -438,6 +446,7 @@ impl Transaction {
             salt: self.salt,
             size_bytes: self.size_bytes,
             request_id: self.request_id.clone(),
+            origin: self.origin.clone(),
             weight: self.weight,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
