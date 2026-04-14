@@ -161,6 +161,7 @@ impl Chain {
                 local_difficulty: 0,
                 salt: 0,
                 size_bytes: 0,
+                request_id: None,
                 weight: 0,
                 is_private: false,
                 session_id: None,

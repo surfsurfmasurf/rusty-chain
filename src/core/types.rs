@@ -128,6 +128,10 @@ pub struct Transaction {
     #[serde(default)]
     pub size_bytes: u32,
 
+    /// Unique request ID for correlating P2P requests and responses.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub request_id: Option<String>,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -228,6 +232,8 @@ pub struct TxSignPayload {
     pub salt: u64,
     #[serde(default)]
     pub size_bytes: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub request_id: Option<String>,
     #[serde(default)]
     pub weight: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -265,6 +271,7 @@ impl Transaction {
             local_difficulty: 0,
             salt: 0,
             size_bytes: 0,
+            request_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -307,6 +314,7 @@ impl Transaction {
             local_difficulty: 0,
             salt: 0,
             size_bytes: 0,
+            request_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -349,6 +357,7 @@ impl Transaction {
             local_difficulty: 0,
             salt: 0,
             size_bytes: 0,
+            request_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -392,6 +401,7 @@ impl Transaction {
             local_difficulty: 0,
             salt: 0,
             size_bytes: 0,
+            request_id: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -427,6 +437,7 @@ impl Transaction {
             local_difficulty: self.local_difficulty,
             salt: self.salt,
             size_bytes: self.size_bytes,
+            request_id: self.request_id.clone(),
             weight: self.weight,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
