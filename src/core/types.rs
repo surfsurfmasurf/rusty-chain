@@ -136,6 +136,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<String>,
 
+    /// Optional reference to a linked transaction in another chain or system.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub external_ref: Option<String>,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -240,6 +244,8 @@ pub struct TxSignPayload {
     pub request_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub external_ref: Option<String>,
     #[serde(default)]
     pub weight: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -279,6 +285,7 @@ impl Transaction {
             size_bytes: 0,
             request_id: None,
             origin: None,
+            external_ref: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -323,6 +330,7 @@ impl Transaction {
             size_bytes: 0,
             request_id: None,
             origin: None,
+            external_ref: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -447,6 +455,7 @@ impl Transaction {
             size_bytes: self.size_bytes,
             request_id: self.request_id.clone(),
             origin: self.origin.clone(),
+            external_ref: self.external_ref.clone(),
             weight: self.weight,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),

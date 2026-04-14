@@ -163,6 +163,7 @@ impl Chain {
                 size_bytes: 0,
                 request_id: None,
                 origin: None,
+                external_ref: None,
                 weight: 0,
                 is_private: false,
                 session_id: None,
