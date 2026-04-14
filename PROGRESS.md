@@ -316,9 +316,25 @@ Next:
 - Refactor: Unified all `Transaction` constructors with the new transaction fields.
 - Maintenance: Pushed 8 commits as part of the Day 60 work session.
 
+Day 61
+- Core: Added `session_id` to `Transaction` and `TxSignPayload` for cross-session replay protection.
+- Core: Added `payload_checksum` to `Transaction` for quick integrity verification.
+- Core: Added `checkpoint_index` to `Transaction` for tracking verification state.
+- Core: Added `is_batched` flag to `Transaction` for batching support.
+- Core: Added `parent_id` to `Transaction` for hierarchical transaction support.
+- Core: Added `schema_id` to `Transaction` for structured metadata support.
+- Core: Added `local_difficulty` to `Transaction` for local verification options.
+- Core: Added `salt` to `Transaction` for same-block replay protection.
+- Core: Added `size_bytes` to `Transaction` for fixed-size transaction support.
+- Core: Added `request_id` to `Transaction` for P2P request correlation.
+- Core: Added `origin` field to `Transaction` for source tracking.
+- Core: Added `external_ref` to `Transaction` for cross-chain linkage support.
+- Core: Added `category` field to `Transaction` for transaction classification.
+- Maintenance: Pushed 13 commits as part of the Day 61 work session.
+
 Next:
-- Implement UPnP support for P2P connectivity.
-- Add weighted fee estimation based on transaction weight.
+- Implement batch transaction validation logic.
+- Add support for cross-chain reference verification.
 
 ## Day 46
 - Core: Added `get_checkpoint_at` and `get_last_checkpoint` to `Chain`.
