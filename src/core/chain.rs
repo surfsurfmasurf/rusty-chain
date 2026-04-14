@@ -164,6 +164,7 @@ impl Chain {
                 request_id: None,
                 origin: None,
                 external_ref: None,
+                category: None,
                 weight: 0,
                 is_private: false,
                 session_id: None,

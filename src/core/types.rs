@@ -140,6 +140,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub external_ref: Option<String>,
 
+    /// Transaction classification (e.g. "payment", "smart_contract", "vote").
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -246,6 +250,8 @@ pub struct TxSignPayload {
     pub origin: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub external_ref: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
     #[serde(default)]
     pub weight: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -286,6 +292,7 @@ impl Transaction {
             request_id: None,
             origin: None,
             external_ref: None,
+            category: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -331,6 +338,7 @@ impl Transaction {
             request_id: None,
             origin: None,
             external_ref: None,
+            category: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -374,6 +382,9 @@ impl Transaction {
             salt: 0,
             size_bytes: 0,
             request_id: None,
+            origin: None,
+            external_ref: None,
+            category: None,
             weight: 0,
             is_private: false,
             session_id: None,
@@ -456,6 +467,7 @@ impl Transaction {
             request_id: self.request_id.clone(),
             origin: self.origin.clone(),
             external_ref: self.external_ref.clone(),
+            category: self.category.clone(),
             weight: self.weight,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
