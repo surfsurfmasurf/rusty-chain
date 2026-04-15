@@ -29,7 +29,7 @@ fn chain_next_nonce_for_is_max_plus_one() {
         priority: 0,
         ttl_ms: 0,
         nonce_id: None,
-        expiration_ms: 0, p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, anchor_id: None,
+        expiration_ms: 0, p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, anchor_id: None,
         message_id: None,
         tag: None,
         checkpoint_index: 0,
