@@ -84,6 +84,14 @@ pub struct Transaction {
     #[serde(default)]
     pub expiration_ms: u64,
 
+    /// UNIQUE: P2P message ID for tracking cross-peer broadcasts.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub p2p_message_id: Option<String>,
+
+    /// Checkpoint identifier for transaction anchoring.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub anchor_id: Option<String>,
+
     /// Unique transaction nonce hash (UUID/Nonce) for double-spend protection at P2P level.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
@@ -176,6 +184,8 @@ impl Default for Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
+            p2p_message_id: None,
+            anchor_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -230,6 +240,10 @@ pub struct TxSignPayload {
     pub nonce_id: Option<String>,
     #[serde(default)]
     pub expiration_ms: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub p2p_message_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub anchor_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -287,6 +301,8 @@ impl Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
+            p2p_message_id: None,
+            anchor_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -333,6 +349,8 @@ impl Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
+            p2p_message_id: None,
+            anchor_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -379,6 +397,8 @@ impl Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
+            p2p_message_id: None,
+            anchor_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -426,6 +446,8 @@ impl Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
+            p2p_message_id: None,
+            anchor_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -465,6 +487,8 @@ impl Transaction {
             ttl_ms: self.ttl_ms,
             nonce_id: self.nonce_id.clone(),
             expiration_ms: self.expiration_ms,
+            p2p_message_id: self.p2p_message_id.clone(),
+            anchor_id: self.anchor_id.clone(),
             message_id: self.message_id.clone(),
             tag: self.tag.clone(),
             unique_id: self.unique_id.clone(),

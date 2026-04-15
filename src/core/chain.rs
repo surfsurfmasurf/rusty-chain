@@ -151,6 +151,8 @@ impl Chain {
                 ttl_ms: 0,
                 nonce_id: Some(format!("coinbase-{}", block_height)),
                 expiration_ms: 0,
+                p2p_message_id: None,
+                anchor_id: None,
                 message_id: None,
                 tag: None,
                 unique_id: None,
