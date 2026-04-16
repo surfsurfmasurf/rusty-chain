@@ -103,9 +103,16 @@ Day 12
 - Added `Block` and `Chain` helpers (`is_coinbase`, `total_reward`, `tip_header`)
 - Fixed and updated test suite to comply with new consensus and state rules
 
+Day 46 (Today)
+- Core: Added `shard_id`, `subnet_id`, and `cluster_id` to `Transaction` and `TxSignPayload` for hierarchical network and scalability support.
+- Core: Added `region_id`, `zone_id`, and `group_id` for geographical network awareness and routing.
+- Refactor: Unified all `Transaction` constructors and `TxSignPayload` generation with the new hierarchical network fields.
+- Maintenance: Fixed manual `Transaction` initializers in existing tests to include the new hierarchical fields.
+- Polish: Improved `Transaction::default()` and updated `is_coinbase` documentation.
+- Maintenance: Pushed 8 commits as part of the Day 46 maintenance and scalability enhancement session.
+
 Next:
 - Start Week 3: P2P networking baseline (libp2p or simple tokio tcp)
-- Block propagation
 
 ## ## Day 16
 - Expanded P2P `Message` enum with `RequestStatus`, `ResponseStatus`, `Inventory`, and `GetMempool`

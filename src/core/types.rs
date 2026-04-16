@@ -88,9 +88,25 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub p2p_message_id: Option<String>,
 
+    /// Hierarchical network identifiers for routing and scalability.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subnet_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cluster_id: Option<String>,
+
     /// Checkpoint identifier for transaction anchoring.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
+
+    /// Geographical network identifiers for routing and scalability.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub region_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zone_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group_id: Option<String>,
 
     /// Unique transaction nonce hash (UUID/Nonce) for double-spend protection at P2P level.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -184,8 +200,14 @@ impl Default for Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
-            p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None,
+            p2p_message_id: None,
+            shard_id: None,
+            subnet_id: None,
+            cluster_id: None,
             anchor_id: None,
+            region_id: None,
+            zone_id: None,
+            group_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -243,7 +265,19 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub p2p_message_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subnet_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cluster_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub region_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zone_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -301,8 +335,14 @@ impl Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
-            p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None,
+            p2p_message_id: None,
+            shard_id: None,
+            subnet_id: None,
+            cluster_id: None,
             anchor_id: None,
+            region_id: None,
+            zone_id: None,
+            group_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -349,8 +389,14 @@ impl Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
-            p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None,
+            p2p_message_id: None,
+            shard_id: None,
+            subnet_id: None,
+            cluster_id: None,
             anchor_id: None,
+            region_id: None,
+            zone_id: None,
+            group_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -397,8 +443,14 @@ impl Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
-            p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None,
+            p2p_message_id: None,
+            shard_id: None,
+            subnet_id: None,
+            cluster_id: None,
             anchor_id: None,
+            region_id: None,
+            zone_id: None,
+            group_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -446,8 +498,14 @@ impl Transaction {
             ttl_ms: 0,
             nonce_id: None,
             expiration_ms: 0,
-            p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None,
+            p2p_message_id: None,
+            shard_id: None,
+            subnet_id: None,
+            cluster_id: None,
             anchor_id: None,
+            region_id: None,
+            zone_id: None,
+            group_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
@@ -488,7 +546,13 @@ impl Transaction {
             nonce_id: self.nonce_id.clone(),
             expiration_ms: self.expiration_ms,
             p2p_message_id: self.p2p_message_id.clone(),
+            shard_id: self.shard_id.clone(),
+            subnet_id: self.subnet_id.clone(),
+            cluster_id: self.cluster_id.clone(),
             anchor_id: self.anchor_id.clone(),
+            region_id: self.region_id.clone(),
+            zone_id: self.zone_id.clone(),
+            group_id: self.group_id.clone(),
             message_id: self.message_id.clone(),
             tag: self.tag.clone(),
             unique_id: self.unique_id.clone(),
