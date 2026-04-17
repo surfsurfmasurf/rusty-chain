@@ -188,6 +188,10 @@ pub struct Transaction {
     #[serde(default)]
     pub is_replayable: bool,
 
+    /// Optional gas limit for transaction execution.
+    #[serde(default)]
+    pub gas_limit: u64,
+
     /// Unique P2P session identifier to prevent cross-session replay.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -243,6 +247,7 @@ impl Default for Transaction {
             state_ref: None,
             is_expired: false,
             is_replayable: false,
+            gas_limit: 0,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -338,6 +343,8 @@ pub struct TxSignPayload {
     pub is_expired: bool,
     #[serde(default)]
     pub is_replayable: bool,
+    #[serde(default)]
+    pub gas_limit: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     #[serde(default)]
@@ -390,6 +397,7 @@ impl Transaction {
             state_ref: None,
             is_expired: false,
             is_replayable: false,
+            gas_limit: 0,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -448,6 +456,7 @@ impl Transaction {
             state_ref: None,
             is_expired: false,
             is_replayable: false,
+            gas_limit: 0,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -561,6 +570,7 @@ impl Transaction {
             state_ref: None,
             is_expired: false,
             is_replayable: false,
+            gas_limit: 0,
             is_private: false,
             session_id: None,
             payload_checksum: None,
