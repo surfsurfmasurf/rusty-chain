@@ -192,6 +192,10 @@ pub struct Transaction {
     #[serde(default)]
     pub gas_limit: u64,
 
+    /// Optional reference to an external system for validation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub external_system: Option<String>,
+
     /// Unique P2P session identifier to prevent cross-session replay.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -248,6 +252,7 @@ impl Default for Transaction {
             is_expired: false,
             is_replayable: false,
             gas_limit: 0,
+            external_system: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -346,6 +351,8 @@ pub struct TxSignPayload {
     #[serde(default)]
     pub gas_limit: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub external_system: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     #[serde(default)]
     pub version: u32,
@@ -398,6 +405,7 @@ impl Transaction {
             is_expired: false,
             is_replayable: false,
             gas_limit: 0,
+            external_system: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -457,6 +465,7 @@ impl Transaction {
             is_expired: false,
             is_replayable: false,
             gas_limit: 0,
+            external_system: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -571,6 +580,7 @@ impl Transaction {
             is_expired: false,
             is_replayable: false,
             gas_limit: 0,
+            external_system: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
