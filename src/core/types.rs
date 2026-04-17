@@ -184,6 +184,10 @@ pub struct Transaction {
     #[serde(default)]
     pub is_expired: bool,
 
+    /// Is the transaction valid for replay?
+    #[serde(default)]
+    pub is_replayable: bool,
+
     /// Unique P2P session identifier to prevent cross-session replay.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -238,6 +242,7 @@ impl Default for Transaction {
             is_minable: true,
             state_ref: None,
             is_expired: false,
+            is_replayable: false,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -331,6 +336,8 @@ pub struct TxSignPayload {
     pub state_ref: Option<String>,
     #[serde(default)]
     pub is_expired: bool,
+    #[serde(default)]
+    pub is_replayable: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     #[serde(default)]
@@ -382,6 +389,7 @@ impl Transaction {
             is_minable: true,
             state_ref: None,
             is_expired: false,
+            is_replayable: false,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -439,6 +447,7 @@ impl Transaction {
             is_minable: true,
             state_ref: None,
             is_expired: false,
+            is_replayable: false,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -551,6 +560,7 @@ impl Transaction {
             is_minable: true,
             state_ref: None,
             is_expired: false,
+            is_replayable: false,
             is_private: false,
             session_id: None,
             payload_checksum: None,
