@@ -204,6 +204,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bridge_id: Option<String>,
 
+    /// Optional reference to a specific application or contract.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app_id: Option<String>,
+
     /// Unique P2P session identifier to prevent cross-session replay.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -263,6 +267,7 @@ impl Default for Transaction {
             external_system: None,
             script: None,
             bridge_id: None,
+            app_id: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -367,6 +372,8 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bridge_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     #[serde(default)]
     pub version: u32,
@@ -422,6 +429,7 @@ impl Transaction {
             external_system: None,
             script: None,
             bridge_id: None,
+            app_id: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -484,6 +492,7 @@ impl Transaction {
             external_system: None,
             script: None,
             bridge_id: None,
+            app_id: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -601,6 +610,7 @@ impl Transaction {
             external_system: None,
             script: None,
             bridge_id: None,
+            app_id: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
