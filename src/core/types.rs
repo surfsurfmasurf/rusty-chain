@@ -180,6 +180,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub state_ref: Option<String>,
 
+    /// Transaction expiration status for pruning.
+    #[serde(default)]
+    pub is_expired: bool,
+
     /// Unique P2P session identifier to prevent cross-session replay.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -233,6 +237,7 @@ impl Default for Transaction {
             weight: 0,
             is_minable: true,
             state_ref: None,
+            is_expired: false,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -324,6 +329,8 @@ pub struct TxSignPayload {
     pub is_minable: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub state_ref: Option<String>,
+    #[serde(default)]
+    pub is_expired: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     #[serde(default)]
@@ -374,6 +381,7 @@ impl Transaction {
             weight: 0,
             is_minable: true,
             state_ref: None,
+            is_expired: false,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -430,6 +438,7 @@ impl Transaction {
             weight: 0,
             is_minable: true,
             state_ref: None,
+            is_expired: false,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -541,6 +550,7 @@ impl Transaction {
             weight: 0,
             is_minable: true,
             state_ref: None,
+            is_expired: false,
             is_private: false,
             session_id: None,
             payload_checksum: None,
