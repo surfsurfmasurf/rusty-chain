@@ -172,6 +172,14 @@ pub struct Transaction {
     #[serde(default)]
     pub weight: u32,
 
+    /// Is the transaction valid for mining? (e.g. used for test transactions)
+    #[serde(default)]
+    pub is_minable: bool,
+
+    /// Optional reference to a previous state hash for verification.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state_ref: Option<String>,
+
     /// Unique P2P session identifier to prevent cross-session replay.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -223,6 +231,8 @@ impl Default for Transaction {
             external_ref: None,
             category: None,
             weight: 0,
+            is_minable: true,
+            state_ref: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -310,6 +320,10 @@ pub struct TxSignPayload {
     pub category: Option<String>,
     #[serde(default)]
     pub weight: u32,
+    #[serde(default)]
+    pub is_minable: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state_ref: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     #[serde(default)]
@@ -358,6 +372,8 @@ impl Transaction {
             external_ref: None,
             category: None,
             weight: 0,
+            is_minable: true,
+            state_ref: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -412,6 +428,8 @@ impl Transaction {
             external_ref: None,
             category: None,
             weight: 0,
+            is_minable: true,
+            state_ref: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -521,6 +539,8 @@ impl Transaction {
             external_ref: None,
             category: None,
             weight: 0,
+            is_minable: true,
+            state_ref: None,
             is_private: false,
             session_id: None,
             payload_checksum: None,
