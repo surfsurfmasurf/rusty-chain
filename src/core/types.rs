@@ -208,6 +208,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app_id: Option<String>,
 
+    /// Transaction specific status flags.
+    #[serde(default)]
+    pub flags: u32,
+
     /// Unique P2P session identifier to prevent cross-session replay.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -268,6 +272,7 @@ impl Default for Transaction {
             script: None,
             bridge_id: None,
             app_id: None,
+            flags: 0,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -373,6 +378,8 @@ pub struct TxSignPayload {
     pub bridge_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app_id: Option<String>,
+    #[serde(default)]
+    pub flags: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     #[serde(default)]
@@ -430,6 +437,7 @@ impl Transaction {
             script: None,
             bridge_id: None,
             app_id: None,
+            flags: 0,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -493,6 +501,7 @@ impl Transaction {
             script: None,
             bridge_id: None,
             app_id: None,
+            flags: 0,
             is_private: false,
             session_id: None,
             payload_checksum: None,
@@ -611,6 +620,7 @@ impl Transaction {
             script: None,
             bridge_id: None,
             app_id: None,
+            flags: 0,
             is_private: false,
             session_id: None,
             payload_checksum: None,
