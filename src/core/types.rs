@@ -108,6 +108,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub group_id: Option<String>,
 
+    /// UNIQUE: P2P level routing identifiers.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hop_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub route_id: Option<String>,
+
     /// Unique transaction nonce hash (UUID/Nonce) for double-spend protection at P2P level.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
@@ -248,6 +256,9 @@ impl Default for Transaction {
             region_id: None,
             zone_id: None,
             group_id: None,
+            path_id: None,
+            hop_id: None,
+            route_id: None,
             message_id: None,
             tag: None,
             unique_id: None,
