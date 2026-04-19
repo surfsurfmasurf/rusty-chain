@@ -114,6 +114,19 @@ Day 46 (Today)
 Next:
 - Start Week 3: P2P networking baseline (libp2p or simple tokio tcp)
 
+Day 63 (Today)
+- Core: Added `layer_id`, `tier_id`, and `plane_id` to `Transaction` for network topology awareness.
+- Core: Added `path_id`, `hop_id`, and `route_id` for P2P-level routing tracking and analysis.
+- Core: Added `is_minable`, `state_ref`, `gas_limit`, `external_system`, `script`, `bridge_id`, `app_id`, and `session_id` fields for future scalability and cross-chain support.
+- Refactor: Updated `TxSignPayload` to include all new fields, ensuring full signature coverage for transaction metadata.
+- Maintenance: Refactored `state_tests.rs` and `nonce_tests.rs` to use `Transaction::default()` and field-based initialization, significantly improving test maintainability.
+- Polish: Unified transaction constructors and coinbase generation in `chain.rs` and `types.rs`.
+- Maintenance: Pushed 9 commits as part of the Day 63 scalability and maintenance session.
+
+Next:
+- Implement P2P routing logic using the new path/route identifiers.
+- Explore libp2p integration for more robust peer discovery.
+
 ## ## Day 16
 - Expanded P2P `Message` enum with `RequestStatus`, `ResponseStatus`, `Inventory`, and `GetMempool`
 - Refactored message size limits into a dedicated `size_limit()` helper
