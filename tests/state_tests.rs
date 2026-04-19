@@ -13,43 +13,14 @@ fn coinbase_tx_increases_balance() {
     let mut c = Chain::new_genesis();
 
     // Construct a coinbase tx
-    let coinbase = Transaction {
-        from: "SYSTEM".to_string(),
-        to: "alice".to_string(),
-        amount: 50,
-        fee: 0,
-        nonce: 1, // coinbase nonce must match block height
-        pubkey_hex: None,
-        signature_b64: None,
-        memo: None,
-        sequence: 0,
-        timestamp_ms: 0,
-        locktime: None,
-        expiry: None,
-        priority: 0,
-        ttl_ms: 0,
-        nonce_id: None,
-        expiration_ms: 0, p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None, anchor_id: None,
-        message_id: None,
-        tag: None,
-        checkpoint_index: 0,
-        is_batched: false,
-        parent_id: None,
-        schema_id: None,
-        local_difficulty: 0,
-        salt: 0,
-        size_bytes: 0,
-        request_id: None,
-        origin: None,
-        external_ref: None,
-        category: None,
-        version: 1,
-        unique_id: None,
-        session_id: None,
-        payload_checksum: None,
-        weight: 0,
-        is_private: false,
-    };
+    let mut coinbase = Transaction::default();
+    coinbase.from = "SYSTEM".to_string();
+    coinbase.to = "alice".to_string();
+    coinbase.amount = 50;
+    coinbase.nonce = 1;
+    coinbase.timestamp_ms = 0;
+    coinbase.priority = 0;
+    coinbase.is_minable = true;
 
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
@@ -62,43 +33,14 @@ fn transfer_tx_updates_balances() {
     let mut c = Chain::new_genesis();
 
     // 1. Mine coinbase to Alice
-    let coinbase = Transaction {
-        from: "SYSTEM".to_string(),
-        to: "alice".to_string(),
-        amount: 50,
-        fee: 0,
-        nonce: 1,
-        pubkey_hex: None,
-        signature_b64: None,
-        memo: None,
-        sequence: 0,
-        timestamp_ms: 0,
-        locktime: None,
-        expiry: None,
-        priority: 0,
-        ttl_ms: 0,
-        nonce_id: None,
-        expiration_ms: 0, p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None, anchor_id: None,
-        message_id: None,
-        tag: None,
-        checkpoint_index: 0,
-        is_batched: false,
-        parent_id: None,
-        schema_id: None,
-        local_difficulty: 0,
-        salt: 0,
-        size_bytes: 0,
-        request_id: None,
-        origin: None,
-        external_ref: None,
-        category: None,
-        version: 1,
-        unique_id: None,
-        session_id: None,
-        payload_checksum: None,
-        weight: 0,
-        is_private: false,
-    };
+    let mut coinbase = Transaction::default();
+    coinbase.from = "SYSTEM".to_string();
+    coinbase.to = "alice".to_string();
+    coinbase.amount = 50;
+    coinbase.nonce = 1;
+    coinbase.timestamp_ms = 0;
+    coinbase.priority = 0;
+    coinbase.is_minable = true;
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
     // 2. Mine transfer Alice -> Bob
@@ -132,43 +74,14 @@ fn invalid_nonce_makes_chain_invalid() {
     let mut c = Chain::new_genesis();
 
     // Fund Alice
-    let coinbase = Transaction {
-        from: "SYSTEM".to_string(),
-        to: "alice".to_string(),
-        amount: 50,
-        fee: 0,
-        nonce: 1,
-        pubkey_hex: None,
-        signature_b64: None,
-        memo: None,
-        sequence: 0,
-        timestamp_ms: 0,
-        locktime: None,
-        expiry: None,
-        priority: 0,
-        ttl_ms: 0,
-        nonce_id: None,
-        expiration_ms: 0, p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None, anchor_id: None,
-        message_id: None,
-        tag: None,
-        checkpoint_index: 0,
-        is_batched: false,
-        parent_id: None,
-        schema_id: None,
-        local_difficulty: 0,
-        salt: 0,
-        size_bytes: 0,
-        request_id: None,
-        origin: None,
-        external_ref: None,
-        category: None,
-        version: 1,
-        unique_id: None,
-        session_id: None,
-        payload_checksum: None,
-        weight: 0,
-        is_private: false,
-    };
+    let mut coinbase = Transaction::default();
+    coinbase.from = "SYSTEM".to_string();
+    coinbase.to = "alice".to_string();
+    coinbase.amount = 50;
+    coinbase.nonce = 1;
+    coinbase.timestamp_ms = 0;
+    coinbase.priority = 0;
+    coinbase.is_minable = true;
     c.mine_block(vec![coinbase], 1, None).unwrap();
 
     // Alice sends with nonce 5 (expected 0)
@@ -187,43 +100,14 @@ fn fees_are_collected_by_miner() {
     let mut c = Chain::new_genesis();
 
     // 1. Give Alice some starting funds (100)
-    let cb = Transaction {
-        from: "SYSTEM".to_string(),
-        to: "alice".to_string(),
-        amount: 50,
-        fee: 0,
-        nonce: 1,
-        pubkey_hex: None,
-        signature_b64: None,
-        memo: None,
-        sequence: 0,
-        timestamp_ms: 0,
-        locktime: None,
-        expiry: None,
-        priority: 0,
-        ttl_ms: 0,
-        nonce_id: None,
-        expiration_ms: 0, p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None, anchor_id: None,
-        message_id: None,
-        tag: None,
-        checkpoint_index: 0,
-        is_batched: false,
-        parent_id: None,
-        schema_id: None,
-        local_difficulty: 0,
-        salt: 0,
-        size_bytes: 0,
-        request_id: None,
-        origin: None,
-        external_ref: None,
-        category: None,
-        version: 1,
-        unique_id: None,
-        session_id: None,
-        payload_checksum: None,
-        weight: 0,
-        is_private: false,
-    };
+    let mut cb = Transaction::default();
+    cb.from = "SYSTEM".to_string();
+    cb.to = "alice".to_string();
+    cb.amount = 50;
+    cb.nonce = 1;
+    cb.timestamp_ms = 0;
+    cb.priority = 0;
+    cb.is_minable = true;
     c.mine_block(vec![cb], 1, None).unwrap();
 
     // 2. Alice sends 10 to Bob with 5 fee. Miner is 'charlie'.
@@ -245,43 +129,14 @@ fn insufficient_balance_for_fee_fails() {
     let mut c = Chain::new_genesis();
 
     // Alice has 50. Tries to send 50 with 1 fee (needs 51).
-    let cb = Transaction {
-        from: "SYSTEM".to_string(),
-        to: "alice".to_string(),
-        amount: 50,
-        fee: 0,
-        nonce: 1,
-        pubkey_hex: None,
-        signature_b64: None,
-        memo: None,
-        sequence: 0,
-        timestamp_ms: 0,
-        locktime: None,
-        expiry: None,
-        priority: 0,
-        ttl_ms: 0,
-        nonce_id: None,
-        expiration_ms: 0, p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None, anchor_id: None,
-        message_id: None,
-        tag: None,
-        checkpoint_index: 0,
-        is_batched: false,
-        parent_id: None,
-        schema_id: None,
-        local_difficulty: 0,
-        salt: 0,
-        size_bytes: 0,
-        request_id: None,
-        origin: None,
-        external_ref: None,
-        category: None,
-        version: 1,
-        unique_id: None,
-        session_id: None,
-        payload_checksum: None,
-        weight: 0,
-        is_private: false,
-    };
+    let mut cb = Transaction::default();
+    cb.from = "SYSTEM".to_string();
+    cb.to = "alice".to_string();
+    cb.amount = 50;
+    cb.nonce = 1;
+    cb.timestamp_ms = 0;
+    cb.priority = 0;
+    cb.is_minable = true;
     c.mine_block(vec![cb], 1, None).unwrap();
 
     let tx = Transaction::new_with_fee("alice", "bob", 50, 1, 0, 0);

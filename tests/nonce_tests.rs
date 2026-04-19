@@ -13,43 +13,14 @@ fn chain_next_nonce_for_is_max_plus_one() {
     let mut c = Chain::new_genesis();
 
     // Fund alice
-    let cb = Transaction {
-        from: "SYSTEM".to_string(),
-        to: "alice".to_string(),
-        amount: 50,
-        fee: 0,
-        nonce: 1,
-        pubkey_hex: None,
-        signature_b64: None,
-        memo: None,
-        sequence: 0,
-        timestamp_ms: 0,
-        locktime: None,
-        expiry: None,
-        priority: 0,
-        ttl_ms: 0,
-        nonce_id: None,
-        expiration_ms: 0, p2p_message_id: None, shard_id: None, subnet_id: None, cluster_id: None, region_id: None, zone_id: None, group_id: None, anchor_id: None,
-        message_id: None,
-        tag: None,
-        checkpoint_index: 0,
-        is_batched: false,
-        parent_id: None,
-        schema_id: None,
-        local_difficulty: 0,
-        salt: 0,
-        size_bytes: 0,
-        request_id: None,
-        origin: None,
-        external_ref: None,
-        category: None,
-        version: 1,
-        unique_id: None,
-        session_id: None,
-        payload_checksum: None,
-        weight: 0,
-        is_private: false,
-    };
+    let mut cb = Transaction::default();
+    cb.from = "SYSTEM".to_string();
+    cb.to = "alice".to_string();
+    cb.amount = 50;
+    cb.nonce = 1;
+    cb.timestamp_ms = 0;
+    cb.priority = 0;
+    cb.is_minable = true;
     c.mine_block(vec![cb], 0, None).unwrap();
 
     let tx1 = Transaction::new("alice", "bob", 1, 0);
