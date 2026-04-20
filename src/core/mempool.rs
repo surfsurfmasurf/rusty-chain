@@ -210,6 +210,22 @@ impl Mempool {
             .collect()
     }
 
+    /// Optimized: Returns a list of transactions in the mempool that have a specific node_id.
+    pub fn get_txs_by_node_id(&self, node_id: &str) -> Vec<&Transaction> {
+        self.txs
+            .iter()
+            .filter(|t| t.node_id.as_ref() == Some(&node_id.to_string()))
+            .collect()
+    }
+
+    /// Optimized: Returns a list of transactions in the mempool that have a specific process_id.
+    pub fn get_txs_by_process_id(&self, process_id: &str) -> Vec<&Transaction> {
+        self.txs
+            .iter()
+            .filter(|t| t.process_id.as_ref() == Some(&process_id.to_string()))
+            .collect()
+    }
+
     /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
         if let Some(pos) = self.tx_index.remove(tx_id) {
