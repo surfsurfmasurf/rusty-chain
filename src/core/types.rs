@@ -40,11 +40,9 @@ pub struct Transaction {
     pub pubkey_hex: Option<String>,
 
     /// Optional ed25519 signature (base64) over the signing payload.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub signature_b64: Option<String>,
 
     /// Optional comment/metadata for the transaction (limit: 128 chars)
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub memo: Option<String>,
 
     /// Optional sequence number for the transaction (future-proofing)
@@ -56,11 +54,9 @@ pub struct Transaction {
     pub timestamp_ms: u64,
 
     /// Optional locktime (block height). If set, the transaction is invalid until the chain reaches this height.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub locktime: Option<u64>,
 
     /// Optional expiry (block height). If set, the transaction is invalid after the chain reaches this height.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expiry: Option<u64>,
 
     /// Optional priority level (0-255). Used for mempool ordering and processing.
@@ -76,7 +72,6 @@ pub struct Transaction {
     pub ttl_ms: u64,
 
     /// UNIQUE: Unique identifier for the transaction (UUID v4), used for tracking through P2P and mempool.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nonce_id: Option<String>,
 
     /// Transaction expiration timestamp (Unix epoch ms).
@@ -84,96 +79,58 @@ pub struct Transaction {
     #[serde(default)]
     pub expiration_ms: u64,
 
-    /// UNIQUE: P2P message ID for tracking cross-peer broadcasts.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub p2p_message_id: Option<String>,
 
     /// Hierarchical network identifiers for routing and scalability.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub shard_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subnet_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_id: Option<String>,
 
     /// Checkpoint identifier for transaction anchoring.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
 
-    /// UNIQUE: Node identifier for tracking transaction origin at a physical level.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node_id: Option<String>,
 
-    /// UNIQUE: Physical rack identifier for hardware-aware routing and analysis.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rack_id: Option<String>,
 
-    /// UNIQUE: Server slot identifier for high-resolution topology mapping.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub slot_id: Option<String>,
 
-    /// UNIQUE: Container identifier for virtualized node tracking.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub container_id: Option<String>,
 
-    /// UNIQUE: Process identifier for high-granularity transaction source mapping.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub process_id: Option<String>,
 
-    /// UNIQUE: Thread identifier for internal concurrency analysis.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub thread_id: Option<String>,
 
-    /// UNIQUE: Deployment identifier for mapping transactions to specific software rollouts.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deployment_id: Option<String>,
 
-    /// UNIQUE: Environment identifier (e.g., 'prod', 'staging', 'dev') for network segmentation.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub environment_id: Option<String>,
 
-    /// UNIQUE: Organization identifier for multi-tenant network support.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub org_id: Option<String>,
 
     /// Geographical network identifiers for routing and scalability.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub zone_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub group_id: Option<String>,
 
-    /// UNIQUE: P2P level routing identifiers.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub path_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hop_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub route_id: Option<String>,
 
     /// Network topology identifiers.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub layer_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tier_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub plane_id: Option<String>,
 
     /// Unique transaction nonce hash (UUID/Nonce) for double-spend protection at P2P level.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
 
     /// Checksum of the transaction payload for quick integrity verification.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub payload_checksum: Option<String>,
 
     /// Optional P2P message ID to handle P2P-level deduplication.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
 
     /// Optional transaction tag for categorizing or filtering transactions.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
 
     /// Checkpoint index to track when this transaction was last verified against a checkpoint.
@@ -185,11 +142,9 @@ pub struct Transaction {
     pub is_batched: bool,
 
     /// Reference to a parent transaction (for nested transactions or batch linkage).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
 
     /// Transaction metadata schema identifier.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub schema_id: Option<String>,
 
     /// Optional transaction difficulty for local or specific verification.
@@ -205,19 +160,15 @@ pub struct Transaction {
     pub size_bytes: u32,
 
     /// Unique request ID for correlating P2P requests and responses.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
 
     /// Transaction origin (e.g. "wallet", "faucet", "node").
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<String>,
 
     /// Optional reference to a linked transaction in another chain or system.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub external_ref: Option<String>,
 
     /// Transaction classification (e.g. "payment", "smart_contract", "vote").
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category: Option<String>,
 
     /// Transaction weight for congestion control.
@@ -229,7 +180,6 @@ pub struct Transaction {
     pub is_minable: bool,
 
     /// Optional reference to a previous state hash for verification.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub state_ref: Option<String>,
 
     /// Transaction expiration status for pruning.
@@ -245,19 +195,15 @@ pub struct Transaction {
     pub gas_limit: u64,
 
     /// Optional reference to an external system for validation.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub external_system: Option<String>,
 
     /// Transaction-specific logic or script for advanced validation.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub script: Option<String>,
 
     /// Optional identifier for a cross-chain bridge transaction.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bridge_id: Option<String>,
 
     /// Optional reference to a specific application or contract.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app_id: Option<String>,
 
     /// Transaction specific status flags.
@@ -265,7 +211,6 @@ pub struct Transaction {
     pub flags: u32,
 
     /// Unique P2P session identifier to prevent cross-session replay.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
 
     /// Version number for the transaction format.
@@ -300,12 +245,6 @@ impl Default for Transaction {
             node_id: None,
             rack_id: None,
             slot_id: None,
-            container_id: None,
-            process_id: None,
-            thread_id: None,
-            deployment_id: None,
-            environment_id: None,
-            org_id: None,
             container_id: None,
             process_id: None,
             thread_id: None,
@@ -371,9 +310,7 @@ pub struct TxSignPayload {
     pub sequence: u32,
     #[serde(default)]
     pub timestamp_ms: u64,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub locktime: Option<u64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expiry: Option<u64>,
     #[serde(default)]
     pub priority: u8,
@@ -381,77 +318,45 @@ pub struct TxSignPayload {
     pub is_private: bool,
     #[serde(default)]
     pub ttl_ms: u64,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nonce_id: Option<String>,
     #[serde(default)]
     pub expiration_ms: u64,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub p2p_message_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub shard_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subnet_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rack_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub slot_id: Option<String>,
 
     /// UNIQUE: Container identifier for virtualized node tracking.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub container_id: Option<String>,
 
-    /// UNIQUE: Process identifier for high-granularity transaction source mapping.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub process_id: Option<String>,
 
-    /// UNIQUE: Thread identifier for internal concurrency analysis.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub thread_id: Option<String>,
 
-    /// UNIQUE: Deployment identifier for mapping transactions to specific software rollouts.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deployment_id: Option<String>,
 
-    /// UNIQUE: Environment identifier (e.g., 'prod', 'staging', 'dev') for network segmentation.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub environment_id: Option<String>,
 
-    /// UNIQUE: Organization identifier for multi-tenant network support.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub org_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub zone_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub group_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub layer_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tier_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub plane_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub payload_checksum: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tag: Option<String>,
     #[serde(default)]
     pub checkpoint_index: u32,
     #[serde(default)]
     pub is_batched: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub schema_id: Option<String>,
     #[serde(default)]
     pub local_difficulty: u32,
@@ -459,19 +364,14 @@ pub struct TxSignPayload {
     pub salt: u64,
     #[serde(default)]
     pub size_bytes: u32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub external_ref: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category: Option<String>,
     #[serde(default)]
     pub weight: u32,
     #[serde(default)]
     pub is_minable: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub state_ref: Option<String>,
     #[serde(default)]
     pub is_expired: bool,
@@ -479,17 +379,12 @@ pub struct TxSignPayload {
     pub is_replayable: bool,
     #[serde(default)]
     pub gas_limit: u64,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub external_system: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub script: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bridge_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app_id: Option<String>,
     #[serde(default)]
     pub flags: u32,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
     #[serde(default)]
     pub version: u32,
@@ -522,12 +417,6 @@ impl Transaction {
             node_id: None,
             rack_id: None,
             slot_id: None,
-            container_id: None,
-            process_id: None,
-            thread_id: None,
-            deployment_id: None,
-            environment_id: None,
-            org_id: None,
             container_id: None,
             process_id: None,
             thread_id: None,
@@ -613,12 +502,6 @@ impl Transaction {
             deployment_id: None,
             environment_id: None,
             org_id: None,
-            container_id: None,
-            process_id: None,
-            thread_id: None,
-            deployment_id: None,
-            environment_id: None,
-            org_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -692,12 +575,6 @@ impl Transaction {
             node_id: None,
             rack_id: None,
             slot_id: None,
-            container_id: None,
-            process_id: None,
-            thread_id: None,
-            deployment_id: None,
-            environment_id: None,
-            org_id: None,
             container_id: None,
             process_id: None,
             thread_id: None,
@@ -778,12 +655,6 @@ impl Transaction {
             node_id: None,
             rack_id: None,
             slot_id: None,
-            container_id: None,
-            process_id: None,
-            thread_id: None,
-            deployment_id: None,
-            environment_id: None,
-            org_id: None,
             container_id: None,
             process_id: None,
             thread_id: None,
