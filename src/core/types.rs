@@ -124,6 +124,18 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub thread_id: Option<String>,
 
+    /// UNIQUE: Deployment identifier for mapping transactions to specific software rollouts.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deployment_id: Option<String>,
+
+    /// UNIQUE: Environment identifier (e.g., 'prod', 'staging', 'dev') for network segmentation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub environment_id: Option<String>,
+
+    /// UNIQUE: Organization identifier for multi-tenant network support.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub org_id: Option<String>,
+
     /// Geographical network identifiers for routing and scalability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -291,9 +303,15 @@ impl Default for Transaction {
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -395,6 +413,18 @@ pub struct TxSignPayload {
     /// UNIQUE: Thread identifier for internal concurrency analysis.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub thread_id: Option<String>,
+
+    /// UNIQUE: Deployment identifier for mapping transactions to specific software rollouts.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deployment_id: Option<String>,
+
+    /// UNIQUE: Environment identifier (e.g., 'prod', 'staging', 'dev') for network segmentation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub environment_id: Option<String>,
+
+    /// UNIQUE: Organization identifier for multi-tenant network support.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub org_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -495,9 +525,15 @@ impl Transaction {
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -574,9 +610,15 @@ impl Transaction {
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -653,9 +695,15 @@ impl Transaction {
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -733,9 +781,15 @@ impl Transaction {
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             container_id: None,
             process_id: None,
             thread_id: None,
+            deployment_id: None,
+            environment_id: None,
+            org_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -805,6 +859,9 @@ impl Transaction {
             container_id: self.container_id.clone(),
             process_id: self.process_id.clone(),
             thread_id: self.thread_id.clone(),
+            deployment_id: self.deployment_id.clone(),
+            environment_id: self.environment_id.clone(),
+            org_id: self.org_id.clone(),
             region_id: self.region_id.clone(),
             zone_id: self.zone_id.clone(),
             group_id: self.group_id.clone(),
