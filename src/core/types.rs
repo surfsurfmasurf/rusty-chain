@@ -112,6 +112,18 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub slot_id: Option<String>,
 
+    /// UNIQUE: Container identifier for virtualized node tracking.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub container_id: Option<String>,
+
+    /// UNIQUE: Process identifier for high-granularity transaction source mapping.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_id: Option<String>,
+
+    /// UNIQUE: Thread identifier for internal concurrency analysis.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thread_id: Option<String>,
+
     /// Geographical network identifiers for routing and scalability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -276,6 +288,12 @@ impl Default for Transaction {
             node_id: None,
             rack_id: None,
             slot_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -365,6 +383,18 @@ pub struct TxSignPayload {
     pub rack_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub slot_id: Option<String>,
+
+    /// UNIQUE: Container identifier for virtualized node tracking.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub container_id: Option<String>,
+
+    /// UNIQUE: Process identifier for high-granularity transaction source mapping.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_id: Option<String>,
+
+    /// UNIQUE: Thread identifier for internal concurrency analysis.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thread_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -462,6 +492,12 @@ impl Transaction {
             node_id: None,
             rack_id: None,
             slot_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -535,6 +571,12 @@ impl Transaction {
             node_id: None,
             rack_id: None,
             slot_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -608,6 +650,12 @@ impl Transaction {
             node_id: None,
             rack_id: None,
             slot_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -682,6 +730,12 @@ impl Transaction {
             node_id: None,
             rack_id: None,
             slot_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
+            container_id: None,
+            process_id: None,
+            thread_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -748,6 +802,9 @@ impl Transaction {
             node_id: self.node_id.clone(),
             rack_id: self.rack_id.clone(),
             slot_id: self.slot_id.clone(),
+            container_id: self.container_id.clone(),
+            process_id: self.process_id.clone(),
+            thread_id: self.thread_id.clone(),
             region_id: self.region_id.clone(),
             zone_id: self.zone_id.clone(),
             group_id: self.group_id.clone(),
