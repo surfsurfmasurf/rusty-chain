@@ -100,6 +100,18 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
 
+    /// UNIQUE: Node identifier for tracking transaction origin at a physical level.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub node_id: Option<String>,
+
+    /// UNIQUE: Physical rack identifier for hardware-aware routing and analysis.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rack_id: Option<String>,
+
+    /// UNIQUE: Server slot identifier for high-resolution topology mapping.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub slot_id: Option<String>,
+
     /// Geographical network identifiers for routing and scalability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -261,6 +273,9 @@ impl Default for Transaction {
             subnet_id: None,
             cluster_id: None,
             anchor_id: None,
+            node_id: None,
+            rack_id: None,
+            slot_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -344,6 +359,12 @@ pub struct TxSignPayload {
     pub cluster_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub node_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rack_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub slot_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -438,6 +459,9 @@ impl Transaction {
             subnet_id: None,
             cluster_id: None,
             anchor_id: None,
+            node_id: None,
+            rack_id: None,
+            slot_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -508,6 +532,9 @@ impl Transaction {
             subnet_id: None,
             cluster_id: None,
             anchor_id: None,
+            node_id: None,
+            rack_id: None,
+            slot_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -578,6 +605,9 @@ impl Transaction {
             subnet_id: None,
             cluster_id: None,
             anchor_id: None,
+            node_id: None,
+            rack_id: None,
+            slot_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -649,6 +679,9 @@ impl Transaction {
             subnet_id: None,
             cluster_id: None,
             anchor_id: None,
+            node_id: None,
+            rack_id: None,
+            slot_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -712,6 +745,9 @@ impl Transaction {
             subnet_id: self.subnet_id.clone(),
             cluster_id: self.cluster_id.clone(),
             anchor_id: self.anchor_id.clone(),
+            node_id: self.node_id.clone(),
+            rack_id: self.rack_id.clone(),
+            slot_id: self.slot_id.clone(),
             region_id: self.region_id.clone(),
             zone_id: self.zone_id.clone(),
             group_id: self.group_id.clone(),
