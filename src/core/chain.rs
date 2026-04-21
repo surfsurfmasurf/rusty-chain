@@ -198,6 +198,8 @@ impl Chain {
                 script: None,
                 bridge_id: None,
                 app_id: None,
+                label: None,
+                metadata_label: None,
                 flags: 0,
                 is_private: false,
                 session_id: None,
