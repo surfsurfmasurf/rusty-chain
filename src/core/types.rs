@@ -257,6 +257,11 @@ pub struct Transaction {
     #[serde(default)]
     pub flags: u32,
 
+    /// Core: Added 'label' field to Transaction and TxSignPayload for categorization.
+    /// This field is optional and can be used for various purposes like accounting or filtering.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata_label: Option<String>,
+
     /// Unique P2P session identifier to prevent cross-session replay.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
@@ -333,6 +338,7 @@ impl Default for Transaction {
             bridge_id: None,
             app_id: None,
             label: None,
+            metadata_label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -472,6 +478,8 @@ pub struct TxSignPayload {
     pub app_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata_label: Option<String>,
     #[serde(default)]
     pub flags: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -547,6 +555,7 @@ impl Transaction {
             bridge_id: None,
             app_id: None,
             label: None,
+            metadata_label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -627,6 +636,7 @@ impl Transaction {
             bridge_id: None,
             app_id: None,
             label: None,
+            metadata_label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -707,6 +717,7 @@ impl Transaction {
             bridge_id: None,
             app_id: None,
             label: None,
+            metadata_label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -788,6 +799,7 @@ impl Transaction {
             bridge_id: None,
             app_id: None,
             label: None,
+            metadata_label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -858,6 +870,7 @@ impl Transaction {
             bridge_id: self.bridge_id.clone(),
             app_id: self.app_id.clone(),
             label: self.label.clone(),
+            metadata_label: self.metadata_label.clone(),
             flags: self.flags,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
