@@ -249,6 +249,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app_id: Option<String>,
 
+    /// Optional transaction label (e.g. "gift", "work", "internal").
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+
     /// Transaction specific status flags.
     #[serde(default)]
     pub flags: u32,
@@ -328,6 +332,7 @@ impl Default for Transaction {
             script: None,
             bridge_id: None,
             app_id: None,
+            label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -465,6 +470,8 @@ pub struct TxSignPayload {
     pub bridge_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
     #[serde(default)]
     pub flags: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -539,6 +546,7 @@ impl Transaction {
             script: None,
             bridge_id: None,
             app_id: None,
+            label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -618,6 +626,7 @@ impl Transaction {
             script: None,
             bridge_id: None,
             app_id: None,
+            label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -697,6 +706,7 @@ impl Transaction {
             script: None,
             bridge_id: None,
             app_id: None,
+            label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -777,6 +787,7 @@ impl Transaction {
             script: None,
             bridge_id: None,
             app_id: None,
+            label: None,
             flags: 0,
             is_private: false,
             session_id: None,
@@ -846,6 +857,7 @@ impl Transaction {
             script: self.script.clone(),
             bridge_id: self.bridge_id.clone(),
             app_id: self.app_id.clone(),
+            label: self.label.clone(),
             flags: self.flags,
             session_id: self.session_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
