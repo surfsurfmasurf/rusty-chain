@@ -203,6 +203,8 @@ impl Chain {
                 flags: 0,
                 is_private: false,
                 session_id: None,
+                pool_id: None,
+                trace_id: None,
                 payload_checksum: None,
                 version: 1,
             };

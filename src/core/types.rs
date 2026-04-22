@@ -95,6 +95,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_id: Option<String>,
 
+    /// Geographical network identifiers for routing and scalability.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub region_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zone_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group_id: Option<String>,
+
     /// Checkpoint identifier for transaction anchoring.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
@@ -125,14 +133,6 @@ pub struct Transaction {
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub org_id: Option<String>,
-
-    /// Geographical network identifiers for routing and scalability.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub region_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub zone_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub group_id: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub path_id: Option<String>,
@@ -266,6 +266,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
 
+    /// Optional pool identifier for mempool isolation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pool_id: Option<String>,
+
+    /// Optional trace identifier for transaction lifecycle monitoring.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trace_id: Option<String>,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -342,6 +350,8 @@ impl Default for Transaction {
             flags: 0,
             is_private: false,
             session_id: None,
+            pool_id: None,
+            trace_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -484,6 +494,10 @@ pub struct TxSignPayload {
     pub flags: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pool_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trace_id: Option<String>,
     #[serde(default)]
     pub version: u32,
 }
@@ -559,6 +573,8 @@ impl Transaction {
             flags: 0,
             is_private: false,
             session_id: None,
+            pool_id: None,
+            trace_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -640,6 +656,8 @@ impl Transaction {
             flags: 0,
             is_private: false,
             session_id: None,
+            pool_id: None,
+            trace_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -721,6 +739,8 @@ impl Transaction {
             flags: 0,
             is_private: false,
             session_id: None,
+            pool_id: None,
+            trace_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -803,6 +823,8 @@ impl Transaction {
             flags: 0,
             is_private: false,
             session_id: None,
+            pool_id: None,
+            trace_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -873,6 +895,8 @@ impl Transaction {
             metadata_label: self.metadata_label.clone(),
             flags: self.flags,
             session_id: self.session_id.clone(),
+            pool_id: self.pool_id.clone(),
+            trace_id: self.trace_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
             version: self.version,
         }
