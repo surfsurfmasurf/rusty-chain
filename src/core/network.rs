@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpStream};
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum Message {
     Ping,
     Pong,
