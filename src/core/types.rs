@@ -278,6 +278,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub event_id: Option<String>,
 
+    /// Optional reference to a specific log or audit entry ID.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub audit_id: Option<String>,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -357,6 +361,7 @@ impl Default for Transaction {
             pool_id: None,
             trace_id: None,
             event_id: None,
+            audit_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -505,6 +510,8 @@ pub struct TxSignPayload {
     pub trace_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub event_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub audit_id: Option<String>,
     #[serde(default)]
     pub version: u32,
 }
@@ -583,6 +590,7 @@ impl Transaction {
             pool_id: None,
             trace_id: None,
             event_id: None,
+            audit_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -667,6 +675,7 @@ impl Transaction {
             pool_id: None,
             trace_id: None,
             event_id: None,
+            audit_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -835,6 +844,7 @@ impl Transaction {
             pool_id: None,
             trace_id: None,
             event_id: None,
+            audit_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -908,6 +918,7 @@ impl Transaction {
             pool_id: self.pool_id.clone(),
             trace_id: self.trace_id.clone(),
             event_id: self.event_id.clone(),
+            audit_id: self.audit_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
             version: self.version,
         }
