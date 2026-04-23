@@ -1051,6 +1051,18 @@ impl Transaction {
         // Minimum amount of 1 unit (prevents dust/negative amounts)
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
 
+        // Priority score range check
+        anyhow::ensure!(
+            self.priority_score >= 0.0 && self.priority_score <= 1.0,
+            "priority_score must be between 0.0 and 1.0"
+        );
+
+        // Risk score range check
+        anyhow::ensure!(
+            self.risk_score >= 0.0 && self.risk_score <= 1.0,
+            "risk_score must be between 0.0 and 1.0"
+        );
+
         // Expiration check
         if self.expiration_ms > 0 {
             let now = crate::core::time::now_ms();
