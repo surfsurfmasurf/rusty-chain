@@ -217,6 +217,10 @@ pub struct Transaction {
     #[serde(default)]
     pub risk_score: f64,
 
+    /// Optional reference to a specific regulatory jurisdiction.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub jurisdiction_id: Option<String>,
+
     /// Transaction weight for congestion control.
     #[serde(default)]
     pub weight: u32,
@@ -377,6 +381,7 @@ impl Default for Transaction {
             category: None,
             priority_score: 0.0,
             risk_score: 0.0,
+            jurisdiction_id: None,
             weight: 0,
             is_minable: true,
             state_ref: None,
@@ -630,6 +635,7 @@ impl Transaction {
             category: None,
             priority_score: 0.0,
             risk_score: 0.0,
+            jurisdiction_id: None,
             weight: 0,
             is_minable: true,
             state_ref: None,
@@ -723,6 +729,7 @@ impl Transaction {
             category: None,
             priority_score: 0.0,
             risk_score: 0.0,
+            jurisdiction_id: None,
             weight: 0,
             is_minable: true,
             state_ref: None,
@@ -900,6 +907,7 @@ impl Transaction {
             category: None,
             priority_score: 0.0,
             risk_score: 0.0,
+            jurisdiction_id: None,
             weight: 0,
             is_minable: true,
             state_ref: None,
@@ -983,6 +991,7 @@ impl Transaction {
             category: self.category.clone(),
             priority_score: self.priority_score,
             risk_score: self.risk_score,
+            jurisdiction_id: self.jurisdiction_id.clone(),
             weight: self.weight,
             is_minable: self.is_minable,
             state_ref: self.state_ref.clone(),
