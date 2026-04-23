@@ -286,6 +286,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source_id: Option<String>,
 
+    /// Optional reference to a specific data center or location.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_id: Option<String>,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -367,6 +371,7 @@ impl Default for Transaction {
             event_id: None,
             audit_id: None,
             source_id: None,
+            location_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -519,6 +524,8 @@ pub struct TxSignPayload {
     pub audit_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_id: Option<String>,
     #[serde(default)]
     pub version: u32,
 }
@@ -599,6 +606,7 @@ impl Transaction {
             event_id: None,
             audit_id: None,
             source_id: None,
+            location_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -685,6 +693,7 @@ impl Transaction {
             event_id: None,
             audit_id: None,
             source_id: None,
+            location_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -855,6 +864,7 @@ impl Transaction {
             event_id: None,
             audit_id: None,
             source_id: None,
+            location_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -930,6 +940,7 @@ impl Transaction {
             event_id: self.event_id.clone(),
             audit_id: self.audit_id.clone(),
             source_id: self.source_id.clone(),
+            location_id: self.location_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
             version: self.version,
         }
