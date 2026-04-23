@@ -298,6 +298,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub partition_id: Option<String>,
 
+    /// Optional reference to a specific security or compliance domain.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub domain_id: Option<String>,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -382,6 +386,7 @@ impl Default for Transaction {
             location_id: None,
             datacenter_id: None,
             partition_id: None,
+            domain_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -540,6 +545,8 @@ pub struct TxSignPayload {
     pub datacenter_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub partition_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub domain_id: Option<String>,
     #[serde(default)]
     pub version: u32,
 }
@@ -623,6 +630,7 @@ impl Transaction {
             location_id: None,
             datacenter_id: None,
             partition_id: None,
+            domain_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -712,6 +720,7 @@ impl Transaction {
             location_id: None,
             datacenter_id: None,
             partition_id: None,
+            domain_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -885,6 +894,7 @@ impl Transaction {
             location_id: None,
             datacenter_id: None,
             partition_id: None,
+            domain_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -963,6 +973,7 @@ impl Transaction {
             location_id: self.location_id.clone(),
             datacenter_id: self.datacenter_id.clone(),
             partition_id: self.partition_id.clone(),
+            domain_id: self.domain_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
             version: self.version,
         }
