@@ -294,6 +294,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub datacenter_id: Option<String>,
 
+    /// Optional reference to a specific storage or data partition.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub partition_id: Option<String>,
+
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
@@ -377,6 +381,7 @@ impl Default for Transaction {
             source_id: None,
             location_id: None,
             datacenter_id: None,
+            partition_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -533,6 +538,8 @@ pub struct TxSignPayload {
     pub location_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub datacenter_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub partition_id: Option<String>,
     #[serde(default)]
     pub version: u32,
 }
@@ -615,6 +622,7 @@ impl Transaction {
             source_id: None,
             location_id: None,
             datacenter_id: None,
+            partition_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -703,6 +711,7 @@ impl Transaction {
             source_id: None,
             location_id: None,
             datacenter_id: None,
+            partition_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -875,6 +884,7 @@ impl Transaction {
             source_id: None,
             location_id: None,
             datacenter_id: None,
+            partition_id: None,
             payload_checksum: None,
             version: 1,
         }
@@ -952,6 +962,7 @@ impl Transaction {
             source_id: self.source_id.clone(),
             location_id: self.location_id.clone(),
             datacenter_id: self.datacenter_id.clone(),
+            partition_id: self.partition_id.clone(),
             payload_checksum: self.payload_checksum.clone(),
             version: self.version,
         }
