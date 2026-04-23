@@ -205,9 +205,13 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub external_ref: Option<String>,
 
-    /// Transaction classification (e.g. "payment", "smart_contract", "vote").
+    /// Transactionclassification (e.g. "payment", "smart_contract", "vote").
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category: Option<String>,
+
+    /// Optional transaction priority score (0.0 to 1.0).
+    #[serde(default)]
+    pub priority_score: f64,
 
     /// Transaction weight for congestion control.
     #[serde(default)]
@@ -367,6 +371,7 @@ impl Default for Transaction {
             origin: None,
             external_ref: None,
             category: None,
+            priority_score: 0.0,
             weight: 0,
             is_minable: true,
             state_ref: None,
@@ -507,6 +512,8 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category: Option<String>,
     #[serde(default)]
+    pub priority_score: f64,
+    #[serde(default)]
     pub weight: u32,
     #[serde(default)]
     pub is_minable: bool,
@@ -614,6 +621,7 @@ impl Transaction {
             origin: None,
             external_ref: None,
             category: None,
+            priority_score: 0.0,
             weight: 0,
             is_minable: true,
             state_ref: None,
@@ -705,6 +713,7 @@ impl Transaction {
             origin: None,
             external_ref: None,
             category: None,
+            priority_score: 0.0,
             weight: 0,
             is_minable: true,
             state_ref: None,
@@ -880,6 +889,7 @@ impl Transaction {
             origin: None,
             external_ref: None,
             category: None,
+            priority_score: 0.0,
             weight: 0,
             is_minable: true,
             state_ref: None,
@@ -961,6 +971,7 @@ impl Transaction {
             origin: self.origin.clone(),
             external_ref: self.external_ref.clone(),
             category: self.category.clone(),
+            priority_score: self.priority_score,
             weight: self.weight,
             is_minable: self.is_minable,
             state_ref: self.state_ref.clone(),
