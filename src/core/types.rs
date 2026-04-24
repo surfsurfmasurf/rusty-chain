@@ -325,6 +325,45 @@ pub struct Transaction {
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
     pub version: u32,
+
+    /// Hierarchical workflow identifiers for transaction lifecycle tracking.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub flow_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub step_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sequence_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch_id: Option<String>,
+
+    /// Enhanced network and system identifiers for deep observability.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub controller_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub worker_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instance_id: Option<String>,
+
+    /// Transaction lifecycle state and status flags.
+    #[serde(default)]
+    pub is_reverting: bool,
+    #[serde(default)]
+    pub is_conditional: bool,
+    #[serde(default)]
+    pub is_delegated: bool,
+
+    /// Extended audit identifiers for compliance and regulatory tracking.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compliance_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub policy_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub legal_ref: Option<String>,
 }
 
 impl Default for Transaction {
@@ -360,21 +399,6 @@ impl Default for Transaction {
             deployment_id: None,
             environment_id: None,
             org_id: None,
-            flow_id: None,
-            step_id: None,
-            task_id: None,
-            sequence_id: None,
-            stream_id: None,
-            batch_id: None,
-            controller_id: None,
-            worker_id: None,
-            instance_id: None,
-            is_reverting: false,
-            is_conditional: false,
-            is_delegated: false,
-            compliance_id: None,
-            policy_id: None,
-            legal_ref: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -428,6 +452,21 @@ impl Default for Transaction {
             framework_id: None,
             payload_checksum: None,
             version: 1,
+            flow_id: None,
+            step_id: None,
+            task_id: None,
+            sequence_id: None,
+            stream_id: None,
+            batch_id: None,
+            controller_id: None,
+            worker_id: None,
+            instance_id: None,
+            is_reverting: false,
+            is_conditional: false,
+            is_delegated: false,
+            compliance_id: None,
+            policy_id: None,
+            legal_ref: None,
         }
     }
 }
@@ -498,44 +537,6 @@ pub struct TxSignPayload {
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub org_id: Option<String>,
-
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub flow_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub step_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub task_id: Option<String>,
-
-    /// Hierarchical workflow identifiers for transaction lifecycle tracking.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub sequence_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stream_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub batch_id: Option<String>,
-
-    /// Enhanced network and system identifiers for deep observability.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub controller_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub worker_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub instance_id: Option<String>,
-
-    /// Transaction lifecycle state and status flags.
-    #[serde(default)]
-    pub is_reverting: bool,
-    #[serde(default)]
-    pub is_conditional: bool,
-    #[serde(default)]
-    pub is_delegated: bool,
-
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub compliance_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub policy_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub legal_ref: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -635,6 +636,36 @@ pub struct TxSignPayload {
     pub framework_id: Option<String>,
     #[serde(default)]
     pub version: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub flow_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub step_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sequence_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub controller_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub worker_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instance_id: Option<String>,
+    #[serde(default)]
+    pub is_reverting: bool,
+    #[serde(default)]
+    pub is_conditional: bool,
+    #[serde(default)]
+    pub is_delegated: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compliance_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub policy_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub legal_ref: Option<String>,
 }
 
 impl Transaction {
@@ -735,30 +766,16 @@ impl Transaction {
             deployment_id: self.deployment_id.clone(),
             environment_id: self.environment_id.clone(),
             org_id: self.org_id.clone(),
-            flow_id: self.flow_id.clone(),
-            step_id: self.step_id.clone(),
-            task_id: self.task_id.clone(),
-            sequence_id: self.sequence_id.clone(),
-            stream_id: self.stream_id.clone(),
-            batch_id: self.batch_id.clone(),
-            controller_id: self.controller_id.clone(),
-            worker_id: self.worker_id.clone(),
-            instance_id: self.instance_id.clone(),
-            is_reverting: self.is_reverting,
-            is_conditional: self.is_conditional,
-            is_delegated: self.is_delegated,
-            compliance_id: self.compliance_id.clone(),
-            policy_id: self.policy_id.clone(),
-            legal_ref: self.legal_ref.clone(),
             region_id: self.region_id.clone(),
             zone_id: self.zone_id.clone(),
             group_id: self.group_id.clone(),
             layer_id: self.layer_id.clone(),
             tier_id: self.tier_id.clone(),
             plane_id: self.plane_id.clone(),
+            unique_id: self.unique_id.clone(),
+            payload_checksum: self.payload_checksum.clone(),
             message_id: self.message_id.clone(),
             tag: self.tag.clone(),
-            unique_id: self.unique_id.clone(),
             checkpoint_index: self.checkpoint_index,
             is_batched: self.is_batched,
             parent_id: self.parent_id.clone(),
@@ -797,8 +814,22 @@ impl Transaction {
             partition_id: self.partition_id.clone(),
             domain_id: self.domain_id.clone(),
             framework_id: self.framework_id.clone(),
-            payload_checksum: self.payload_checksum.clone(),
             version: self.version,
+            flow_id: self.flow_id.clone(),
+            step_id: self.step_id.clone(),
+            task_id: self.task_id.clone(),
+            sequence_id: self.sequence_id.clone(),
+            stream_id: self.stream_id.clone(),
+            batch_id: self.batch_id.clone(),
+            controller_id: self.controller_id.clone(),
+            worker_id: self.worker_id.clone(),
+            instance_id: self.instance_id.clone(),
+            is_reverting: self.is_reverting,
+            is_conditional: self.is_conditional,
+            is_delegated: self.is_delegated,
+            compliance_id: self.compliance_id.clone(),
+            policy_id: self.policy_id.clone(),
+            legal_ref: self.legal_ref.clone(),
         }
     }
 
