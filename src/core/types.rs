@@ -827,6 +827,11 @@ impl Transaction {
         // Minimum amount of 1 unit (prevents dust/negative amounts)
         anyhow::ensure!(self.amount > 0, "tx.amount must be > 0");
 
+        // Enhanced amount check for large transactions
+        if self.amount > 1_000_000_000 {
+            println!("Large transaction detected: {} units", self.amount);
+        }
+
         // Priority score range check
         anyhow::ensure!(
             self.priority_score >= 0.0 && self.priority_score <= 1.0,
