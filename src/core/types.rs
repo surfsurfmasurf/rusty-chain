@@ -365,6 +365,9 @@ impl Default for Transaction {
             flow_id: None,
             step_id: None,
             task_id: None,
+            sequence_id: None,
+            stream_id: None,
+            batch_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -495,6 +498,14 @@ pub struct TxSignPayload {
     pub step_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub task_id: Option<String>,
+
+    /// Hierarchical workflow identifiers for transaction lifecycle tracking.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sequence_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch_id: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -697,6 +708,9 @@ impl Transaction {
             flow_id: self.flow_id.clone(),
             step_id: self.step_id.clone(),
             task_id: self.task_id.clone(),
+            sequence_id: self.sequence_id.clone(),
+            stream_id: self.stream_id.clone(),
+            batch_id: self.batch_id.clone(),
             region_id: self.region_id.clone(),
             zone_id: self.zone_id.clone(),
             group_id: self.group_id.clone(),
