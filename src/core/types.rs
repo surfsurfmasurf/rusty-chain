@@ -859,6 +859,11 @@ impl Transaction {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
         }
 
+        // Validate metadata_label length if present
+        if let Some(label) = &self.metadata_label {
+            anyhow::ensure!(label.len() <= 64, "metadata_label must be <= 64 characters");
+        }
+
         anyhow::ensure!(self.version > 0, "tx.version must be > 0");
 
         if let Some(uid) = &self.unique_id {
