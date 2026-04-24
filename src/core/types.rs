@@ -371,6 +371,9 @@ impl Default for Transaction {
             controller_id: None,
             worker_id: None,
             instance_id: None,
+            is_reverting: false,
+            is_conditional: false,
+            is_delegated: false,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -517,6 +520,14 @@ pub struct TxSignPayload {
     pub worker_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub instance_id: Option<String>,
+
+    /// Transaction lifecycle state and status flags.
+    #[serde(default)]
+    pub is_reverting: bool,
+    #[serde(default)]
+    pub is_conditional: bool,
+    #[serde(default)]
+    pub is_delegated: bool,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -725,6 +736,9 @@ impl Transaction {
             controller_id: self.controller_id.clone(),
             worker_id: self.worker_id.clone(),
             instance_id: self.instance_id.clone(),
+            is_reverting: self.is_reverting,
+            is_conditional: self.is_conditional,
+            is_delegated: self.is_delegated,
             region_id: self.region_id.clone(),
             zone_id: self.zone_id.clone(),
             group_id: self.group_id.clone(),
