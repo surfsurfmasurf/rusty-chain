@@ -13,6 +13,11 @@ impl BlockHeader {
         crate::core::hash::header_hash(self)
     }
 
+    /// Optimized hash check for difficulty.
+    pub fn has_valid_difficulty(&self, difficulty: u32) -> bool {
+        self.verify_pow(difficulty).is_ok()
+    }
+
     /// Stateless header verification (PoW check).
     pub fn verify_pow(&self, difficulty: u32) -> anyhow::Result<()> {
         let hash = self.hash();
