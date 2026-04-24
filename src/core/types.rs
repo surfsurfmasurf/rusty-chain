@@ -134,6 +134,13 @@ pub struct Transaction {
     pub org_id: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub flow_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub step_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub path_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hop_id: Option<String>,
@@ -355,6 +362,9 @@ impl Default for Transaction {
             deployment_id: None,
             environment_id: None,
             org_id: None,
+            flow_id: None,
+            step_id: None,
+            task_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -478,6 +488,14 @@ pub struct TxSignPayload {
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub org_id: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub flow_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub step_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<String>,
+
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -676,6 +694,9 @@ impl Transaction {
             deployment_id: self.deployment_id.clone(),
             environment_id: self.environment_id.clone(),
             org_id: self.org_id.clone(),
+            flow_id: self.flow_id.clone(),
+            step_id: self.step_id.clone(),
+            task_id: self.task_id.clone(),
             region_id: self.region_id.clone(),
             zone_id: self.zone_id.clone(),
             group_id: self.group_id.clone(),
