@@ -146,6 +146,34 @@ pub struct Transaction {
     pub task_id: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sequence_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch_id: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub controller_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub worker_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instance_id: Option<String>,
+
+    #[serde(default)]
+    pub is_reverting: bool,
+    #[serde(default)]
+    pub is_conditional: bool,
+    #[serde(default)]
+    pub is_delegated: bool,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compliance_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub policy_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub legal_ref: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub path_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hop_id: Option<String>,
@@ -328,6 +356,45 @@ pub struct Transaction {
     /// Optional reference to a specific regulatory or legal framework.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub framework_id: Option<String>,
+
+    /// Hierarchical workflow identifiers for transaction lifecycle tracking.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub flow_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub step_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sequence_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch_id: Option<String>,
+
+    /// Enhanced network and system identifiers for deep observability.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub controller_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub worker_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instance_id: Option<String>,
+
+    /// Transaction lifecycle state and status flags.
+    #[serde(default)]
+    pub is_reverting: bool,
+    #[serde(default)]
+    pub is_conditional: bool,
+    #[serde(default)]
+    pub is_delegated: bool,
+
+    /// Extended audit identifiers for compliance and regulatory tracking.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compliance_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub policy_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub legal_ref: Option<String>,
 
     /// Version number for the transaction format.
     #[serde(default = "default_tx_version")]
@@ -536,6 +603,13 @@ pub struct TxSignPayload {
     pub is_conditional: bool,
     #[serde(default)]
     pub is_delegated: bool,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compliance_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub policy_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub legal_ref: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
