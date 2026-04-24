@@ -368,6 +368,9 @@ impl Default for Transaction {
             sequence_id: None,
             stream_id: None,
             batch_id: None,
+            controller_id: None,
+            worker_id: None,
+            instance_id: None,
             region_id: None,
             zone_id: None,
             group_id: None,
@@ -506,6 +509,14 @@ pub struct TxSignPayload {
     pub stream_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub batch_id: Option<String>,
+
+    /// Enhanced network and system identifiers for deep observability.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub controller_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub worker_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instance_id: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -711,6 +722,9 @@ impl Transaction {
             sequence_id: self.sequence_id.clone(),
             stream_id: self.stream_id.clone(),
             batch_id: self.batch_id.clone(),
+            controller_id: self.controller_id.clone(),
+            worker_id: self.worker_id.clone(),
+            instance_id: self.instance_id.clone(),
             region_id: self.region_id.clone(),
             zone_id: self.zone_id.clone(),
             group_id: self.group_id.clone(),
