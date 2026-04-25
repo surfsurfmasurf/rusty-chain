@@ -1,7 +1,5 @@
 use rusty_chain::core::mempool::Mempool;
 use rusty_chain::core::types::Transaction;
-use std::thread;
-use std::time::Duration;
 
 #[test]
 fn test_transaction_expiration_validation() {

@@ -104,7 +104,7 @@ fn test_get_checkpoint_helpers() {
 fn test_header_stateless_verification() {
     let mut chain = Chain::new_genesis();
     chain.pow_difficulty = 3;
-    let header = &chain.blocks[0].header;
+    let _header = &chain.blocks[0].header;
     // Genesis header might not have valid PoW for difficulty 3 if created with different difficulty
     // Let's mine one block to be sure
     let block = chain.mine_empty_block(3).unwrap();
