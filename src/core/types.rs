@@ -364,6 +364,14 @@ pub struct Transaction {
     pub policy_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub legal_ref: Option<String>,
+
+    /// Transaction security and integrity fields.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub secure_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bundle_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proof_id: Option<String>,
 }
 
 impl Default for Transaction {
@@ -467,6 +475,9 @@ impl Default for Transaction {
             compliance_id: None,
             policy_id: None,
             legal_ref: None,
+            secure_hash: None,
+            bundle_id: None,
+            proof_id: None,
         }
     }
 }
@@ -666,6 +677,12 @@ pub struct TxSignPayload {
     pub policy_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub legal_ref: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub secure_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bundle_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proof_id: Option<String>,
 }
 
 impl Transaction {
@@ -830,6 +847,9 @@ impl Transaction {
             compliance_id: self.compliance_id.clone(),
             policy_id: self.policy_id.clone(),
             legal_ref: self.legal_ref.clone(),
+            secure_hash: self.secure_hash.clone(),
+            bundle_id: self.bundle_id.clone(),
+            proof_id: self.proof_id.clone(),
         }
     }
 
