@@ -396,6 +396,14 @@ pub struct Transaction {
     pub sub_topic: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub channel_id: Option<String>,
+
+    /// Future account and permission management fields.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub actor_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub role_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub permission_set: Option<String>,
 }
 
 impl Default for Transaction {
@@ -511,6 +519,9 @@ impl Default for Transaction {
             topic: None,
             sub_topic: None,
             channel_id: None,
+            actor_id: None,
+            role_id: None,
+            permission_set: None,
         }
     }
 }
@@ -734,6 +745,12 @@ pub struct TxSignPayload {
     pub sub_topic: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub channel_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub actor_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub role_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub permission_set: Option<String>,
 }
 
 impl Transaction {
@@ -910,6 +927,9 @@ impl Transaction {
             topic: self.topic.clone(),
             sub_topic: self.sub_topic.clone(),
             channel_id: self.channel_id.clone(),
+            actor_id: self.actor_id.clone(),
+            role_id: self.role_id.clone(),
+            permission_set: self.permission_set.clone(),
         }
     }
 
