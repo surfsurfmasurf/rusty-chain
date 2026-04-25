@@ -372,6 +372,14 @@ pub struct Transaction {
     pub bundle_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proof_id: Option<String>,
+
+    /// Future scalability and state management fields.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state_commitment: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub witness_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub snapshot_id: Option<String>,
 }
 
 impl Default for Transaction {
@@ -478,6 +486,9 @@ impl Default for Transaction {
             secure_hash: None,
             bundle_id: None,
             proof_id: None,
+            state_commitment: None,
+            witness_id: None,
+            snapshot_id: None,
         }
     }
 }
@@ -683,6 +694,12 @@ pub struct TxSignPayload {
     pub bundle_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proof_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state_commitment: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub witness_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub snapshot_id: Option<String>,
 }
 
 impl Transaction {
@@ -850,6 +867,9 @@ impl Transaction {
             secure_hash: self.secure_hash.clone(),
             bundle_id: self.bundle_id.clone(),
             proof_id: self.proof_id.clone(),
+            state_commitment: self.state_commitment.clone(),
+            witness_id: self.witness_id.clone(),
+            snapshot_id: self.snapshot_id.clone(),
         }
     }
 
