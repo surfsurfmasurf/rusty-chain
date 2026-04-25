@@ -388,6 +388,14 @@ pub struct Transaction {
     pub target_chain: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bridge_adapter_id: Option<String>,
+
+    /// Transaction metadata and labeling.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub topic: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sub_topic: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub channel_id: Option<String>,
 }
 
 impl Default for Transaction {
@@ -500,6 +508,9 @@ impl Default for Transaction {
             origin_chain: None,
             target_chain: None,
             bridge_adapter_id: None,
+            topic: None,
+            sub_topic: None,
+            channel_id: None,
         }
     }
 }
@@ -717,6 +728,12 @@ pub struct TxSignPayload {
     pub target_chain: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bridge_adapter_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub topic: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sub_topic: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub channel_id: Option<String>,
 }
 
 impl Transaction {
@@ -890,6 +907,9 @@ impl Transaction {
             origin_chain: self.origin_chain.clone(),
             target_chain: self.target_chain.clone(),
             bridge_adapter_id: self.bridge_adapter_id.clone(),
+            topic: self.topic.clone(),
+            sub_topic: self.sub_topic.clone(),
+            channel_id: self.channel_id.clone(),
         }
     }
 
