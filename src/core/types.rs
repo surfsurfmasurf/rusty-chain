@@ -404,6 +404,14 @@ pub struct Transaction {
     pub role_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub permission_set: Option<String>,
+
+    /// Transaction resource and cost tracking.
+    #[serde(default)]
+    pub compute_units: u64,
+    #[serde(default)]
+    pub storage_units: u64,
+    #[serde(default)]
+    pub bandwidth_units: u64,
 }
 
 impl Default for Transaction {
@@ -522,6 +530,9 @@ impl Default for Transaction {
             actor_id: None,
             role_id: None,
             permission_set: None,
+            compute_units: 0,
+            storage_units: 0,
+            bandwidth_units: 0,
         }
     }
 }
@@ -751,6 +762,12 @@ pub struct TxSignPayload {
     pub role_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub permission_set: Option<String>,
+    #[serde(default)]
+    pub compute_units: u64,
+    #[serde(default)]
+    pub storage_units: u64,
+    #[serde(default)]
+    pub bandwidth_units: u64,
 }
 
 impl Transaction {
@@ -930,6 +947,9 @@ impl Transaction {
             actor_id: self.actor_id.clone(),
             role_id: self.role_id.clone(),
             permission_set: self.permission_set.clone(),
+            compute_units: self.compute_units,
+            storage_units: self.storage_units,
+            bandwidth_units: self.bandwidth_units,
         }
     }
 
