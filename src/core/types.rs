@@ -326,6 +326,10 @@ pub struct Transaction {
     #[serde(default = "default_tx_version")]
     pub version: u32,
 
+    /// Unique hash for transaction deduplication and identification.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tx_id_hash: Option<String>,
+
     /// Hierarchical workflow identifiers for transaction lifecycle tracking.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub flow_id: Option<String>,
@@ -498,7 +502,7 @@ impl Default for Transaction {
             partition_id: None,
             domain_id: None,
             framework_id: None,
-            payload_checksum: None,
+            tx_id_hash: None,
             version: 1,
             flow_id: None,
             step_id: None,
@@ -702,6 +706,8 @@ pub struct TxSignPayload {
     pub framework_id: Option<String>,
     #[serde(default)]
     pub version: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tx_id_hash: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub flow_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -916,6 +922,7 @@ impl Transaction {
             partition_id: self.partition_id.clone(),
             domain_id: self.domain_id.clone(),
             framework_id: self.framework_id.clone(),
+            tx_id_hash: self.tx_id_hash.clone(),
             version: self.version,
             flow_id: self.flow_id.clone(),
             step_id: self.step_id.clone(),
