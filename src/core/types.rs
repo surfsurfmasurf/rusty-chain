@@ -346,6 +346,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub plugin_id: Option<String>,
 
+    /// Optional reference to a specific service or backend identifier.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub service_id: Option<String>,
+
     /// Hierarchical workflow identifiers for transaction lifecycle tracking.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub flow_id: Option<String>,
@@ -524,6 +528,7 @@ impl Default for Transaction {
             instantiation_id: None,
             module_id: None,
             plugin_id: None,
+            service_id: None,
             version: 1,
             flow_id: None,
             step_id: None,
@@ -737,6 +742,8 @@ pub struct TxSignPayload {
     pub module_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub plugin_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub service_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub flow_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -956,6 +963,7 @@ impl Transaction {
             instantiation_id: self.instantiation_id.clone(),
             module_id: self.module_id.clone(),
             plugin_id: self.plugin_id.clone(),
+            service_id: self.service_id.clone(),
             version: self.version,
             flow_id: self.flow_id.clone(),
             step_id: self.step_id.clone(),
