@@ -502,6 +502,7 @@ impl Default for Transaction {
             partition_id: None,
             domain_id: None,
             framework_id: None,
+            payload_checksum: None,
             tx_id_hash: None,
             version: 1,
             flow_id: None,
