@@ -127,6 +127,13 @@ Next:
 - Implement P2P routing logic using the new path/route identifiers.
 - Explore libp2p integration for more robust peer discovery.
 
+## Day 66 (Today)
+- Core: Added `tx_id_hash`, `authority_id`, `instantiation_id`, `module_id`, `plugin_id`, `service_id`, and `endpoint_id` to `Transaction` and `TxSignPayload` for enhanced deduplication, delegated validation, and modular extensibility.
+- Refactor: Unified all `Transaction` constructors and the signing payload with the new fields.
+- Maintenance: Ensured `Transaction::default()` remains consistent with the expanding schema.
+- Polish: Improved field documentation for core transaction types.
+- Maintenance: Pushed 9 commits as part of the Day 66 work session to enhance core metadata and modularity.
+
 ## ## Day 16
 - Expanded P2P `Message` enum with `RequestStatus`, `ResponseStatus`, `Inventory`, and `GetMempool`
 - Refactored message size limits into a dedicated `size_limit()` helper
