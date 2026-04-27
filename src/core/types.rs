@@ -448,6 +448,13 @@ pub struct Transaction {
     pub proposal_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub vote_weight: Option<u64>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub encryption_key_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub integrity_proof: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recovery_id: Option<String>,
 }
 
 impl Default for Transaction {
@@ -579,6 +586,9 @@ impl Default for Transaction {
             governance_id: None,
             proposal_id: None,
             vote_weight: None,
+            encryption_key_id: None,
+            integrity_proof: None,
+            recovery_id: None,
         }
     }
 }
@@ -836,6 +846,13 @@ pub struct TxSignPayload {
     pub proposal_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub vote_weight: Option<u64>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub encryption_key_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub integrity_proof: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recovery_id: Option<String>,
 }
 
 impl Transaction {
@@ -1028,6 +1045,9 @@ impl Transaction {
             governance_id: self.governance_id.clone(),
             proposal_id: self.proposal_id.clone(),
             vote_weight: self.vote_weight,
+            encryption_key_id: self.encryption_key_id.clone(),
+            integrity_proof: self.integrity_proof.clone(),
+            recovery_id: self.recovery_id.clone(),
         }
     }
 
