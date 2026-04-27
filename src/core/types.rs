@@ -440,6 +440,14 @@ pub struct Transaction {
     pub storage_units: u64,
     #[serde(default)]
     pub bandwidth_units: u64,
+
+    /// New fields for Day 67: advanced scaling and governance.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub governance_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proposal_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vote_weight: Option<u64>,
 }
 
 impl Default for Transaction {
@@ -568,6 +576,9 @@ impl Default for Transaction {
             compute_units: 0,
             storage_units: 0,
             bandwidth_units: 0,
+            governance_id: None,
+            proposal_id: None,
+            vote_weight: None,
         }
     }
 }
@@ -817,6 +828,14 @@ pub struct TxSignPayload {
     pub storage_units: u64,
     #[serde(default)]
     pub bandwidth_units: u64,
+
+    /// New fields for Day 67: advanced scaling and governance.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub governance_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub proposal_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vote_weight: Option<u64>,
 }
 
 impl Transaction {
@@ -1006,6 +1025,9 @@ impl Transaction {
             compute_units: self.compute_units,
             storage_units: self.storage_units,
             bandwidth_units: self.bandwidth_units,
+            governance_id: self.governance_id.clone(),
+            proposal_id: self.proposal_id.clone(),
+            vote_weight: self.vote_weight,
         }
     }
 
