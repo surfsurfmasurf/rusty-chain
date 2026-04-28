@@ -455,6 +455,21 @@ pub struct Transaction {
     pub integrity_proof: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub recovery_id: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata_uri: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mime_type: Option<String>,
+
+    /// Future scalability and network performance fields.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub latency_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub throughput_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reliability_id: Option<String>,
 }
 
 impl Default for Transaction {
@@ -589,6 +604,12 @@ impl Default for Transaction {
             encryption_key_id: None,
             integrity_proof: None,
             recovery_id: None,
+            metadata_uri: None,
+            content_hash: None,
+            mime_type: None,
+            latency_id: None,
+            throughput_id: None,
+            reliability_id: None,
         }
     }
 }
@@ -853,6 +874,19 @@ pub struct TxSignPayload {
     pub integrity_proof: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub recovery_id: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata_uri: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mime_type: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub latency_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub throughput_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reliability_id: Option<String>,
 }
 
 impl Transaction {
@@ -1048,6 +1082,12 @@ impl Transaction {
             encryption_key_id: self.encryption_key_id.clone(),
             integrity_proof: self.integrity_proof.clone(),
             recovery_id: self.recovery_id.clone(),
+            metadata_uri: self.metadata_uri.clone(),
+            content_hash: self.content_hash.clone(),
+            mime_type: self.mime_type.clone(),
+            latency_id: self.latency_id.clone(),
+            throughput_id: self.throughput_id.clone(),
+            reliability_id: self.reliability_id.clone(),
         }
     }
 
