@@ -662,6 +662,12 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cell_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub area_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fabric_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node_id: Option<String>,
