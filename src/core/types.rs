@@ -1201,6 +1201,13 @@ impl Transaction {
             );
         }
 
+        if let Some(cid) = &self.cell_id {
+            anyhow::ensure!(
+                !cid.trim().is_empty(),
+                "tx.cell_id must not be empty if present"
+            );
+        }
+
         Ok(())
     }
 
