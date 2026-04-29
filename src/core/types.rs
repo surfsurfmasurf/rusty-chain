@@ -99,6 +99,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_id: Option<String>,
 
+    /// Multi-layered network identifiers for Day 68.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cell_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub area_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fabric_id: Option<String>,
+
     /// Geographical network identifiers for routing and scalability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
