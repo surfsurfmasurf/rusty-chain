@@ -1201,10 +1201,18 @@ impl Transaction {
             );
         }
 
+        // Validate multi-layer networking fields if present
         if let Some(cid) = &self.cell_id {
             anyhow::ensure!(
                 !cid.trim().is_empty(),
                 "tx.cell_id must not be empty if present"
+            );
+        }
+
+        if let Some(aid) = &self.area_id {
+            anyhow::ensure!(
+                !aid.trim().is_empty(),
+                "tx.area_id must not be empty if present"
             );
         }
 
