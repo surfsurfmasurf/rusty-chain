@@ -6,11 +6,11 @@ fn test_transaction_multi_layer_networking() {
     tx.cell_id = Some("cell-1".to_string());
     tx.area_id = Some("area-51".to_string());
     tx.fabric_id = Some("fabric-0".to_string());
-    
+
     assert_eq!(tx.cell_id.as_deref(), Some("cell-1"));
     assert_eq!(tx.area_id.as_deref(), Some("area-51"));
     assert_eq!(tx.fabric_id.as_deref(), Some("fabric-0"));
-    
+
     // Verify it passes basic validation
     assert!(tx.validate_basic().is_ok());
 }
