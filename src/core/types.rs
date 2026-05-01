@@ -555,6 +555,7 @@ impl Default for Transaction {
             category: None,
             priority_score: 0.0,
             risk_score: 0.0,
+            is_verifiable: true,
             jurisdiction_id: None,
             weight: 0,
             is_minable: true,
@@ -764,6 +765,8 @@ pub struct TxSignPayload {
     pub priority_score: f64,
     #[serde(default)]
     pub risk_score: f64,
+    #[serde(default)]
+    pub is_verifiable: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub jurisdiction_id: Option<String>,
     #[serde(default)]
@@ -1062,6 +1065,7 @@ impl Transaction {
             category: self.category.clone(),
             priority_score: self.priority_score,
             risk_score: self.risk_score,
+            is_verifiable: self.is_verifiable,
             jurisdiction_id: self.jurisdiction_id.clone(),
             weight: self.weight,
             is_minable: self.is_minable,
