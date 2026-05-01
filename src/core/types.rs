@@ -776,8 +776,6 @@ pub struct TxSignPayload {
     pub priority_score: f64,
     #[serde(default)]
     pub risk_score: f64,
-    #[serde(default)]
-    pub is_verifiable: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub jurisdiction_id: Option<String>,
     #[serde(default)]
