@@ -377,13 +377,21 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub batch_id: Option<String>,
 
-    /// Enhanced network and system identifiers for deep observability.
+    /// Hierarchical network and system identifiers for deep observability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub controller_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub worker_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub instance_id: Option<String>,
+
+    /// New identifiers for Day 68: observability and telemetry.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sensor_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub telemetry_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metric_id: Option<String>,
 
     /// Transaction lifecycle state and status flags.
     #[serde(default)]
@@ -585,6 +593,9 @@ impl Default for Transaction {
             controller_id: None,
             worker_id: None,
             instance_id: None,
+            sensor_id: None,
+            telemetry_id: None,
+            metric_id: None,
             is_reverting: false,
             is_conditional: false,
             is_delegated: false,
@@ -828,6 +839,12 @@ pub struct TxSignPayload {
     pub worker_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub instance_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sensor_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub telemetry_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metric_id: Option<String>,
     #[serde(default)]
     pub is_reverting: bool,
     #[serde(default)]
@@ -1072,6 +1089,9 @@ impl Transaction {
             controller_id: self.controller_id.clone(),
             worker_id: self.worker_id.clone(),
             instance_id: self.instance_id.clone(),
+            sensor_id: self.sensor_id.clone(),
+            telemetry_id: self.telemetry_id.clone(),
+            metric_id: self.metric_id.clone(),
             is_reverting: self.is_reverting,
             is_conditional: self.is_conditional,
             is_delegated: self.is_delegated,
