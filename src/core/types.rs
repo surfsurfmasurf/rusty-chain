@@ -229,6 +229,10 @@ pub struct Transaction {
     #[serde(default)]
     pub risk_score: f64,
 
+    /// Is the transaction verifiable?
+    #[serde(default)]
+    pub is_verifiable: bool,
+
     /// Optional reference to a specific regulatory jurisdiction.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub jurisdiction_id: Option<String>,
@@ -738,6 +742,8 @@ pub struct TxSignPayload {
     pub plane_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
+    #[serde(default)]
+    pub is_verifiable: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub payload_checksum: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
