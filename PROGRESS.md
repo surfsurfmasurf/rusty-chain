@@ -190,6 +190,19 @@ Next:
 - P2P: Introduced `P2PNodeHandle` for lightweight, shared access to node state from peer handlers.
 - Refactor: Split `handle_peer` into reader/writer loops using `tokio::select!`.
 
+## Day 68 (Today)
+- Core: Added `sensor_id`, `telemetry_id`, `metric_id`, `signal_id`, `pulse_id`, and `frequency_id` to `Transaction` and `TxSignPayload` for observability and high-frequency telemetry support.
+- Core: Added `is_verifiable` flag to bypass signature verification for specific system transactions.
+- Core: Added `debug_tag` internal field (skipped in serialization) for better troubleshooting.
+- Core: Added `signing_size` helper to `Transaction`.
+- Validation: Implemented `signal_id` non-empty validation and updated `validate_accept` to respect the `is_verifiable` flag.
+- Refactor: Unified all `Transaction` constructors and signing payload generation.
+- Maintenance: Pushed 8 commits as part of the Day 68 observability and scaling session.
+
+Next:
+- Implement telemetry stream aggregation in the P2P node.
+- Explore time-series indexing for sensor-based transactions.
+
 ## Day 20
 - Validation: Implemented `validate_transaction` and `validate_block` in `Chain` to unify state checks across CLI and P2P.
 - P2P: Implemented `process_message` to handle incoming gossip (TXs and Blocks) with full validation.
