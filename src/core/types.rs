@@ -1169,6 +1169,11 @@ impl Transaction {
         self.from == "SYSTEM"
     }
 
+    /// Optimized size helper for signing performance.
+    pub fn signing_size(&self) -> usize {
+        self.signing_bytes().len()
+    }
+
     /// Basic sanity checks (Week 1/early Week 2 demo).
     ///
     /// Note: signatures/balances/nonces will be enforced later.
