@@ -290,6 +290,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
 
+    /// Internal system tag for debugging (not signed).
+    #[serde(skip)]
+    pub debug_tag: Option<String>,
+
     /// Optional pool identifier for mempool isolation.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pool_id: Option<String>,
@@ -569,6 +573,7 @@ impl Default for Transaction {
             app_id: None,
             label: None,
             metadata_label: None,
+            debug_tag: None,
             flags: 0,
             is_private: false,
             session_id: None,
