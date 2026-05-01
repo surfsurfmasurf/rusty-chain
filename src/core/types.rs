@@ -1239,6 +1239,13 @@ impl Transaction {
             );
         }
 
+        if let Some(sid) = &self.signal_id {
+            anyhow::ensure!(
+                !sid.trim().is_empty(),
+                "tx.signal_id must not be empty if present"
+            );
+        }
+
         // Validate multi-layer networking fields if present
         if let Some(cid) = &self.cell_id {
             anyhow::ensure!(
