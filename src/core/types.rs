@@ -392,6 +392,12 @@ pub struct Transaction {
     pub telemetry_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metric_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub signal_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pulse_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub frequency_id: Option<String>,
 
     /// Transaction lifecycle state and status flags.
     #[serde(default)]
@@ -596,6 +602,9 @@ impl Default for Transaction {
             sensor_id: None,
             telemetry_id: None,
             metric_id: None,
+            signal_id: None,
+            pulse_id: None,
+            frequency_id: None,
             is_reverting: false,
             is_conditional: false,
             is_delegated: false,
@@ -845,6 +854,12 @@ pub struct TxSignPayload {
     pub telemetry_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metric_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub signal_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pulse_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub frequency_id: Option<String>,
     #[serde(default)]
     pub is_reverting: bool,
     #[serde(default)]
@@ -1092,6 +1107,9 @@ impl Transaction {
             sensor_id: self.sensor_id.clone(),
             telemetry_id: self.telemetry_id.clone(),
             metric_id: self.metric_id.clone(),
+            signal_id: self.signal_id.clone(),
+            pulse_id: self.pulse_id.clone(),
+            frequency_id: self.frequency_id.clone(),
             is_reverting: self.is_reverting,
             is_conditional: self.is_conditional,
             is_delegated: self.is_delegated,
