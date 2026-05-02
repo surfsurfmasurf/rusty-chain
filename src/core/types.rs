@@ -418,6 +418,10 @@ pub struct Transaction {
     pub is_conditional: bool,
     #[serde(default)]
     pub is_delegated: bool,
+    #[serde(default)]
+    pub is_validated: bool,
+    #[serde(default)]
+    pub is_audited: bool,
 
     /// Extended audit identifiers for compliance and regulatory tracking.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -653,6 +657,8 @@ impl Default for Transaction {
             is_reverting: false,
             is_conditional: false,
             is_delegated: false,
+            is_validated: false,
+            is_audited: false,
             compliance_id: None,
             policy_id: None,
             legal_ref: None,
@@ -924,6 +930,10 @@ pub struct TxSignPayload {
     pub is_conditional: bool,
     #[serde(default)]
     pub is_delegated: bool,
+    #[serde(default)]
+    pub is_validated: bool,
+    #[serde(default)]
+    pub is_audited: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub compliance_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1186,6 +1196,8 @@ impl Transaction {
             is_reverting: self.is_reverting,
             is_conditional: self.is_conditional,
             is_delegated: self.is_delegated,
+            is_validated: self.is_validated,
+            is_audited: self.is_audited,
             compliance_id: self.compliance_id.clone(),
             policy_id: self.policy_id.clone(),
             legal_ref: self.legal_ref.clone(),
