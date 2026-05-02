@@ -518,6 +518,10 @@ pub struct Transaction {
     pub is_redundant: bool,
     #[serde(default)]
     pub is_fragmented: bool,
+
+    /// Optimization for quick serialization check.
+    #[serde(skip)]
+    pub cached_size: Option<usize>,
 }
 
 impl Default for Transaction {
@@ -676,6 +680,7 @@ impl Default for Transaction {
             reliability_id: None,
             is_redundant: false,
             is_fragmented: false,
+            cached_size: None,
         }
     }
 }
@@ -1220,6 +1225,9 @@ impl Transaction {
 
     /// Get size.
     pub fn size(&self) -> usize {
+        if let Some(size) = self.cached_size {
+            return size;
+        }
         serde_json::to_vec(self).unwrap_or_default().len()
     }
 
