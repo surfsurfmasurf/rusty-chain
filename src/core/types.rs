@@ -1343,10 +1343,17 @@ impl Transaction {
             );
         }
 
-        if let Some(pc) = &self.payload_checksum {
+        if let Some(PC) = &self.payload_checksum {
             anyhow::ensure!(
-                !pc.trim().is_empty(),
+                !PC.trim().is_empty(),
                 "tx.payload_checksum must not be empty if present"
+            );
+        }
+
+        if let Some(LID) = &self.latency_id {
+            anyhow::ensure!(
+                !LID.trim().is_empty(),
+                "tx.latency_id must not be empty if present"
             );
         }
 
