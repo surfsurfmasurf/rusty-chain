@@ -1289,6 +1289,20 @@ impl Transaction {
             );
         }
 
+        if let Some(frid) = &self.flow_rate_id {
+            anyhow::ensure!(
+                !frid.trim().is_empty(),
+                "tx.flow_rate_id must not be empty if present"
+            );
+        }
+
+        if let Some(cid) = &self.congestion_id {
+            anyhow::ensure!(
+                !cid.trim().is_empty(),
+                "tx.congestion_id must not be empty if present"
+            );
+        }
+
         if let Some(sid) = &self.signal_id {
             anyhow::ensure!(
                 !sid.trim().is_empty(),
