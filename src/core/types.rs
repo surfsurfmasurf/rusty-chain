@@ -512,6 +512,12 @@ pub struct Transaction {
     pub throughput_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reliability_id: Option<String>,
+
+    /// Internal system flags for advanced routing.
+    #[serde(default)]
+    pub is_redundant: bool,
+    #[serde(default)]
+    pub is_fragmented: bool,
 }
 
 impl Default for Transaction {
@@ -668,6 +674,8 @@ impl Default for Transaction {
             latency_id: None,
             throughput_id: None,
             reliability_id: None,
+            is_redundant: false,
+            is_fragmented: false,
         }
     }
 }
@@ -975,6 +983,10 @@ pub struct TxSignPayload {
     pub throughput_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reliability_id: Option<String>,
+    #[serde(default)]
+    pub is_redundant: bool,
+    #[serde(default)]
+    pub is_fragmented: bool,
 }
 
 impl Transaction {
@@ -1191,6 +1203,8 @@ impl Transaction {
             latency_id: self.latency_id.clone(),
             throughput_id: self.throughput_id.clone(),
             reliability_id: self.reliability_id.clone(),
+            is_redundant: self.is_redundant,
+            is_fragmented: self.is_fragmented,
         }
     }
 
