@@ -423,6 +423,10 @@ pub struct Transaction {
     #[serde(default)]
     pub is_audited: bool,
 
+    /// New field for Day 16: is the transaction part of a system core update?
+    #[serde(default)]
+    pub is_system_update: bool,
+
     /// Extended audit identifiers for compliance and regulatory tracking.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub compliance_id: Option<String>,
@@ -659,6 +663,7 @@ impl Default for Transaction {
             is_delegated: false,
             is_validated: false,
             is_audited: false,
+            is_system_update: false,
             compliance_id: None,
             policy_id: None,
             legal_ref: None,
@@ -934,6 +939,8 @@ pub struct TxSignPayload {
     pub is_validated: bool,
     #[serde(default)]
     pub is_audited: bool,
+    #[serde(default)]
+    pub is_system_update: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub compliance_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1198,6 +1205,7 @@ impl Transaction {
             is_delegated: self.is_delegated,
             is_validated: self.is_validated,
             is_audited: self.is_audited,
+            is_system_update: self.is_system_update,
             compliance_id: self.compliance_id.clone(),
             policy_id: self.policy_id.clone(),
             legal_ref: self.legal_ref.clone(),
