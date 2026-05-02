@@ -479,6 +479,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub permission_set: Option<String>,
 
+    /// Future advanced scalability and routing identifiers.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub channel_capacity_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub buffer_size_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
     /// Transaction resource and cost tracking.
     #[serde(default)]
     pub compute_units: u64,
@@ -668,6 +676,9 @@ impl Default for Transaction {
             actor_id: None,
             role_id: None,
             permission_set: None,
+            channel_capacity_id: None,
+            buffer_size_id: None,
+            pipeline_id: None,
             compute_units: 0,
             storage_units: 0,
             bandwidth_units: 0,
@@ -1198,6 +1209,9 @@ impl Transaction {
             actor_id: self.actor_id.clone(),
             role_id: self.role_id.clone(),
             permission_set: self.permission_set.clone(),
+            channel_capacity_id: self.channel_capacity_id.clone(),
+            buffer_size_id: self.buffer_size_id.clone(),
+            pipeline_id: self.pipeline_id.clone(),
             compute_units: self.compute_units,
             storage_units: self.storage_units,
             bandwidth_units: self.bandwidth_units,
