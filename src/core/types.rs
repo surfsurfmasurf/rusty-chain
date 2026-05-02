@@ -209,6 +209,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
 
+    /// Internal routing cache.
+    #[serde(skip)]
+    pub next_hop: Option<String>,
+
     /// Transaction origin (e.g. "wallet", "faucet", "node").
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<String>,
@@ -580,6 +584,7 @@ impl Default for Transaction {
             salt: 0,
             size_bytes: 0,
             request_id: None,
+            next_hop: None,
             origin: None,
             external_ref: None,
             category: None,
