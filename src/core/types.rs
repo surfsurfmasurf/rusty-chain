@@ -439,6 +439,18 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub snapshot_id: Option<String>,
 
+    /// Future scalability and network telemetry identifiers.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub flow_rate_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub congestion_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub packet_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub frame_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream_offset: Option<u64>,
+
     /// Future cross-chain and interoperability fields.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin_chain: Option<String>,
@@ -627,6 +639,11 @@ impl Default for Transaction {
             state_commitment: None,
             witness_id: None,
             snapshot_id: None,
+            flow_rate_id: None,
+            congestion_id: None,
+            packet_id: None,
+            frame_id: None,
+            stream_offset: None,
             origin_chain: None,
             target_chain: None,
             bridge_adapter_id: None,
@@ -897,6 +914,16 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub snapshot_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub flow_rate_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub congestion_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub packet_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub frame_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream_offset: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin_chain: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub target_chain: Option<String>,
@@ -1135,6 +1162,11 @@ impl Transaction {
             state_commitment: self.state_commitment.clone(),
             witness_id: self.witness_id.clone(),
             snapshot_id: self.snapshot_id.clone(),
+            flow_rate_id: self.flow_rate_id.clone(),
+            congestion_id: self.congestion_id.clone(),
+            packet_id: self.packet_id.clone(),
+            frame_id: self.frame_id.clone(),
+            stream_offset: self.stream_offset,
             origin_chain: self.origin_chain.clone(),
             target_chain: self.target_chain.clone(),
             bridge_adapter_id: self.bridge_adapter_id.clone(),
