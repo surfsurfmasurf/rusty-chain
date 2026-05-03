@@ -411,18 +411,6 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub frequency_id: Option<String>,
 
-    /// Transaction lifecycle state and status flags.
-    #[serde(default)]
-    pub is_reverting: bool,
-    #[serde(default)]
-    pub is_conditional: bool,
-    #[serde(default)]
-    pub is_delegated: bool,
-    #[serde(default)]
-    pub is_validated: bool,
-    #[serde(default)]
-    pub is_audited: bool,
-
     /// New field for Day 16: is the transaction part of a system core update?
     #[serde(default)]
     pub is_system_update: bool,
@@ -883,6 +871,12 @@ pub struct TxSignPayload {
     pub domain_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub framework_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub channel_capacity_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub buffer_size_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
     #[serde(default)]
     pub version: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1343,16 +1337,16 @@ impl Transaction {
             );
         }
 
-        if let Some(PC) = &self.payload_checksum {
+        if let Some(pc) = &self.payload_checksum {
             anyhow::ensure!(
-                !PC.trim().is_empty(),
+                !pc.trim().is_empty(),
                 "tx.payload_checksum must not be empty if present"
             );
         }
 
-        if let Some(LID) = &self.latency_id {
+        if let Some(lid) = &self.latency_id {
             anyhow::ensure!(
-                !LID.trim().is_empty(),
+                !lid.trim().is_empty(),
                 "tx.latency_id must not be empty if present"
             );
         }
