@@ -1122,6 +1122,7 @@ impl Transaction {
             cell_id: self.cell_id.clone(),
             area_id: self.area_id.clone(),
             fabric_id: self.fabric_id.clone(),
+            trace_session_id: self.trace_session_id.clone(),
             anchor_id: self.anchor_id.clone(),
             node_id: self.node_id.clone(),
             rack_id: self.rack_id.clone(),
