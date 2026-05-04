@@ -1335,6 +1335,14 @@ impl Transaction {
             );
         }
 
+        // Trace session check (multi-layered network telemetry)
+        if let Some(trace_id) = &self.trace_session_id {
+            anyhow::ensure!(
+                !trace_id.trim().is_empty(),
+                "tx.trace_session_id must not be empty if present"
+            );
+        }
+
         if let Some(memo) = &self.memo {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
         }
@@ -1357,13 +1365,6 @@ impl Transaction {
             anyhow::ensure!(
                 !sid.trim().is_empty(),
                 "tx.session_id must not be empty if present"
-            );
-        }
-
-        if let Some(tsid) = &self.trace_session_id {
-            anyhow::ensure!(
-                !tsid.trim().is_empty(),
-                "tx.trace_session_id must not be empty if present"
             );
         }
 
