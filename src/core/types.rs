@@ -107,6 +107,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fabric_id: Option<String>,
 
+    /// New field for Day 69: unique trace session.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trace_session_id: Option<String>,
+
     /// Geographical network identifiers for routing and scalability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
