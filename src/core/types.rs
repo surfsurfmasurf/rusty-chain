@@ -531,6 +531,18 @@ pub struct Transaction {
     #[serde(default)]
     pub is_fragmented: bool,
 
+    /// New transaction status flags for consistency.
+    #[serde(default)]
+    pub is_reverting: bool,
+    #[serde(default)]
+    pub is_conditional: bool,
+    #[serde(default)]
+    pub is_delegated: bool,
+    #[serde(default)]
+    pub is_validated: bool,
+    #[serde(default)]
+    pub is_audited: bool,
+
     /// Optimization for quick serialization check.
     #[serde(skip)]
     pub cached_size: Option<usize>,
