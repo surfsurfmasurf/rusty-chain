@@ -1348,6 +1348,13 @@ impl Transaction {
             );
         }
 
+        if let Some(tsid) = &self.trace_session_id {
+            anyhow::ensure!(
+                !tsid.trim().is_empty(),
+                "tx.trace_session_id must not be empty if present"
+            );
+        }
+
         if let Some(pc) = &self.payload_checksum {
             anyhow::ensure!(
                 !pc.trim().is_empty(),
