@@ -562,6 +562,7 @@ impl Default for Transaction {
             cell_id: None,
             area_id: None,
             fabric_id: None,
+            trace_session_id: None,
             anchor_id: None,
             node_id: None,
             rack_id: None,
