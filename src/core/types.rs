@@ -1365,6 +1365,21 @@ impl Transaction {
             );
         }
 
+        // Workload isolation check
+        if let Some(wid) = &self.workload_id {
+            anyhow::ensure!(
+                !wid.trim().is_empty(),
+                "tx.workload_id must not be empty if present"
+            );
+        }
+
+        if let Some(sid) = &self.stack_id {
+            anyhow::ensure!(
+                !sid.trim().is_empty(),
+                "tx.stack_id must not be empty if present"
+            );
+        }
+
         if let Some(memo) = &self.memo {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
         }
