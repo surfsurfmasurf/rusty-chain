@@ -111,6 +111,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub trace_session_id: Option<String>,
 
+    /// New field for Day 70: workload isolation and optimization.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workload_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stack_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub isolate_id: Option<String>,
+
     /// Geographical network identifiers for routing and scalability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -766,6 +774,14 @@ pub struct TxSignPayload {
     /// New field for Day 69: unique trace session.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub trace_session_id: Option<String>,
+
+    /// New field for Day 70: workload isolation and optimization.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workload_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stack_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub isolate_id: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
