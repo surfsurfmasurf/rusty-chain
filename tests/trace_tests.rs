@@ -25,7 +25,7 @@ fn test_transaction_trace_session_id() {
 fn test_transaction_trace_session_signature_coverage() {
     let mut tx = Transaction::default();
     tx.trace_session_id = Some("trace-xyz".to_string());
-    
+
     let payload = tx.signing_payload();
     assert_eq!(payload.trace_session_id, Some("trace-xyz".to_string()));
 }
