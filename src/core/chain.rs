@@ -142,6 +142,7 @@ impl Chain {
                 memo: Some(format!("Block {block_height} Reward")),
                 priority: 255, // Max priority for coinbase
                 nonce_id: Some(format!("coinbase-{}", block_height)),
+                workload_id: Some("system-reward".to_string()),
                 ..Default::default()
             };
             txs.insert(0, coinbase);
