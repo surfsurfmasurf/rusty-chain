@@ -479,6 +479,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub channel_id: Option<String>,
 
+    /// WORKLOAD_METADATA_VERSION: internal metadata versioning.
+    #[serde(default)]
+    pub workload_metadata_version: u32,
+
     /// Future account and permission management fields.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub actor_id: Option<String>,
@@ -700,6 +704,7 @@ impl Default for Transaction {
             topic: None,
             sub_topic: None,
             channel_id: None,
+            workload_metadata_version: 0,
             actor_id: None,
             role_id: None,
             permission_set: None,
