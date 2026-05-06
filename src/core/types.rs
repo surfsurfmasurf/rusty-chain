@@ -1407,6 +1407,21 @@ impl Transaction {
             );
         }
 
+        // Resource constraint check
+        if let Some(qid) = &self.quota_id {
+            anyhow::ensure!(
+                !qid.trim().is_empty(),
+                "tx.quota_id must not be empty if present"
+            );
+        }
+
+        if let Some(bid) = &self.budget_id {
+            anyhow::ensure!(
+                !bid.trim().is_empty(),
+                "tx.budget_id must not be empty if present"
+            );
+        }
+
         if let Some(memo) = &self.memo {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
         }
