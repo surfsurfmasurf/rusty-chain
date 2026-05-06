@@ -143,6 +143,8 @@ impl Chain {
                 priority: 255, // Max priority for coinbase
                 nonce_id: Some(format!("coinbase-{}", block_height)),
                 workload_id: Some("system-reward".to_string()),
+                quota_id: Some("unlimited".to_string()),
+                budget_id: Some("fixed-reward".to_string()),
                 ..Default::default()
             };
             txs.insert(0, coinbase);
