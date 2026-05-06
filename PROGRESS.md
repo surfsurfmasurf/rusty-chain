@@ -558,3 +558,15 @@ Day 62 (Today)
 Next:
 - Implement workload-based transaction prioritization in the mempool.
 - Explore integration of workload identifiers with P2P resource allocation.
+
+## Day 71 (Today)
+- Core: Added `quota_id`, `budget_id`, and `resource_pool_id` to `Transaction` and `TxSignPayload` for resource constraints and allocation.
+- Core: Updated `Transaction::default()` and `signing_payload()` to support the new resource identifiers.
+- Validation: Implemented `quota_id` and `budget_id` non-empty validation in `validate_basic`.
+- Core: Assigned `unlimited` quota and `fixed-reward` budget to coinbase transactions in `mine_block`.
+- Tests: Added `tests/resource_tests.rs` with coverage for resource field assignment and validation.
+- Maintenance: Pushed 8 commits as part of the Day 71 resource management and scalability session.
+
+Next:
+- Implement resource-pool based transaction filtering in the mempool.
+- Explore integration of quota/budget identifiers with P2P rate limiting.
