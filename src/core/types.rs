@@ -119,6 +119,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub isolate_id: Option<String>,
 
+    /// New field for Day 71: resource constraints and allocation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub quota_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub budget_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub resource_pool_id: Option<String>,
+
     /// Geographical network identifiers for routing and scalability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -790,6 +798,14 @@ pub struct TxSignPayload {
     pub stack_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub isolate_id: Option<String>,
+
+    /// New field for Day 71: resource constraints and allocation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub quota_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub budget_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub resource_pool_id: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
