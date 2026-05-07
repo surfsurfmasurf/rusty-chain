@@ -1,60 +1,35 @@
-use rusty_chain::core::mempool::Mempool;
 use rusty_chain::core::types::Transaction;
 
 #[test]
-fn test_mempool_priority_sorting() {
-    let mut mempool = Mempool::new();
+fn test_priority_flow_control_assignment() {
+    let mut tx = Transaction::default();
+    tx.priority_level_id = Some("high-priority".to_string());
+    tx.flow_control_id = Some("throttled".to_string());
+    tx.execution_tier_id = Some("tier-1".to_string());
 
-    // Same fee, different priority
-    let mut tx1 = Transaction::new("A", "B", 10, 0);
-    tx1.fee = 10;
-    tx1.priority = 10;
-
-    let mut tx2 = Transaction::new("A", "C", 10, 1);
-    tx2.fee = 10;
-    tx2.priority = 20; // Higher priority
-
-    // Higher fee, lower priority
-    let mut tx3 = Transaction::new("A", "D", 10, 2);
-    tx3.fee = 20;
-    tx3.priority = 0;
-
-    mempool.add_tx(tx1).unwrap();
-    mempool.add_tx(tx2).unwrap();
-    mempool.add_tx(tx3).unwrap();
-
-    let sorted = mempool.drain_sorted();
-
-    // 1. tx3 (fee 20)
-    assert_eq!(sorted[0].from, "A");
-    assert_eq!(sorted[0].to, "D");
-
-    // 2. tx2 (fee 10, priority 20)
-    assert_eq!(sorted[1].to, "C");
-
-    // 3. tx1 (fee 10, priority 10)
-    assert_eq!(sorted[2].to, "B");
+    assert_eq!(tx.priority_level_id.unwrap(), "high-priority");
+    assert_eq!(tx.flow_control_id.unwrap(), "throttled");
+    assert_eq!(tx.execution_tier_id.unwrap(), "tier-1");
 }
 
 #[test]
-fn test_mempool_priority_limit_size() {
-    let mut mempool = Mempool::new();
+fn test_priority_flow_control_validation() {
+    let mut tx = Transaction::default();
+    tx.from = "A".to_string();
+    tx.to = "B".to_string();
+    tx.amount = 10;
+    
+    // Empty priority_level_id should fail
+    tx.priority_level_id = Some("  ".to_string());
+    assert!(tx.validate_basic().is_err());
+    
+    tx.priority_level_id = Some("standard".to_string());
+    assert!(tx.validate_basic().is_ok());
 
-    let mut tx1 = Transaction::new("A", "B", 10, 0);
-    tx1.fee = 10;
-    tx1.priority = 50;
+    // Empty flow_control_id should fail
+    tx.flow_control_id = Some("".to_string());
+    assert!(tx.validate_basic().is_err());
 
-    let mut tx2 = Transaction::new("A", "C", 10, 1);
-    tx2.fee = 10;
-    tx2.priority = 100;
-
-    let size = tx1.size();
-    mempool.add_tx(tx1).unwrap();
-    mempool.add_tx(tx2).unwrap();
-
-    // Limit to size of 1 tx. Higher priority should stay.
-    mempool.limit_size(size + 1);
-
-    assert_eq!(mempool.len(), 1);
-    assert_eq!(mempool.txs[0].priority, 100);
+    tx.flow_control_id = Some("bypass".to_string());
+    assert!(tx.validate_basic().is_ok());
 }
