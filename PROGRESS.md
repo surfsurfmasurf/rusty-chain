@@ -571,3 +571,14 @@ Next:
 Next:
 - Implement resource-pool based transaction filtering in the mempool.
 - Explore integration of quota/budget identifiers with P2P rate limiting.
+
+## Day 72 (Today)
+- Core: Added `priority_level_id`, `flow_control_id`, and `execution_tier_id` to `Transaction` and `TxSignPayload` for enhanced execution prioritization and traffic management.
+- Core: Updated `Transaction::default()` and `signing_payload()` to support the new priority and flow control identifiers.
+- Validation: Implemented `priority_level_id` and `flow_control_id` non-empty validation in `validate_basic`.
+- Tests: Added `tests/priority_tests.rs` with coverage for priority field assignment and validation.
+- Maintenance: Pushed 8 commits as part of the Day 72 execution priority and flow control enhancement session.
+
+Next:
+- Implement priority-level based transaction reordering in the mempool.
+- Explore integration of flow-control identifiers with P2P congestion feedback.
