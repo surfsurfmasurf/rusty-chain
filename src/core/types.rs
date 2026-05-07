@@ -127,6 +127,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub resource_pool_id: Option<String>,
 
+    /// New field for Day 72: execution priority and flow control.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub priority_level_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub flow_control_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub execution_tier_id: Option<String>,
+
     /// Geographical network identifiers for routing and scalability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -598,6 +606,9 @@ impl Default for Transaction {
             workload_id: None,
             stack_id: None,
             isolate_id: None,
+            priority_level_id: None,
+            flow_control_id: None,
+            execution_tier_id: None,
             quota_id: None,
             budget_id: None,
             resource_pool_id: None,
@@ -809,6 +820,13 @@ pub struct TxSignPayload {
     pub budget_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub resource_pool_id: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub priority_level_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub flow_control_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub execution_tier_id: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub anchor_id: Option<String>,
@@ -1184,6 +1202,9 @@ impl Transaction {
             quota_id: self.quota_id.clone(),
             budget_id: self.budget_id.clone(),
             resource_pool_id: self.resource_pool_id.clone(),
+            priority_level_id: self.priority_level_id.clone(),
+            flow_control_id: self.flow_control_id.clone(),
+            execution_tier_id: self.execution_tier_id.clone(),
             anchor_id: self.anchor_id.clone(),
             node_id: self.node_id.clone(),
             rack_id: self.rack_id.clone(),
