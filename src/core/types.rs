@@ -1443,6 +1443,21 @@ impl Transaction {
             );
         }
 
+        // Priority and flow control check
+        if let Some(plid) = &self.priority_level_id {
+            anyhow::ensure!(
+                !plid.trim().is_empty(),
+                "tx.priority_level_id must not be empty if present"
+            );
+        }
+
+        if let Some(fcid) = &self.flow_control_id {
+            anyhow::ensure!(
+                !fcid.trim().is_empty(),
+                "tx.flow_control_id must not be empty if present"
+            );
+        }
+
         if let Some(memo) = &self.memo {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
         }
