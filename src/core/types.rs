@@ -1474,6 +1474,21 @@ impl Transaction {
             );
         }
 
+        // Granular resource scheduling check (Day 73)
+        if let Some(cuid) = &self.compute_units_id {
+            anyhow::ensure!(
+                !cuid.trim().is_empty(),
+                "tx.compute_units_id must not be empty if present"
+            );
+        }
+
+        if let Some(mlid) = &self.memory_limit_id {
+            anyhow::ensure!(
+                !mlid.trim().is_empty(),
+                "tx.memory_limit_id must not be empty if present"
+            );
+        }
+
         if let Some(memo) = &self.memo {
             anyhow::ensure!(memo.len() <= 128, "memo must be <= 128 characters");
         }
