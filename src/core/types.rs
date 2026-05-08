@@ -127,6 +127,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub resource_pool_id: Option<String>,
 
+    /// Day 73: Compute and Memory constraints for granular resource scheduling.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compute_units_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory_limit_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub storage_tier_id: Option<String>,
+
     /// New field for Day 72: execution priority and flow control.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub priority_level_id: Option<String>,
@@ -820,6 +828,14 @@ pub struct TxSignPayload {
     pub budget_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub resource_pool_id: Option<String>,
+
+    /// Day 73: Compute and Memory constraints for granular resource scheduling.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compute_units_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory_limit_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub storage_tier_id: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub priority_level_id: Option<String>,
