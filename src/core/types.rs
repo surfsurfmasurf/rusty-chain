@@ -567,6 +567,14 @@ pub struct Transaction {
     #[serde(default)]
     pub is_fragmented: bool,
 
+    /// Execution and audit state flags for granular lifecycle tracking (Day 73).
+    #[serde(default)]
+    pub is_scheduled: bool,
+    #[serde(default)]
+    pub is_preempted: bool,
+    #[serde(default)]
+    pub is_checkpointed: bool,
+
     /// New transaction status flags for consistency.
     #[serde(default)]
     pub is_reverting: bool,
