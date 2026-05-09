@@ -769,6 +769,9 @@ impl Default for Transaction {
             reliability_id: None,
             is_redundant: false,
             is_fragmented: false,
+            is_scheduled: false,
+            is_preempted: false,
+            is_checkpointed: false,
             cached_size: None,
         }
     }
@@ -1397,12 +1400,6 @@ impl Transaction {
             is_scheduled: self.is_scheduled,
             is_preempted: self.is_preempted,
             is_checkpointed: self.is_checkpointed,
-            compute_units_id: self.compute_units_id.clone(),
-            memory_limit_id: self.memory_limit_id.clone(),
-            storage_tier_id: self.storage_tier_id.clone(),
-            priority_level_id: self.priority_level_id.clone(),
-            flow_control_id: self.flow_control_id.clone(),
-            execution_tier_id: self.execution_tier_id.clone(),
         }
     }
 
