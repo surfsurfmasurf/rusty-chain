@@ -582,3 +582,16 @@ Next:
 Next:
 - Implement priority-level based transaction reordering in the mempool.
 - Explore integration of flow-control identifiers with P2P congestion feedback.
+
+## Day 73 (Today)
+- Core: Added `compute_units_id`, `memory_limit_id`, and `storage_tier_id` to `Transaction` and `TxSignPayload` for granular resource scheduling.
+- Core: Added lifecycle flags `is_scheduled`, `is_preempted`, and `is_checkpointed` for fine-grained transaction tracking.
+- Core: Implemented `new_with_resource_units` helper to simplify resource-aware transaction creation.
+- Validation: Implemented `compute_units_id` and `memory_limit_id` non-empty validation in `validate_basic`.
+- Tests: Added `tests/resource_scheduling_tests.rs` and `tests/priority_tests.rs` for verifying Day 72/73 field constraints.
+- Refactor: Unified `signing_payload` and `Transaction::default()` with new resource and lifecycle fields.
+- Maintenance: Pushed 8 commits as part of the Day 73 resource scheduling and execution lifecycle enhancement session.
+
+Next:
+- Implement resource-limit enforcement during block validation.
+- Explore integration with cgroups or isolated execution environments for transaction processing.
