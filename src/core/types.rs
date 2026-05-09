@@ -1358,6 +1358,12 @@ impl Transaction {
             reliability_id: self.reliability_id.clone(),
             is_redundant: self.is_redundant,
             is_fragmented: self.is_fragmented,
+            compute_units_id: self.compute_units_id.clone(),
+            memory_limit_id: self.memory_limit_id.clone(),
+            storage_tier_id: self.storage_tier_id.clone(),
+            priority_level_id: self.priority_level_id.clone(),
+            flow_control_id: self.flow_control_id.clone(),
+            execution_tier_id: self.execution_tier_id.clone(),
         }
     }
 
