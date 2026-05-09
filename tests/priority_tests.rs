@@ -18,11 +18,11 @@ fn test_priority_flow_control_validation() {
     tx.from = "A".to_string();
     tx.to = "B".to_string();
     tx.amount = 10;
-    
+
     // Empty priority_level_id should fail
     tx.priority_level_id = Some("  ".to_string());
     assert!(tx.validate_basic().is_err());
-    
+
     tx.priority_level_id = Some("standard".to_string());
     assert!(tx.validate_basic().is_ok());
 
