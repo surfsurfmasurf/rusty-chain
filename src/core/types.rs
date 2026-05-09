@@ -1129,6 +1129,14 @@ pub struct TxSignPayload {
     pub is_redundant: bool,
     #[serde(default)]
     pub is_fragmented: bool,
+
+    /// New lifecycle flags for granular scheduling (Day 73).
+    #[serde(default)]
+    pub is_scheduled: bool,
+    #[serde(default)]
+    pub is_preempted: bool,
+    #[serde(default)]
+    pub is_checkpointed: bool,
 }
 
 impl Transaction {
