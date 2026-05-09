@@ -1135,6 +1135,26 @@ impl Transaction {
         }
     }
 
+    pub fn new_with_resource_units(
+        from: impl Into<String>,
+        to: impl Into<String>,
+        amount: u64,
+        nonce: u64,
+        compute: u64,
+        memory: u64,
+    ) -> Self {
+        Self {
+            from: from.into(),
+            to: to.into(),
+            amount,
+            fee: 0,
+            nonce,
+            compute_units: compute,
+            storage_units: memory, // Using storage_units for memory as a proxy for this Day 73 demo
+            ..Default::default()
+        }
+    }
+
     pub fn new_with_sequence(
         from: impl Into<String>,
         to: impl Into<String>,
