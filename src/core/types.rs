@@ -143,6 +143,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub execution_tier_id: Option<String>,
 
+    /// New field for Day 74: operational context for workload orchestration.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub operation_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub controller_ref: Option<String>,
+
     /// Geographical network identifiers for routing and scalability.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_id: Option<String>,
@@ -628,6 +636,9 @@ impl Default for Transaction {
             quota_id: None,
             budget_id: None,
             resource_pool_id: None,
+            context_id: None,
+            operation_id: None,
+            controller_ref: None,
             compute_units_id: None,
             memory_limit_id: None,
             storage_tier_id: None,
@@ -1134,6 +1145,13 @@ pub struct TxSignPayload {
     pub is_fragmented: bool,
 
     /// New lifecycle flags for granular scheduling (Day 73).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub operation_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub controller_ref: Option<String>,
+
     #[serde(default)]
     pub is_scheduled: bool,
     #[serde(default)]
@@ -1260,6 +1278,9 @@ impl Transaction {
             quota_id: self.quota_id.clone(),
             budget_id: self.budget_id.clone(),
             resource_pool_id: self.resource_pool_id.clone(),
+            context_id: self.context_id.clone(),
+            operation_id: self.operation_id.clone(),
+            controller_ref: self.controller_ref.clone(),
             compute_units_id: self.compute_units_id.clone(),
             memory_limit_id: self.memory_limit_id.clone(),
             storage_tier_id: self.storage_tier_id.clone(),
@@ -1519,6 +1540,21 @@ impl Transaction {
             anyhow::ensure!(
                 !fcid.trim().is_empty(),
                 "tx.flow_control_id must not be empty if present"
+            );
+        }
+
+        // Operational context check (Day 74)
+        if let Some(cid) = &self.context_id {
+            anyhow::ensure!(
+                !cid.trim().is_empty(),
+                "tx.context_id must not be empty if present"
+            );
+        }
+
+        if let Some(oid) = &self.operation_id {
+            anyhow::ensure!(
+                !oid.trim().is_empty(),
+                "tx.operation_id must not be empty if present"
             );
         }
 
