@@ -242,6 +242,22 @@ impl Mempool {
             .collect()
     }
 
+    /// Optimized: Returns a list of transactions in the mempool that have a specific lifecycle_stage.
+    pub fn get_txs_by_lifecycle_stage(&self, stage: &str) -> Vec<&Transaction> {
+        self.txs
+            .iter()
+            .filter(|t| t.lifecycle_stage.as_ref() == Some(&stage.to_string()))
+            .collect()
+    }
+
+    /// Optimized: Returns a list of transactions in the mempool that have a specific event_correlation_id.
+    pub fn get_txs_by_event_correlation_id(&self, event_id: &str) -> Vec<&Transaction> {
+        self.txs
+            .iter()
+            .filter(|t| t.event_correlation_id.as_ref() == Some(&event_id.to_string()))
+            .collect()
+    }
+
     /// Removes a transaction from the mempool by its ID.
     pub fn remove_tx(&mut self, tx_id: &str) {
         if let Some(pos) = self.tx_index.remove(tx_id) {
