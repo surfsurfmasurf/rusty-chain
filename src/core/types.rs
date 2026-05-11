@@ -1700,6 +1700,14 @@ impl Transaction {
             );
         }
 
+        // New check for Day 75: lifecycle_stage non-empty if present
+        if let Some(stage) = &self.lifecycle_stage {
+            anyhow::ensure!(
+                !stage.trim().is_empty(),
+                "tx.lifecycle_stage must not be empty if present"
+            );
+        }
+
         if let Some(aid) = &self.area_id {
             anyhow::ensure!(
                 !aid.trim().is_empty(),
