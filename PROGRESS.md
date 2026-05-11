@@ -583,6 +583,18 @@ Next:
 - Implement priority-level based transaction reordering in the mempool.
 - Explore integration of flow-control identifiers with P2P congestion feedback.
 
+## Day 75 (Today)
+- Core: Added `stream_id_v2`, `event_correlation_id`, and `telemetry_context_id` to `Transaction` and `TxSignPayload` for enhanced telemetry and event correlation.
+- Core: Added `lifecycle_stage` field to track transaction processing phases.
+- Validation: Implemented `stream_id_v2` and `event_correlation_id` non-empty validation in `validate_basic`.
+- Mempool: Added `get_txs_by_lifecycle_stage` and `get_txs_by_event_correlation_id` lookup helpers.
+- Tests: Added `tests/telemetry_v2_tests.rs` with coverage for the new Day 75 fields and validation logic.
+- Maintenance: Pushed 8 commits as part of the Day 75 telemetry and lifecycle enhancement session.
+
+Next:
+- Implement automated lifecycle transitions in the mempool.
+- Explore integration of event correlation with P2P monitoring tools.
+
 ## Day 74 (Today)
 - Core: Added `context_id`, `operation_id`, and `controller_ref` to `Transaction` and `TxSignPayload` for operational workload orchestration.
 - Validation: Implemented `context_id` and `operation_id` non-empty validation in `validate_basic`.
