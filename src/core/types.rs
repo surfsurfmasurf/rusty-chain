@@ -83,6 +83,10 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nonce_id: Option<String>,
 
+    /// New field for Day 75: transaction lifecycle stage.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lifecycle_stage: Option<String>,
+
     /// Transaction expiration timestamp (Unix epoch ms).
     /// If non-zero, the transaction is invalid if `now_ms > expiration_ms`.
     #[serde(default)]
@@ -626,6 +630,7 @@ impl Default for Transaction {
             priority: 0,
             ttl_ms: 0,
             nonce_id: None,
+            lifecycle_stage: None,
             expiration_ms: 0,
             p2p_message_id: None,
             shard_id: None,
@@ -828,6 +833,8 @@ pub struct TxSignPayload {
     pub ttl_ms: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nonce_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lifecycle_stage: Option<String>,
     #[serde(default)]
     pub expiration_ms: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1281,6 +1288,7 @@ impl Transaction {
             is_private: self.is_private,
             ttl_ms: self.ttl_ms,
             nonce_id: self.nonce_id.clone(),
+            lifecycle_stage: self.lifecycle_stage.clone(),
             expiration_ms: self.expiration_ms,
             p2p_message_id: self.p2p_message_id.clone(),
             shard_id: self.shard_id.clone(),
