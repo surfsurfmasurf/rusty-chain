@@ -1579,6 +1579,21 @@ impl Transaction {
             );
         }
 
+        // Telemetry stream and event correlation check (Day 75)
+        if let Some(sid2) = &self.stream_id_v2 {
+            anyhow::ensure!(
+                !sid2.trim().is_empty(),
+                "tx.stream_id_v2 must not be empty if present"
+            );
+        }
+
+        if let Some(ecid) = &self.event_correlation_id {
+            anyhow::ensure!(
+                !ecid.trim().is_empty(),
+                "tx.event_correlation_id must not be empty if present"
+            );
+        }
+
         // Granular resource scheduling check (Day 73)
         if let Some(cuid) = &self.compute_units_id {
             anyhow::ensure!(
