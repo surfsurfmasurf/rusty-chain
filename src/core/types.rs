@@ -1271,6 +1271,24 @@ impl Transaction {
         }
     }
 
+    pub fn new_with_analytics(
+        from: impl Into<String>,
+        to: impl Into<String>,
+        amount: u64,
+        nonce: u64,
+        analytics_id: impl Into<String>,
+    ) -> Self {
+        Self {
+            from: from.into(),
+            to: to.into(),
+            amount,
+            fee: 0,
+            nonce,
+            analytics_id: Some(analytics_id.into()),
+            ..Default::default()
+        }
+    }
+
     pub fn new_with_fee(
         from: impl Into<String>,
         to: impl Into<String>,
