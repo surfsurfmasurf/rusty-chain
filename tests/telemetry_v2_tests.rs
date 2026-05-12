@@ -36,6 +36,10 @@ fn test_day75_validation_rejection() {
     tx.stream_id_v2 = Some("valid".to_string());
     tx.event_correlation_id = Some("".to_string());
     assert!(tx.validate_basic().is_err());
+
+    tx.event_correlation_id = Some("valid".to_string());
+    tx.analytics_id = Some(" ".to_string());
+    assert!(tx.validate_basic().is_err());
 }
 
 #[test]
