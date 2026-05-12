@@ -155,6 +155,14 @@ pub struct Transaction {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub telemetry_context_id: Option<String>,
 
+    /// New field for Day 76: analytics and metric reporting context.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub analytics_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub report_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metric_context_id: Option<String>,
+
     /// New field for Day 74: operational context for workload orchestration.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub context_id: Option<String>,
@@ -655,6 +663,9 @@ impl Default for Transaction {
             stream_id_v2: None,
             event_correlation_id: None,
             telemetry_context_id: None,
+            analytics_id: None,
+            report_id: None,
+            metric_context_id: None,
             compute_units_id: None,
             memory_limit_id: None,
             storage_tier_id: None,
@@ -1177,6 +1188,13 @@ pub struct TxSignPayload {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub telemetry_context_id: Option<String>,
 
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub analytics_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub report_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metric_context_id: Option<String>,
+
     #[serde(default)]
     pub is_scheduled: bool,
     #[serde(default)]
@@ -1310,6 +1328,9 @@ impl Transaction {
             stream_id_v2: self.stream_id_v2.clone(),
             event_correlation_id: self.event_correlation_id.clone(),
             telemetry_context_id: self.telemetry_context_id.clone(),
+            analytics_id: self.analytics_id.clone(),
+            report_id: self.report_id.clone(),
+            metric_context_id: self.metric_context_id.clone(),
             compute_units_id: self.compute_units_id.clone(),
             memory_limit_id: self.memory_limit_id.clone(),
             storage_tier_id: self.storage_tier_id.clone(),
@@ -1599,6 +1620,21 @@ impl Transaction {
             anyhow::ensure!(
                 !ecid.trim().is_empty(),
                 "tx.event_correlation_id must not be empty if present"
+            );
+        }
+
+        // Analytics and metric reporting check (Day 76)
+        if let Some(aid) = &self.analytics_id {
+            anyhow::ensure!(
+                !aid.trim().is_empty(),
+                "tx.analytics_id must not be empty if present"
+            );
+        }
+
+        if let Some(rid) = &self.report_id {
+            anyhow::ensure!(
+                !rid.trim().is_empty(),
+                "tx.report_id must not be empty if present"
             );
         }
 
