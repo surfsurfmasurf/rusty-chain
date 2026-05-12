@@ -1638,6 +1638,13 @@ impl Transaction {
             );
         }
 
+        if let Some(mcid) = &self.metric_context_id {
+            anyhow::ensure!(
+                !mcid.trim().is_empty(),
+                "tx.metric_context_id must not be empty if present"
+            );
+        }
+
         // Granular resource scheduling check (Day 73)
         if let Some(cuid) = &self.compute_units_id {
             anyhow::ensure!(
