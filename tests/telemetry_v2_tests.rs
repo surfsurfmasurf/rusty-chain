@@ -1,5 +1,5 @@
-use rusty_chain::core::types::Transaction;
 use rusty_chain::core::mempool::Mempool;
+use rusty_chain::core::types::Transaction;
 
 #[test]
 fn test_day75_telemetry_fields() {
@@ -15,13 +15,24 @@ fn test_day75_telemetry_fields() {
 }
 
 #[test]
+fn test_day76_analytics_fields() {
+    let mut tx = Transaction::new("A", "B", 100, 0);
+    tx.analytics_id = Some("analytics-1".to_string());
+    tx.report_id = Some("report-A".to_string());
+    tx.metric_context_id = Some("metric-ctx".to_string());
+
+    assert!(tx.validate_basic().is_ok());
+    assert_eq!(tx.signing_payload().analytics_id, Some("analytics-1".to_string()));
+}
+
+#[test]
 fn test_day75_validation_rejection() {
     let mut tx = Transaction::new("A", "B", 100, 0);
-    
+
     // Empty stream_id_v2 should fail validation if present
     tx.stream_id_v2 = Some("  ".to_string());
     assert!(tx.validate_basic().is_err());
-    
+
     tx.stream_id_v2 = Some("valid".to_string());
     tx.event_correlation_id = Some("".to_string());
     assert!(tx.validate_basic().is_err());
